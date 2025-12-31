@@ -17,6 +17,7 @@
 #include "gpu_image/morphology.hpp"
 #include "gpu_image/threshold.hpp"
 #include "gpu_image/color_space.hpp"
+#include "gpu_image/geometric.hpp"
 
 namespace gpu_image {
 

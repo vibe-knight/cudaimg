@@ -33,6 +33,7 @@ add_library(gpu_image_processing STATIC
     src/morphology.cu
     src/threshold.cu
     src/color_space.cu
+    src/geometric.cu
 )
 
 target_link_libraries(gpu_image_processing CUDA::cudart)
@@ -71,6 +72,7 @@ if(BUILD_TESTS)
         tests/test_morphology.cpp
         tests/test_threshold.cpp
         tests/test_color_space.cpp
+        tests/test_geometric.cpp
     )
     
     target_link_libraries(gpu_image_tests

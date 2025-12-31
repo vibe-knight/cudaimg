@@ -11,6 +11,7 @@
 - **形态学操作**: 腐蚀、膨胀、开运算、闭运算、梯度、顶帽、黑帽
 - **阈值处理**: 全局阈值、自适应阈值、Otsu 自动阈值
 - **颜色空间**: RGB/HSV/YUV 转换、通道分离与合并
+- **几何变换**: 旋转、翻转、仿射变换、透视变换、裁剪、填充
 - **流水线处理**: 使用 CUDA Streams 实现异步并行处理
 
 ## 系统要求
@@ -126,6 +127,7 @@ ctest --output-on-failure
 │   ├── morphology.hpp     # 形态学操作
 │   ├── threshold.hpp      # 阈值处理
 │   ├── color_space.hpp    # 颜色空间转换
+│   ├── geometric.hpp      # 几何变换
 │   ├── image_processor.hpp # 高级 API
 │   └── pipeline_processor.hpp # 流水线处理
 ├── src/                   # 源文件
@@ -152,6 +154,20 @@ ctest --output-on-failure
 | `sobelEdgeDetection()` | Sobel 边缘检测 |
 | `histogram()` | 计算直方图 |
 | `resize()` | 图像缩放 |
+
+### Geometric
+
+几何变换类，提供各种空间变换操作。
+
+| 方法 | 描述 |
+|------|------|
+| `rotate()` | 任意角度旋转（双线性插值） |
+| `rotate90()` | 90度倍数旋转（高效） |
+| `flip()` | 图像翻转（水平/垂直/双向） |
+| `affineTransform()` | 仿射变换 |
+| `perspectiveTransform()` | 透视变换 |
+| `crop()` | 图像裁剪 |
+| `pad()` | 图像填充 |
 
 ### PipelineProcessor
 
