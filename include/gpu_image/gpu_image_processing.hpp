@@ -14,6 +14,9 @@
 #include "gpu_image/image_resizer.hpp"
 #include "gpu_image/image_processor.hpp"
 #include "gpu_image/pipeline_processor.hpp"
+#include "gpu_image/morphology.hpp"
+#include "gpu_image/threshold.hpp"
+#include "gpu_image/color_space.hpp"
 
 namespace gpu_image {
 

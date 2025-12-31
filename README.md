@@ -8,6 +8,9 @@
 - **卷积操作**: 高斯模糊、Sobel 边缘检测（使用 Shared Memory 优化）
 - **直方图**: 计算和均衡化（使用原子操作和并行规约）
 - **图像缩放**: 双线性插值、最近邻插值
+- **形态学操作**: 腐蚀、膨胀、开运算、闭运算、梯度、顶帽、黑帽
+- **阈值处理**: 全局阈值、自适应阈值、Otsu 自动阈值
+- **颜色空间**: RGB/HSV/YUV 转换、通道分离与合并
 - **流水线处理**: 使用 CUDA Streams 实现异步并行处理
 
 ## 系统要求
@@ -103,6 +106,12 @@ cd build
 ctest --output-on-failure
 ```
 
+## 运行基准测试
+
+```bash
+./bin/benchmark
+```
+
 ## 项目结构
 
 ```
@@ -114,11 +123,15 @@ ctest --output-on-failure
 │   ├── convolution_engine.hpp  # 卷积操作
 │   ├── histogram_calculator.hpp # 直方图
 │   ├── image_resizer.hpp  # 图像缩放
+│   ├── morphology.hpp     # 形态学操作
+│   ├── threshold.hpp      # 阈值处理
+│   ├── color_space.hpp    # 颜色空间转换
 │   ├── image_processor.hpp # 高级 API
 │   └── pipeline_processor.hpp # 流水线处理
 ├── src/                   # 源文件
 ├── tests/                 # 单元测试
 ├── examples/              # 示例程序
+├── benchmarks/            # 性能基准测试
 └── CMakeLists.txt
 ```
 

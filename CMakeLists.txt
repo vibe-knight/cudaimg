@@ -30,6 +30,9 @@ add_library(gpu_image_processing STATIC
     src/image_resizer.cu
     src/image_processor.cpp
     src/pipeline_processor.cu
+    src/morphology.cu
+    src/threshold.cu
+    src/color_space.cu
 )
 
 target_link_libraries(gpu_image_processing CUDA::cudart)
@@ -65,6 +68,9 @@ if(BUILD_TESTS)
         tests/test_histogram.cpp
         tests/test_resizer.cpp
         tests/test_pipeline.cpp
+        tests/test_morphology.cpp
+        tests/test_threshold.cpp
+        tests/test_color_space.cpp
     )
     
     target_link_libraries(gpu_image_tests
@@ -85,4 +91,11 @@ if(BUILD_EXAMPLES)
     
     add_executable(pipeline_example examples/pipeline_example.cpp)
     target_link_libraries(pipeline_example gpu_image_processing)
+endif()
+
+# 基准测试
+option(BUILD_BENCHMARKS "Build benchmarks" ON)
+if(BUILD_BENCHMARKS)
+    add_executable(benchmark benchmarks/benchmark_main.cpp)
+    target_link_libraries(benchmark gpu_image_processing)
 endif()

@@ -44,7 +44,7 @@
     - 实现 `synchronize` 和 `synchronizeAll` 方法
     - _Requirements: 6.1, 6.4_
 
-- [ ] 3. Checkpoint - 内存管理层验证
+- [x] 3. Checkpoint - 内存管理层验证
   - 确保所有测试通过，如有问题请询问用户
 
 - [x] 4. 像素级操作实现
@@ -80,7 +80,7 @@
     - **Property 4: 亮度调整范围不变性**
     - **Validates: Requirements 2.3**
 
-- [ ] 5. Checkpoint - 像素操作验证
+- [x] 5. Checkpoint - 像素操作验证
   - 确保所有测试通过，如有问题请询问用户
 
 - [x] 6. 卷积操作实现
@@ -130,7 +130,7 @@
     - **Property 8: 缩放操作近似可逆性**
     - **Validates: Requirements 5.1**
 
-- [ ] 9. Checkpoint - 处理层验证
+- [x] 9. Checkpoint - 处理层验证
   - 确保所有测试通过，如有问题请询问用户
 
 - [x] 10. 高级 API 层实现
@@ -179,7 +179,7 @@
     - 演示流水线性能优势
     - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 13. Final Checkpoint - 完整验证
+- [x] 13. Final Checkpoint - 完整验证
   - 确保所有测试通过，如有问题请询问用户
 
 ## Notes
