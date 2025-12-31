@@ -34,6 +34,7 @@ add_library(gpu_image_processing STATIC
     src/threshold.cu
     src/color_space.cu
     src/geometric.cu
+    src/filters.cu
 )
 
 target_link_libraries(gpu_image_processing CUDA::cudart)
@@ -73,6 +74,7 @@ if(BUILD_TESTS)
         tests/test_threshold.cpp
         tests/test_color_space.cpp
         tests/test_geometric.cpp
+        tests/test_filters.cpp
     )
     
     target_link_libraries(gpu_image_tests

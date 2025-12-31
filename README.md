@@ -12,6 +12,8 @@
 - **阈值处理**: 全局阈值、自适应阈值、Otsu 自动阈值
 - **颜色空间**: RGB/HSV/YUV 转换、通道分离与合并
 - **几何变换**: 旋转、翻转、仿射变换、透视变换、裁剪、填充
+- **滤波器**: 中值滤波、双边滤波、盒式滤波、锐化、拉普拉斯
+- **图像算术**: 加法、减法、乘法、混合、加权和、绝对差
 - **流水线处理**: 使用 CUDA Streams 实现异步并行处理
 
 ## 系统要求
@@ -128,6 +130,7 @@ ctest --output-on-failure
 │   ├── threshold.hpp      # 阈值处理
 │   ├── color_space.hpp    # 颜色空间转换
 │   ├── geometric.hpp      # 几何变换
+│   ├── filters.hpp        # 滤波器和图像算术
 │   ├── image_processor.hpp # 高级 API
 │   └── pipeline_processor.hpp # 流水线处理
 ├── src/                   # 源文件
@@ -168,6 +171,33 @@ ctest --output-on-failure
 | `perspectiveTransform()` | 透视变换 |
 | `crop()` | 图像裁剪 |
 | `pad()` | 图像填充 |
+
+### Filters
+
+滤波器类，提供各种图像滤波操作。
+
+| 方法 | 描述 |
+|------|------|
+| `medianFilter()` | 中值滤波（去噪） |
+| `bilateralFilter()` | 双边滤波（保边去噪） |
+| `boxFilter()` | 盒式滤波（均值滤波） |
+| `sharpen()` | 锐化滤波 |
+| `laplacian()` | 拉普拉斯滤波（边缘增强） |
+
+### ImageArithmetic
+
+图像算术操作类。
+
+| 方法 | 描述 |
+|------|------|
+| `add()` | 图像加法 |
+| `subtract()` | 图像减法 |
+| `multiply()` | 图像乘法 |
+| `blend()` | Alpha 混合 |
+| `addWeighted()` | 加权和 |
+| `absDiff()` | 绝对差 |
+| `addScalar()` | 标量加法 |
+| `multiplyScalar()` | 标量乘法 |
 
 ### PipelineProcessor
 

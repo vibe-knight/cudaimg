@@ -18,6 +18,7 @@
 #include "gpu_image/threshold.hpp"
 #include "gpu_image/color_space.hpp"
 #include "gpu_image/geometric.hpp"
+#include "gpu_image/filters.hpp"
 
 namespace gpu_image {
 
