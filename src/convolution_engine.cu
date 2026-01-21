@@ -186,17 +186,21 @@ void ConvolutionEngine::convolve(const GpuImage& input, GpuImage& output,
     CUDA_CHECK(cudaMemcpyToSymbol(d_kernel, kernel, 
                                    kernelSize * kernelSize * sizeof(float)));
     
-    dim3 block(16, 16);
+    constexpr int kBlockSize = 16;
+    dim3 block(kBlockSize, kBlockSize);
     dim3 grid((input.width + block.x - 1) / block.x,
               (input.height + block.y - 1) / block.y);
     
     int borderModeInt = static_cast<int>(borderMode);
+    int halo = kernelSize / 2;
+    int sharedSize = kBlockSize + 2 * halo;
+    size_t sharedBytes = static_cast<size_t>(sharedSize) * sharedSize * sizeof(float);
     
-    // 使用简单版本（更稳定）
-    convolveKernelSimple<<<grid, block, 0, stream>>>(
+    // 使用支持边界模式的 shared memory 版本
+    convolveKernelShared<kBlockSize, 7><<<grid, block, sharedBytes, stream>>>(
         input.buffer.dataAs<unsigned char>(),
         output.buffer.dataAs<unsigned char>(),
-        input.width, input.height, input.channels, kernelSize
+        input.width, input.height, input.channels, kernelSize, borderModeInt
     );
     
     CUDA_CHECK(cudaGetLastError());

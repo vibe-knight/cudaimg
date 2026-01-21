@@ -228,6 +228,16 @@ void HistogramCalculator::equalize(const GpuImage& input, GpuImage& output,
     }
     
     int totalPixels = input.width * input.height;
+    if (totalPixels == cdfMin) {
+        if (stream == nullptr) {
+            CUDA_CHECK(cudaMemcpy(output.buffer.data(), input.buffer.data(),
+                                  input.totalBytes(), cudaMemcpyDeviceToDevice));
+        } else {
+            CUDA_CHECK(cudaMemcpyAsync(output.buffer.data(), input.buffer.data(),
+                                       input.totalBytes(), cudaMemcpyDeviceToDevice, stream));
+        }
+        return;
+    }
     
     // 上传 CDF 到 GPU
     DeviceBuffer cdfBuffer(NUM_BINS * sizeof(int));
