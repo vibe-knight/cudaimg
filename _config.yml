@@ -2,15 +2,37 @@ title: Mini-OpenCV
 description: >-
   基于 CUDA 的高性能图像处理库 — 像素操作、卷积、形态学、几何变换、滤波、色彩空间转换与流水线处理
 remote_theme: pages-themes/cayman@v0.2.0
-
-url: "https://lessup.github.io"
-baseurl: "/mini-opencv"
-lang: zh-CN
-
 plugins:
   - jekyll-remote-theme
   - jekyll-seo-tag
+repository: LessUp/mini-opencv
+show_downloads: false
 
+# SEO & metadata
+url: https://lessup.github.io
+baseurl: /mini-opencv
+lang: zh-CN
+author: LessUp
+
+# Markdown rendering
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: rouge
+
+# Default layout for all pages
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+  - scope:
+      path: "changelog"
+    values:
+      layout: default
+
+# Exclude irrelevant files from Jekyll build
 exclude:
   - src
   - include
