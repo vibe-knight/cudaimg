@@ -1,28 +1,50 @@
-# GPU Image Processing Library
+# Mini-OpenCV — GPU 图像处理库
 
+[![CI](https://github.com/LessUp/mini-opencv/actions/workflows/ci.yml/badge.svg)](https://github.com/LessUp/mini-opencv/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/Docs-GitHub%20Pages-blue?logo=github)](https://lessup.github.io/mini-opencv/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
-[English](README.md) | 简体中文
 ![CUDA](https://img.shields.io/badge/CUDA-11.0+-76B900?logo=nvidia&logoColor=white)
-![C++](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=c%2B%2B&logoColor=white)
+![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=c%2B%2B&logoColor=white)
 ![CMake](https://img.shields.io/badge/CMake-3.18+-064F8C?logo=cmake&logoColor=white)
 
-基于 CUDA 的高性能图像处理库，类似于 OpenCV 的迷你版本。
+[English](README.md) | 简体中文
+
+基于 CUDA 的高性能图像处理库 — 覆盖像素操作、卷积、形态学、几何变换、滤波、色彩空间转换与异步流水线处理。所有算子均 GPU 并行实现，提供类 OpenCV 风格的 C++ API。
+
+## 架构总览
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    用户应用层                             │
+│         ImageProcessor  ·  PipelineProcessor             │
+├─────────────────────────────────────────────────────────┤
+│                    算子层 (CUDA Kernels)                  │
+│  PixelOperator │ ConvolutionEngine │ HistogramCalculator  │
+│  ImageResizer  │ Morphology        │ Threshold            │
+│  ColorSpace    │ Geometric         │ Filters              │
+│  ImageArithmetic                                         │
+├─────────────────────────────────────────────────────────┤
+│                    基础设施层                             │
+│  DeviceBuffer · MemoryManager · StreamManager · CudaError │
+│  GpuImage · HostImage · ImageIO (stb)                    │
+└─────────────────────────────────────────────────────────┘
+```
 
 ## 功能特性
 
-- **像素级操作**: 反色、灰度化、亮度调整
-- **卷积操作**: 高斯模糊、Sobel 边缘检测（使用 Shared Memory 优化）
-- **直方图**: 计算和均衡化（使用原子操作和并行规约）
-- **图像缩放**: 双线性插值、最近邻插值
-- **形态学操作**: 腐蚀、膨胀、开运算、闭运算、梯度、顶帽、黑帽
-- **阈值处理**: 全局阈值、自适应阈值、Otsu 自动阈值
-- **颜色空间**: RGB/HSV/YUV 转换、通道分离与合并
-- **几何变换**: 旋转、翻转、仿射变换、透视变换、裁剪、填充
-- **滤波器**: 中值滤波、双边滤波、盒式滤波、锐化、拉普拉斯
-- **图像算术**: 加法、减法、乘法、混合、加权和、绝对差
-- **流水线处理**: 使用 CUDA Streams 实现异步并行处理
+| 类别 | 算子 | 优化技术 |
+|------|------|----------|
+| **像素操作** | 反色、灰度化、亮度调整 | 逐像素并行 |
+| **卷积** | 高斯模糊、Sobel 边缘检测、自定义卷积核 | Shared Memory Tiling |
+| **直方图** | 计算、均衡化 | 原子操作 + 并行规约 |
+| **缩放** | 双线性插值、最近邻插值 | 任意尺寸 |
+| **形态学** | 腐蚀、膨胀、开/闭运算、梯度、顶帽、黑帽 | 可自定义结构元素 |
+| **阈值** | 全局阈值、自适应阈值、Otsu 自动阈值 | 直方图驱动 |
+| **色彩空间** | RGB/HSV/YUV 转换、通道分离/合并 | 批量转换 |
+| **几何变换** | 旋转、翻转、仿射/透视变换、裁剪、填充 | 双线性插值 |
+| **滤波** | 中值、双边、盒式、锐化、拉普拉斯 | 保边去噪 |
+| **图像算术** | 加/减/乘、Alpha 混合、加权和、绝对差 | 标量 & 图像 |
+| **流水线** | 多步骤串联、批量异步处理 | 多 CUDA Stream 并发 |
 
 ## 系统要求
 
@@ -35,18 +57,18 @@
 
 ```bash
 mkdir build && cd build
-cmake ..
+cmake -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON ..
 make -j$(nproc)
 ```
 
 ### 构建选项
 
-- `BUILD_TESTS`: 构建测试 (默认 ON)
-- `BUILD_EXAMPLES`: 构建示例程序 (默认 ON)
-
-```bash
-cmake -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON ..
-```
+| 选项 | 默认值 | 说明 |
+|------|--------|------|
+| `BUILD_TESTS` | ON | 构建单元测试 (GTest v1.14.0) |
+| `BUILD_EXAMPLES` | ON | 构建示例程序 |
+| `BUILD_BENCHMARKS` | OFF | 构建基准测试 (Google Benchmark v1.8.3) |
+| `GPU_IMAGE_ENABLE_IO` | ON | 启用 stb 图像文件 I/O |
 
 ## 使用示例
 
@@ -123,29 +145,38 @@ ctest --output-on-failure
 ./bin/benchmark
 ```
 
+## GPU 架构支持
+
+| 架构 | Compute Capability | 代号 |
+|------|-------------------|------|
+| Turing | SM 75 | RTX 20xx / T4 |
+| Ampere | SM 80 / 86 | A100 / RTX 30xx |
+| Ada Lovelace | SM 89 | RTX 40xx / L4 |
+| Hopper | SM 90 | H100 |
+
 ## 项目结构
 
 ```
-├── include/gpu_image/     # 头文件
-│   ├── cuda_error.hpp     # CUDA 错误处理
-│   ├── device_buffer.hpp  # GPU 内存管理
-│   ├── gpu_image.hpp      # 图像数据结构
-│   ├── pixel_operator.hpp # 像素操作
-│   ├── convolution_engine.hpp  # 卷积操作
-│   ├── histogram_calculator.hpp # 直方图
-│   ├── image_resizer.hpp  # 图像缩放
-│   ├── morphology.hpp     # 形态学操作
-│   ├── threshold.hpp      # 阈值处理
-│   ├── color_space.hpp    # 颜色空间转换
-│   ├── geometric.hpp      # 几何变换
-│   ├── filters.hpp        # 滤波器和图像算术
-│   ├── image_processor.hpp # 高级 API
-│   └── pipeline_processor.hpp # 流水线处理
-├── src/                   # 源文件
-├── tests/                 # 单元测试
-├── examples/              # 示例程序
-├── benchmarks/            # 性能基准测试
-└── CMakeLists.txt
+mini-opencv/
+├── include/gpu_image/          # 公共头文件（19 个模块）
+│   ├── gpu_image_processing.hpp  # 统一入口头文件
+│   ├── image_processor.hpp       # 高级同步 API
+│   ├── pipeline_processor.hpp    # 流水线异步 API
+│   ├── convolution_engine.hpp    # 卷积算子
+│   ├── morphology.hpp            # 形态学算子
+│   ├── geometric.hpp             # 几何变换
+│   ├── filters.hpp               # 滤波 + 图像算术
+│   ├── color_space.hpp           # 色彩空间转换
+│   ├── threshold.hpp             # 阈值处理
+│   ├── device_buffer.hpp         # RAII GPU 内存
+│   └── ...                       # cuda_error, gpu_image, stream_manager 等
+├── src/                          # CUDA/C++ 源文件（16 个）
+├── tests/                        # 单元测试（12 个测试文件）
+├── examples/                     # 示例程序
+│   ├── basic_example.cpp           # 基础用法
+│   └── pipeline_example.cpp        # 流水线用法
+├── benchmarks/                   # 性能基准测试
+└── CMakeLists.txt                # CMake 构建系统
 ```
 
 ## API 参考
@@ -217,6 +248,17 @@ ctest --output-on-failure
 | `processHost()` | 处理单张 Host 图像 |
 | `processBatchHost()` | 批量处理 Host 图像 |
 | `synchronize()` | 同步所有操作 |
+
+## 工程质量
+
+- **现代 CMake** — target-based 编译选项与 generator expressions，支持 `BUILD_INTERFACE`/`INSTALL_INTERFACE`
+- **FetchContent 依赖** — GTest v1.14.0、Google Benchmark v1.8.3、stb（无需手动安装第三方库）
+- **CUDA 架构自动检测** — CMake 3.24+ 自动使用 `native`，低版本回退常见架构列表
+- **Install 支持** — `gpu_image::gpu_image_processing` CMake 导出目标，可作为依赖库使用
+- **版本注入** — 编译期注入 `GPU_IMAGE_VERSION_MAJOR/MINOR/PATCH` 宏
+- **CI 流水线** — GitHub Actions 自动化构建 + clang-format 格式检查
+- **完整测试** — 12 个测试文件覆盖所有算子模块
+- **跨平台编译选项** — GCC/Clang (`-Wall -Wextra -Wpedantic`) + MSVC (`/W4`) 双支持
 
 ## 许可证
 

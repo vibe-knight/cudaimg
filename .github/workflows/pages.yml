@@ -4,8 +4,10 @@ on:
   push:
     branches: [main]
     paths:
+      - 'index.md'
       - '*.md'
       - 'docs/**'
+      - 'changelog/**'
       - '_config.yml'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
@@ -26,13 +28,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          fetch-depth: 1
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            *.md
-            _config.yml
-            docs
-            changelog
+            index.md
+            README.md
+            README.zh-CN.md
+            CONTRIBUTING.md
             LICENSE
+            _config.yml
+            changelog
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

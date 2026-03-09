@@ -33,6 +33,15 @@ CMakeUserPresets.json
 Testing/
 *.log
 
+# Jekyll
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
+
+# Cache
+.cache/
+
 # OS
 .DS_Store
 Thumbs.db

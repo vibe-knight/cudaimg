@@ -1,5 +1,6 @@
 title: Mini-OpenCV
-description: GPU Image Processing Library — CUDA convolution, morphology, geometric transforms
+description: >-
+  基于 CUDA 的高性能图像处理库 — 像素操作、卷积、形态学、几何变换、滤波、色彩空间转换与流水线处理
 remote_theme: pages-themes/cayman@v0.2.0
 
 url: "https://lessup.github.io"
@@ -9,3 +10,31 @@ lang: zh-CN
 plugins:
   - jekyll-remote-theme
   - jekyll-seo-tag
+
+exclude:
+  - src
+  - include
+  - tests
+  - examples
+  - benchmarks
+  - build
+  - cmake-build-*
+  - CMakeLists.txt
+  - CMakePresets.json
+  - CMakeUserPresets.json
+  - compile_commands.json
+  - .editorconfig
+  - .clang-format
+  - .clang-tidy
+  - .gitignore
+  - .github
+  - .vscode
+  - .kiro
+  - "*.cu"
+  - "*.cuh"
+  - "*.cpp"
+  - "*.hpp"
+  - "*.o"
+  - "*.a"
+  - "*.so"
+  - "*.exe"
