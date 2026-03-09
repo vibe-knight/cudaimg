@@ -10,6 +10,13 @@ DeviceBuffer::DeviceBuffer(size_t size) : devicePtr_(nullptr), size_(size) {
     }
 }
 
+DeviceBuffer DeviceBuffer::fromRaw(void* ptr, size_t size) noexcept {
+    DeviceBuffer buf;
+    buf.devicePtr_ = ptr;
+    buf.size_ = size;
+    return buf;
+}
+
 DeviceBuffer::~DeviceBuffer() {
     release();
 }
@@ -77,6 +84,13 @@ void DeviceBuffer::release() {
         devicePtr_ = nullptr;
         size_ = 0;
     }
+}
+
+std::pair<void*, size_t> DeviceBuffer::detach() noexcept {
+    auto result = std::make_pair(devicePtr_, size_);
+    devicePtr_ = nullptr;
+    size_ = 0;
+    return result;
 }
 
 } // namespace gpu_image

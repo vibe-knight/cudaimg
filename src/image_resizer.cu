@@ -99,6 +99,55 @@ __global__ void resizeNearestKernel(
     }
 }
 
+// 双三次插值权重函数 (Catmull-Rom)
+__device__ float bicubicWeight(float x) {
+    float absX = fabsf(x);
+    if (absX <= 1.0f) {
+        return 1.5f * absX * absX * absX - 2.5f * absX * absX + 1.0f;
+    } else if (absX < 2.0f) {
+        return -0.5f * absX * absX * absX + 2.5f * absX * absX - 4.0f * absX + 2.0f;
+    }
+    return 0.0f;
+}
+
+// 双三次插值缩放 Kernel
+__global__ void resizeBicubicKernel(
+    const unsigned char* input, unsigned char* output,
+    int srcWidth, int srcHeight, int dstWidth, int dstHeight, int channels) {
+    
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+    
+    if (x >= dstWidth || y >= dstHeight) return;
+    
+    float srcX = (x + 0.5f) * srcWidth / dstWidth - 0.5f;
+    float srcY = (y + 0.5f) * srcHeight / dstHeight - 0.5f;
+    
+    int ix = static_cast<int>(floorf(srcX));
+    int iy = static_cast<int>(floorf(srcY));
+    float fx = srcX - ix;
+    float fy = srcY - iy;
+    
+    for (int c = 0; c < channels; ++c) {
+        float sum = 0.0f;
+        
+        for (int ky = -1; ky <= 2; ++ky) {
+            float wy = bicubicWeight(fy - ky);
+            int sy = max(0, min(iy + ky, srcHeight - 1));
+            
+            for (int kx = -1; kx <= 2; ++kx) {
+                float wx = bicubicWeight(fx - kx);
+                int sx = max(0, min(ix + kx, srcWidth - 1));
+                
+                sum += input[(sy * srcWidth + sx) * channels + c] * wx * wy;
+            }
+        }
+        
+        output[(y * dstWidth + x) * channels + c] = static_cast<unsigned char>(
+            fminf(fmaxf(sum + 0.5f, 0.0f), 255.0f));
+    }
+}
+
 // ImageResizer 实现
 void ImageResizer::resize(const GpuImage& input, GpuImage& output,
                           int newWidth, int newHeight,
@@ -129,8 +178,15 @@ void ImageResizer::resize(const GpuImage& input, GpuImage& output,
             );
             break;
             
+        case InterpolationMode::Bicubic:
+            resizeBicubicKernel<<<grid, block, 0, stream>>>(
+                input.buffer.dataAs<unsigned char>(),
+                output.buffer.dataAs<unsigned char>(),
+                input.width, input.height, newWidth, newHeight, input.channels
+            );
+            break;
+            
         case InterpolationMode::Bilinear:
-        case InterpolationMode::Bicubic:  // 暂时使用双线性代替
         default:
             resizeBilinearKernel<<<grid, block, 0, stream>>>(
                 input.buffer.dataAs<unsigned char>(),

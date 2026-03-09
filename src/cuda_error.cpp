@@ -3,13 +3,17 @@
 
 namespace gpu_image {
 
-CudaException::CudaException(cudaError_t error, const char* file, int line)
-    : std::runtime_error(""), error_(error) {
+namespace {
+std::string buildCudaErrorMessage(cudaError_t error, const char* file, int line) {
     std::ostringstream oss;
     oss << "CUDA Error: " << cudaGetErrorString(error)
         << " (code " << static_cast<int>(error) << ")"
         << " at " << file << ":" << line;
-    static_cast<std::runtime_error&>(*this) = std::runtime_error(oss.str());
+    return oss.str();
 }
+} // anonymous namespace
+
+CudaException::CudaException(cudaError_t error, const char* file, int line)
+    : std::runtime_error(buildCudaErrorMessage(error, file, line)), error_(error) {}
 
 } // namespace gpu_image

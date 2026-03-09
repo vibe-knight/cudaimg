@@ -2,6 +2,7 @@
 
 #include <cuda_runtime.h>
 #include <cstddef>
+#include <utility>
 
 namespace gpu_image {
 
@@ -9,10 +10,13 @@ namespace gpu_image {
 class DeviceBuffer {
 public:
     // 默认构造函数（空缓冲区）
-    DeviceBuffer() : devicePtr_(nullptr), size_(0) {}
+    DeviceBuffer() noexcept : devicePtr_(nullptr), size_(0) {}
     
     // 构造函数：分配指定大小的 Device 内存
     explicit DeviceBuffer(size_t size);
+    
+    // 从已有原始指针接管所有权（用于内存池）
+    [[nodiscard]] static DeviceBuffer fromRaw(void* ptr, size_t size) noexcept;
     
     // 析构函数：自动释放 Device 内存
     ~DeviceBuffer();
@@ -36,24 +40,28 @@ public:
     void copyToHostAsync(void* hostPtr, size_t size, cudaStream_t stream) const;
     
     // 获取 Device 指针
-    void* data() { return devicePtr_; }
-    const void* data() const { return devicePtr_; }
+    [[nodiscard]] void* data() noexcept { return devicePtr_; }
+    [[nodiscard]] const void* data() const noexcept { return devicePtr_; }
     
     // 模板版本
     template<typename T>
-    T* dataAs() { return static_cast<T*>(devicePtr_); }
+    [[nodiscard]] T* dataAs() noexcept { return static_cast<T*>(devicePtr_); }
     
     template<typename T>
-    const T* dataAs() const { return static_cast<const T*>(devicePtr_); }
+    [[nodiscard]] const T* dataAs() const noexcept { return static_cast<const T*>(devicePtr_); }
     
     // 获取缓冲区大小
-    size_t size() const { return size_; }
+    [[nodiscard]] size_t size() const noexcept { return size_; }
     
     // 检查是否有效
-    bool isValid() const { return devicePtr_ != nullptr && size_ > 0; }
+    [[nodiscard]] bool isValid() const noexcept { return devicePtr_ != nullptr && size_ > 0; }
     
-    // 释放内存
+    // 释放内存（cudaFree）
     void release();
+    
+    // 放弃所有权，返回原始指针和大小（不释放内存）
+    // 调用者负责后续释放
+    std::pair<void*, size_t> detach() noexcept;
 
 private:
     void* devicePtr_;

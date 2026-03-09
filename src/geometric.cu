@@ -177,6 +177,83 @@ __global__ void affineKernel(
     }
 }
 
+// 透视变换 Kernel (真正的 3x3 齐次矩阵)
+__global__ void perspectiveKernel(
+    const unsigned char* input, unsigned char* output,
+    int srcWidth, int srcHeight, int dstWidth, int dstHeight, int channels,
+    float h00, float h01, float h02,
+    float h10, float h11, float h12,
+    float h20, float h21, float h22) {
+    
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+    
+    if (x >= dstWidth || y >= dstHeight) return;
+    
+    // 计算逆变换矩阵 (3x3 的伴随矩阵 / 行列式)
+    float det = h00 * (h11 * h22 - h12 * h21)
+              - h01 * (h10 * h22 - h12 * h20)
+              + h02 * (h10 * h21 - h11 * h20);
+    
+    if (fabsf(det) < 1e-8f) {
+        for (int c = 0; c < channels; ++c) {
+            output[(y * dstWidth + x) * channels + c] = 0;
+        }
+        return;
+    }
+    
+    float invDet = 1.0f / det;
+    
+    // 伴随矩阵的第一列（逆矩阵的第一行）
+    float i00 = (h11 * h22 - h12 * h21) * invDet;
+    float i01 = (h02 * h21 - h01 * h22) * invDet;
+    float i02 = (h01 * h12 - h02 * h11) * invDet;
+    float i10 = (h12 * h20 - h10 * h22) * invDet;
+    float i11 = (h00 * h22 - h02 * h20) * invDet;
+    float i12 = (h02 * h10 - h00 * h12) * invDet;
+    float i20 = (h10 * h21 - h11 * h20) * invDet;
+    float i21 = (h01 * h20 - h00 * h21) * invDet;
+    float i22 = (h00 * h11 - h01 * h10) * invDet;
+    
+    // 反向映射: 齐次坐标
+    float w = i20 * x + i21 * y + i22;
+    if (fabsf(w) < 1e-8f) {
+        for (int c = 0; c < channels; ++c) {
+            output[(y * dstWidth + x) * channels + c] = 0;
+        }
+        return;
+    }
+    
+    float srcX = (i00 * x + i01 * y + i02) / w;
+    float srcY = (i10 * x + i11 * y + i12) / w;
+    
+    for (int c = 0; c < channels; ++c) {
+        float value = 0.0f;
+        
+        if (srcX >= 0 && srcX < srcWidth - 1 && srcY >= 0 && srcY < srcHeight - 1) {
+            // 双线性插值
+            int x0 = static_cast<int>(floorf(srcX));
+            int y0 = static_cast<int>(floorf(srcY));
+            int x1 = x0 + 1;
+            int y1 = y0 + 1;
+            
+            float fx = srcX - x0;
+            float fy = srcY - y0;
+            
+            float v00 = input[(y0 * srcWidth + x0) * channels + c];
+            float v10 = input[(y0 * srcWidth + x1) * channels + c];
+            float v01 = input[(y1 * srcWidth + x0) * channels + c];
+            float v11 = input[(y1 * srcWidth + x1) * channels + c];
+            
+            value = v00 * (1 - fx) * (1 - fy) + v10 * fx * (1 - fy) +
+                    v01 * (1 - fx) * fy + v11 * fx * fy;
+        }
+        
+        output[(y * dstWidth + x) * channels + c] = static_cast<unsigned char>(
+            fminf(fmaxf(value, 0.0f), 255.0f));
+    }
+}
+
 // 裁剪 Kernel
 __global__ void cropKernel(
     const unsigned char* input, unsigned char* output,
@@ -355,12 +432,35 @@ void Geometric::perspectiveTransform(const GpuImage& input, GpuImage& output,
                                      const float* matrix,
                                      int outputWidth, int outputHeight,
                                      cudaStream_t stream) {
-    // 简化实现：使用仿射变换近似
-    float affineMatrix[6] = {
+    if (!input.isValid()) {
+        throw std::invalid_argument("Invalid input image");
+    }
+    if (matrix == nullptr) {
+        throw std::invalid_argument("Matrix is null");
+    }
+    if (outputWidth <= 0 || outputHeight <= 0) {
+        throw std::invalid_argument("Invalid output dimensions");
+    }
+    
+    if (output.width != outputWidth || output.height != outputHeight ||
+        output.channels != input.channels) {
+        output = ImageUtils::createGpuImage(outputWidth, outputHeight, input.channels);
+    }
+    
+    dim3 block(16, 16);
+    dim3 grid((outputWidth + block.x - 1) / block.x,
+              (outputHeight + block.y - 1) / block.y);
+    
+    perspectiveKernel<<<grid, block, 0, stream>>>(
+        input.buffer.dataAs<unsigned char>(),
+        output.buffer.dataAs<unsigned char>(),
+        input.width, input.height, outputWidth, outputHeight, input.channels,
         matrix[0], matrix[1], matrix[2],
-        matrix[3], matrix[4], matrix[5]
-    };
-    affineTransform(input, output, affineMatrix, outputWidth, outputHeight, stream);
+        matrix[3], matrix[4], matrix[5],
+        matrix[6], matrix[7], matrix[8]
+    );
+    
+    CUDA_CHECK(cudaGetLastError());
 }
 
 void Geometric::crop(const GpuImage& input, GpuImage& output,

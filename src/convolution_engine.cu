@@ -112,6 +112,64 @@ __global__ void convolveKernelSimple(
     }
 }
 
+// 可分离卷积 - 水平方向 Kernel
+__global__ void separableRowKernel(
+    const unsigned char* input, unsigned char* output,
+    int width, int height, int channels, int kernelSize) {
+    
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+    
+    if (x >= width || y >= height) return;
+    
+    int half = kernelSize / 2;
+    
+    for (int c = 0; c < channels; ++c) {
+        float sum = 0.0f;
+        
+        for (int k = 0; k < kernelSize; ++k) {
+            int srcX = x + k - half;
+            float value = 0.0f;
+            if (srcX >= 0 && srcX < width) {
+                value = input[(y * width + srcX) * channels + c];
+            }
+            sum += value * d_kernel[k];
+        }
+        
+        sum = fminf(fmaxf(sum, 0.0f), 255.0f);
+        output[(y * width + x) * channels + c] = static_cast<unsigned char>(sum + 0.5f);
+    }
+}
+
+// 可分离卷积 - 垂直方向 Kernel
+__global__ void separableColKernel(
+    const unsigned char* input, unsigned char* output,
+    int width, int height, int channels, int kernelSize) {
+    
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+    
+    if (x >= width || y >= height) return;
+    
+    int half = kernelSize / 2;
+    
+    for (int c = 0; c < channels; ++c) {
+        float sum = 0.0f;
+        
+        for (int k = 0; k < kernelSize; ++k) {
+            int srcY = y + k - half;
+            float value = 0.0f;
+            if (srcY >= 0 && srcY < height) {
+                value = input[(srcY * width + x) * channels + c];
+            }
+            sum += value * d_kernel[k];
+        }
+        
+        sum = fminf(fmaxf(sum, 0.0f), 255.0f);
+        output[(y * width + x) * channels + c] = static_cast<unsigned char>(sum + 0.5f);
+    }
+}
+
 // Sobel 边缘检测 Kernel
 __global__ void sobelKernel(
     const unsigned char* input, unsigned char* output,
@@ -293,15 +351,48 @@ std::vector<float> ConvolutionEngine::generateGaussianKernel1D(int size, float s
 void ConvolutionEngine::separableConvolve(const GpuImage& input, GpuImage& output,
                                            const float* rowKernel, const float* colKernel,
                                            int kernelSize, cudaStream_t stream) {
-    // 简化实现：使用两次 1D 卷积
-    // 这里暂时使用 2D 卷积作为替代
-    std::vector<float> kernel2D(kernelSize * kernelSize);
-    for (int y = 0; y < kernelSize; ++y) {
-        for (int x = 0; x < kernelSize; ++x) {
-            kernel2D[y * kernelSize + x] = rowKernel[x] * colKernel[y];
-        }
+    if (!input.isValid()) {
+        throw std::invalid_argument("Invalid input image");
     }
-    convolve(input, output, kernel2D.data(), kernelSize, BorderMode::Zero, stream);
+    if (kernelSize < 1 || kernelSize > 7 || kernelSize % 2 == 0) {
+        throw std::invalid_argument("Kernel size must be odd and between 1 and 7");
+    }
+    if (rowKernel == nullptr || colKernel == nullptr) {
+        throw std::invalid_argument("Kernel is null");
+    }
+    
+    // 第一步：水平方向卷积（使用 rowKernel）
+    GpuImage temp = ImageUtils::createGpuImage(input.width, input.height, input.channels);
+    
+    // 将行核复制到常量内存
+    CUDA_CHECK(cudaMemcpyToSymbol(d_kernel, rowKernel, kernelSize * sizeof(float)));
+    
+    constexpr int kBlockSize = 16;
+    dim3 block(kBlockSize, kBlockSize);
+    dim3 grid((input.width + block.x - 1) / block.x,
+              (input.height + block.y - 1) / block.y);
+    
+    separableRowKernel<<<grid, block, 0, stream>>>(
+        input.buffer.dataAs<unsigned char>(),
+        temp.buffer.dataAs<unsigned char>(),
+        input.width, input.height, input.channels, kernelSize
+    );
+    CUDA_CHECK(cudaGetLastError());
+    
+    // 第二步：垂直方向卷积（使用 colKernel）
+    if (output.width != input.width || output.height != input.height ||
+        output.channels != input.channels) {
+        output = ImageUtils::createGpuImage(input.width, input.height, input.channels);
+    }
+    
+    CUDA_CHECK(cudaMemcpyToSymbol(d_kernel, colKernel, kernelSize * sizeof(float)));
+    
+    separableColKernel<<<grid, block, 0, stream>>>(
+        temp.buffer.dataAs<unsigned char>(),
+        output.buffer.dataAs<unsigned char>(),
+        input.width, input.height, input.channels, kernelSize
+    );
+    CUDA_CHECK(cudaGetLastError());
 }
 
 } // namespace gpu_image

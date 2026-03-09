@@ -36,18 +36,13 @@ DeviceBuffer MemoryManager::allocate(size_t size) {
             it->second.pop_back();
             poolSize_ -= alignedSize;
             
-            // 创建一个管理该指针的 DeviceBuffer
-            DeviceBuffer buffer;
-            // 使用移动赋值来设置内部状态
-            // 注意：这里需要一个特殊的构造方式
-            // 我们直接分配新的，因为 DeviceBuffer 不支持从原始指针构造
-            cudaFree(ptr); // 释放池中的指针
-            return DeviceBuffer(size); // 重新分配
+            // 使用 fromRaw 将池中的原始指针包装为 DeviceBuffer
+            return DeviceBuffer::fromRaw(ptr, alignedSize);
         }
     }
     
-    // 从 CUDA 分配新内存
-    DeviceBuffer buffer(size);
+    // 从 CUDA 分配新内存（使用对齐后的大小以便回收）
+    DeviceBuffer buffer(alignedSize);
     
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -65,16 +60,28 @@ void MemoryManager::deallocate(DeviceBuffer&& buffer) {
         return;
     }
     
-    // 由于 DeviceBuffer 的 RAII 设计，直接让它析构即可
-    // 内存池功能在这个简化版本中不完全实现
-    // buffer 会在函数结束时自动释放
+    size_t alignedSize = alignSize(buffer.size());
+    
+    if (poolEnabled_) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        
+        // 池未满时回收，否则直接释放
+        if (poolSize_ + alignedSize <= maxPoolSize_) {
+            auto [ptr, sz] = buffer.detach();
+            memoryPool_[alignedSize].push_back(ptr);
+            poolSize_ += alignedSize;
+            return;
+        }
+    }
+    
+    // 池已满或禁用，buffer 析构时自动 cudaFree
 }
 
 void MemoryManager::clearPool() {
     std::lock_guard<std::mutex> lock(mutex_);
     
-    for (auto& pair : memoryPool_) {
-        for (void* ptr : pair.second) {
+    for (auto& [sz, ptrs] : memoryPool_) {
+        for (void* ptr : ptrs) {
             cudaFree(ptr);
         }
     }
