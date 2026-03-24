@@ -2,8 +2,15 @@ cmake_minimum_required(VERSION 3.18)
 project(gpu_image_processing
     VERSION 2.0.0
     DESCRIPTION "CUDA-based high-performance image processing library"
-    LANGUAGES CXX CUDA
+    LANGUAGES CXX
 )
+
+include(CheckLanguage)
+check_language(CUDA)
+if(NOT CMAKE_CUDA_COMPILER)
+    message(FATAL_ERROR "CUDA toolkit with nvcc is required to build mini-opencv. Set CUDAToolkit_ROOT or ensure nvcc is available on PATH.")
+endif()
+enable_language(CUDA)
 
 # ── C++ / CUDA 标准 ──────────────────────────────────────────────
 set(CMAKE_CXX_STANDARD 17)
