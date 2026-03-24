@@ -43,10 +43,13 @@ __global__ void rgbToHsvKernel(const unsigned char *input,
     }
   }
 
-  // 归一化到 0-255
-  output[idx] = static_cast<unsigned char>(h * 255.0f / 360.0f);
-  output[idx + 1] = static_cast<unsigned char>(s * 255.0f);
-  output[idx + 2] = static_cast<unsigned char>(v * 255.0f);
+  // 归一化到 0-255，使用四舍五入减小往返误差
+  output[idx] =
+      static_cast<unsigned char>(fminf(fmaxf(h * 255.0f / 360.0f + 0.5f, 0.0f), 255.0f));
+  output[idx + 1] =
+      static_cast<unsigned char>(fminf(fmaxf(s * 255.0f + 0.5f, 0.0f), 255.0f));
+  output[idx + 2] =
+      static_cast<unsigned char>(fminf(fmaxf(v * 255.0f + 0.5f, 0.0f), 255.0f));
 }
 
 // HSV to RGB Kernel
@@ -97,9 +100,12 @@ __global__ void hsvToRgbKernel(const unsigned char *input,
     b = x_val;
   }
 
-  output[idx] = static_cast<unsigned char>((r + m) * 255.0f);
-  output[idx + 1] = static_cast<unsigned char>((g + m) * 255.0f);
-  output[idx + 2] = static_cast<unsigned char>((b + m) * 255.0f);
+  output[idx] = static_cast<unsigned char>(
+      fminf(fmaxf((r + m) * 255.0f + 0.5f, 0.0f), 255.0f));
+  output[idx + 1] = static_cast<unsigned char>(
+      fminf(fmaxf((g + m) * 255.0f + 0.5f, 0.0f), 255.0f));
+  output[idx + 2] = static_cast<unsigned char>(
+      fminf(fmaxf((b + m) * 255.0f + 0.5f, 0.0f), 255.0f));
 }
 
 // RGB to YUV Kernel
@@ -120,12 +126,15 @@ __global__ void rgbToYuvKernel(const unsigned char *input,
 
   // BT.601 标准
   float Y = 0.299f * r + 0.587f * g + 0.114f * b;
-  float U = -0.14713f * r - 0.28886f * g + 0.436f * b + 128.0f;
-  float V = 0.615f * r - 0.51499f * g - 0.10001f * b + 128.0f;
+  float U = -0.168736f * r - 0.331264f * g + 0.5f * b + 128.0f;
+  float V = 0.5f * r - 0.418688f * g - 0.081312f * b + 128.0f;
 
-  output[idx] = static_cast<unsigned char>(fminf(fmaxf(Y, 0.0f), 255.0f));
-  output[idx + 1] = static_cast<unsigned char>(fminf(fmaxf(U, 0.0f), 255.0f));
-  output[idx + 2] = static_cast<unsigned char>(fminf(fmaxf(V, 0.0f), 255.0f));
+  output[idx] =
+      static_cast<unsigned char>(fminf(fmaxf(Y + 0.5f, 0.0f), 255.0f));
+  output[idx + 1] =
+      static_cast<unsigned char>(fminf(fmaxf(U + 0.5f, 0.0f), 255.0f));
+  output[idx + 2] =
+      static_cast<unsigned char>(fminf(fmaxf(V + 0.5f, 0.0f), 255.0f));
 }
 
 // YUV to RGB Kernel
@@ -144,13 +153,16 @@ __global__ void yuvToRgbKernel(const unsigned char *input,
   float U = input[idx + 1] - 128.0f;
   float V = input[idx + 2] - 128.0f;
 
-  float r = Y + 1.13983f * V;
-  float g = Y - 0.39465f * U - 0.58060f * V;
-  float b = Y + 2.03211f * U;
+  float r = Y + 1.402f * V;
+  float g = Y - 0.344136f * U - 0.714136f * V;
+  float b = Y + 1.772f * U;
 
-  output[idx] = static_cast<unsigned char>(fminf(fmaxf(r, 0.0f), 255.0f));
-  output[idx + 1] = static_cast<unsigned char>(fminf(fmaxf(g, 0.0f), 255.0f));
-  output[idx + 2] = static_cast<unsigned char>(fminf(fmaxf(b, 0.0f), 255.0f));
+  output[idx] =
+      static_cast<unsigned char>(fminf(fmaxf(r + 0.5f, 0.0f), 255.0f));
+  output[idx + 1] =
+      static_cast<unsigned char>(fminf(fmaxf(g + 0.5f, 0.0f), 255.0f));
+  output[idx + 2] =
+      static_cast<unsigned char>(fminf(fmaxf(b + 0.5f, 0.0f), 255.0f));
 }
 
 // RGB to CIE L*a*b* Kernel

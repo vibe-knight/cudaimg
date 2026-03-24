@@ -143,7 +143,7 @@ mini-opencv/
 - **Install support** — `gpu_image::gpu_image_processing` CMake export target
 - **Version injection** — Compile-time `GPU_IMAGE_VERSION_MAJOR/MINOR/PATCH` macros
 - **CI pipeline** — GitHub Actions: CUDA build + clang-format check
-- **Full test coverage** — 12 test files covering all operator modules
+- **Test suite** — 12 test files covering the main operator modules and core processing paths
 - **Cross-platform flags** — GCC/Clang (`-Wall -Wextra -Wpedantic`) + MSVC (`/W4`)
 
 ## License

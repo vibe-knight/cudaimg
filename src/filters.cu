@@ -325,6 +325,12 @@ void Filters::bilateralFilter(const GpuImage &input, GpuImage &output,
   if (kernelSize < 1 || kernelSize % 2 == 0) {
     throw std::invalid_argument("Kernel size must be odd and positive");
   }
+  if (sigmaSpace <= 0.0f) {
+    throw std::invalid_argument("sigmaSpace must be positive");
+  }
+  if (sigmaColor <= 0.0f) {
+    throw std::invalid_argument("sigmaColor must be positive");
+  }
 
   if (output.width != input.width || output.height != input.height ||
       output.channels != input.channels) {

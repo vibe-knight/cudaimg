@@ -65,7 +65,8 @@ void MemoryManager::deallocate(DeviceBuffer &&buffer) {
 
     // 池未满时回收，否则直接释放
     if (poolSize_ + alignedSize <= maxPoolSize_) {
-      auto [ptr, sz] = buffer.detach();
+      auto detached = buffer.detach();
+      void *ptr = detached.first;
       memoryPool_[alignedSize].push_back(ptr);
       poolSize_ += alignedSize;
       return;

@@ -39,6 +39,13 @@ jobs:
           else
             cmake --build build -j$(nproc)
           fi
+      - name: Test
+        run: |
+          if [ -f CMakePresets.json ]; then
+            ctest --test-dir build --output-on-failure
+          else
+            ctest --test-dir build --output-on-failure
+          fi
   format:
     runs-on: ubuntu-latest
     steps:

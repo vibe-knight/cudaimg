@@ -5,15 +5,18 @@
 
 namespace gpu_image {
 
-// 常量内存用于存储卷积核
-__constant__ float d_kernel[49]; // 最大支持 7x7 卷积核
+namespace {
+struct KernelData {
+  float values[49] = {0.0f};
+};
+} // namespace
 
 // 使用 Shared Memory 的卷积 Kernel
 template <int BLOCK_SIZE, int MAX_KERNEL_SIZE>
 __global__ void convolveKernelShared(const unsigned char *input,
                                      unsigned char *output, int width,
                                      int height, int channels, int kernelSize,
-                                     int borderMode) {
+                                     int borderMode, KernelData kernelData) {
 
   // Shared memory 大小：block + halo
   const int halo = kernelSize / 2;
@@ -69,8 +72,8 @@ __global__ void convolveKernelShared(const unsigned char *input,
         for (int kx = 0; kx < kernelSize; ++kx) {
           int sx = tx + kx;
           int sy = ty + ky;
-          sum +=
-              sharedMem[sy * sharedSize + sx] * d_kernel[ky * kernelSize + kx];
+          sum += sharedMem[sy * sharedSize + sx] *
+                 kernelData.values[ky * kernelSize + kx];
         }
       }
 
@@ -87,7 +90,8 @@ __global__ void convolveKernelShared(const unsigned char *input,
 // 简单卷积 Kernel（不使用 shared memory，用于小图像或调试）
 __global__ void convolveKernelSimple(const unsigned char *input,
                                      unsigned char *output, int width,
-                                     int height, int channels, int kernelSize) {
+                                     int height, int channels, int kernelSize,
+                                     KernelData kernelData) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -110,7 +114,7 @@ __global__ void convolveKernelSimple(const unsigned char *input,
           value = input[(srcY * width + srcX) * channels + c];
         }
 
-        sum += value * d_kernel[ky * kernelSize + kx];
+        sum += value * kernelData.values[ky * kernelSize + kx];
       }
     }
 
@@ -123,7 +127,8 @@ __global__ void convolveKernelSimple(const unsigned char *input,
 // 可分离卷积 - 水平方向 Kernel
 __global__ void separableRowKernel(const unsigned char *input,
                                    unsigned char *output, int width, int height,
-                                   int channels, int kernelSize) {
+                                   int channels, int kernelSize,
+                                   KernelData kernelData) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -142,7 +147,7 @@ __global__ void separableRowKernel(const unsigned char *input,
       if (srcX >= 0 && srcX < width) {
         value = input[(y * width + srcX) * channels + c];
       }
-      sum += value * d_kernel[k];
+      sum += value * kernelData.values[k];
     }
 
     sum = fminf(fmaxf(sum, 0.0f), 255.0f);
@@ -154,7 +159,8 @@ __global__ void separableRowKernel(const unsigned char *input,
 // 可分离卷积 - 垂直方向 Kernel
 __global__ void separableColKernel(const unsigned char *input,
                                    unsigned char *output, int width, int height,
-                                   int channels, int kernelSize) {
+                                   int channels, int kernelSize,
+                                   KernelData kernelData) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -173,7 +179,7 @@ __global__ void separableColKernel(const unsigned char *input,
       if (srcY >= 0 && srcY < height) {
         value = input[(srcY * width + x) * channels + c];
       }
-      sum += value * d_kernel[k];
+      sum += value * kernelData.values[k];
     }
 
     sum = fminf(fmaxf(sum, 0.0f), 255.0f);
@@ -254,9 +260,10 @@ void ConvolutionEngine::convolve(const GpuImage &input, GpuImage &output,
         ImageUtils::createGpuImage(input.width, input.height, input.channels);
   }
 
-  // 复制卷积核到常量内存
-  CUDA_CHECK(cudaMemcpyToSymbol(d_kernel, kernel,
-                                kernelSize * kernelSize * sizeof(float)));
+  KernelData kernelData;
+  for (int i = 0; i < kernelSize * kernelSize; ++i) {
+    kernelData.values[i] = kernel[i];
+  }
 
   constexpr int kBlockSize = 16;
   dim3 block(kBlockSize, kBlockSize);
@@ -273,7 +280,7 @@ void ConvolutionEngine::convolve(const GpuImage &input, GpuImage &output,
   convolveKernelShared<kBlockSize, 7><<<grid, block, sharedBytes, stream>>>(
       input.buffer.dataAs<unsigned char>(),
       output.buffer.dataAs<unsigned char>(), input.width, input.height,
-      input.channels, kernelSize, borderModeInt);
+      input.channels, kernelSize, borderModeInt, kernelData);
 
   CUDA_CHECK(cudaGetLastError());
 }
@@ -283,6 +290,9 @@ void ConvolutionEngine::gaussianBlur(const GpuImage &input, GpuImage &output,
                                      cudaStream_t stream) {
   if (kernelSize < 1 || kernelSize > 7 || kernelSize % 2 == 0) {
     throw std::invalid_argument("Kernel size must be odd and between 1 and 7");
+  }
+  if (sigma <= 0.0f) {
+    throw std::invalid_argument("Sigma must be positive");
   }
 
   std::vector<float> kernel = generateGaussianKernel(kernelSize, sigma);
@@ -319,6 +329,9 @@ std::vector<float> ConvolutionEngine::generateGaussianKernel(int size,
   if (size < 1 || size % 2 == 0) {
     throw std::invalid_argument("Kernel size must be positive and odd");
   }
+  if (sigma <= 0.0f) {
+    throw std::invalid_argument("Sigma must be positive");
+  }
 
   std::vector<float> kernel(size * size);
   int half = size / 2;
@@ -344,6 +357,9 @@ std::vector<float> ConvolutionEngine::generateGaussianKernel1D(int size,
                                                                float sigma) {
   if (size < 1 || size % 2 == 0) {
     throw std::invalid_argument("Kernel size must be positive and odd");
+  }
+  if (sigma <= 0.0f) {
+    throw std::invalid_argument("Sigma must be positive");
   }
 
   std::vector<float> kernel(size);
@@ -383,9 +399,10 @@ void ConvolutionEngine::separableConvolve(const GpuImage &input,
   GpuImage temp =
       ImageUtils::createGpuImage(input.width, input.height, input.channels);
 
-  // 将行核复制到常量内存
-  CUDA_CHECK(
-      cudaMemcpyToSymbol(d_kernel, rowKernel, kernelSize * sizeof(float)));
+  KernelData rowKernelData;
+  for (int i = 0; i < kernelSize; ++i) {
+    rowKernelData.values[i] = rowKernel[i];
+  }
 
   constexpr int kBlockSize = 16;
   dim3 block(kBlockSize, kBlockSize);
@@ -394,7 +411,7 @@ void ConvolutionEngine::separableConvolve(const GpuImage &input,
 
   separableRowKernel<<<grid, block, 0, stream>>>(
       input.buffer.dataAs<unsigned char>(), temp.buffer.dataAs<unsigned char>(),
-      input.width, input.height, input.channels, kernelSize);
+      input.width, input.height, input.channels, kernelSize, rowKernelData);
   CUDA_CHECK(cudaGetLastError());
 
   // 第二步：垂直方向卷积（使用 colKernel）
@@ -404,13 +421,15 @@ void ConvolutionEngine::separableConvolve(const GpuImage &input,
         ImageUtils::createGpuImage(input.width, input.height, input.channels);
   }
 
-  CUDA_CHECK(
-      cudaMemcpyToSymbol(d_kernel, colKernel, kernelSize * sizeof(float)));
+  KernelData colKernelData;
+  for (int i = 0; i < kernelSize; ++i) {
+    colKernelData.values[i] = colKernel[i];
+  }
 
   separableColKernel<<<grid, block, 0, stream>>>(
       temp.buffer.dataAs<unsigned char>(),
       output.buffer.dataAs<unsigned char>(), input.width, input.height,
-      input.channels, kernelSize);
+      input.channels, kernelSize, colKernelData);
   CUDA_CHECK(cudaGetLastError());
 }
 

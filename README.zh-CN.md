@@ -142,7 +142,7 @@ ctest --output-on-failure
 ## 运行基准测试
 
 ```bash
-./bin/benchmark
+./bin/gpu_image_benchmark
 ```
 
 ## GPU 架构支持
@@ -257,7 +257,7 @@ mini-opencv/
 - **Install 支持** — `gpu_image::gpu_image_processing` CMake 导出目标，可作为依赖库使用
 - **版本注入** — 编译期注入 `GPU_IMAGE_VERSION_MAJOR/MINOR/PATCH` 宏
 - **CI 流水线** — GitHub Actions 自动化构建 + clang-format 格式检查
-- **完整测试** — 12 个测试文件覆盖所有算子模块
+- **测试套件** — 12 个测试文件覆盖主要算子模块与核心处理路径
 - **跨平台编译选项** — GCC/Clang (`-Wall -Wextra -Wpedantic`) + MSVC (`/W4`) 双支持
 
 ## 许可证

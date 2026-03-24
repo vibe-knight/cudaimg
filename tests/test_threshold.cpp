@@ -134,8 +134,8 @@ TEST_F(ThresholdTest, OtsuThreshold) {
 
   unsigned char otsuThresh = Threshold::otsuThreshold(gpuInput);
 
-  // Otsu 阈值应该在两个峰值之间
-  EXPECT_GT(otsuThresh, 50);
+  // 对这种双峰分布，Otsu 可能返回平台区间内任一点，包含左峰端点
+  EXPECT_GE(otsuThresh, 50);
   EXPECT_LT(otsuThresh, 200);
 }
 

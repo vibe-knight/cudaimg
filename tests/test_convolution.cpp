@@ -10,6 +10,7 @@
 #include <cmath>
 #include <gtest/gtest.h>
 #include <vector>
+#include <cuda_runtime.h>
 
 using namespace gpu_image;
 
@@ -280,3 +281,113 @@ TEST_F(ConvolutionTest, IdentityConvolution) {
     }
   }
 }
+
+TEST_F(ConvolutionTest, InvalidGaussianSigma) {
+  HostImage input = createTestImage(32, 32, 1);
+  GpuImage gpuInput = ImageUtils::uploadToGpu(input);
+  GpuImage output;
+
+  EXPECT_THROW(ConvolutionEngine::gaussianBlur(gpuInput, output, 3, 0.0f),
+               std::invalid_argument);
+  EXPECT_THROW(ConvolutionEngine::gaussianBlur(gpuInput, output, 3, -1.0f),
+               std::invalid_argument);
+  EXPECT_THROW(ConvolutionEngine::generateGaussianKernel(3, 0.0f),
+               std::invalid_argument);
+  EXPECT_THROW(ConvolutionEngine::generateGaussianKernel1D(3, -1.0f),
+               std::invalid_argument);
+}
+
+TEST_F(ConvolutionTest, ConcurrentDifferentKernelsDoNotInterfere) {
+  HostImage input = ImageUtils::createHostImage(32, 32, 1);
+  std::fill(input.data.begin(), input.data.end(), 0);
+  input.at(16, 16, 0) = 255;
+
+  GpuImage gpuInput = ImageUtils::uploadToGpu(input);
+  GpuImage identityOutput;
+  GpuImage blurOutput;
+
+  std::vector<float> identityKernel = {0, 0, 0, 0, 1, 0, 0, 0, 0};
+  std::vector<float> blurKernel(9, 1.0f / 9.0f);
+
+  cudaStream_t stream1 = nullptr;
+  cudaStream_t stream2 = nullptr;
+  CUDA_CHECK(cudaStreamCreate(&stream1));
+  CUDA_CHECK(cudaStreamCreate(&stream2));
+
+  ConvolutionEngine::convolve(gpuInput, identityOutput, identityKernel.data(), 3,
+                              BorderMode::Zero, stream1);
+  ConvolutionEngine::convolve(gpuInput, blurOutput, blurKernel.data(), 3,
+                              BorderMode::Zero, stream2);
+
+  CUDA_CHECK(cudaStreamSynchronize(stream1));
+  CUDA_CHECK(cudaStreamSynchronize(stream2));
+  CUDA_CHECK(cudaStreamDestroy(stream1));
+  CUDA_CHECK(cudaStreamDestroy(stream2));
+
+  HostImage identityResult = ImageUtils::downloadFromGpu(identityOutput);
+  HostImage blurResult = ImageUtils::downloadFromGpu(blurOutput);
+
+  EXPECT_EQ(identityResult.at(16, 16, 0), 255);
+  EXPECT_EQ(identityResult.at(16, 15, 0), 0);
+  EXPECT_EQ(blurResult.at(16, 16, 0), 28);
+  EXPECT_EQ(blurResult.at(16, 15, 0), 28);
+}
+
+TEST_F(ConvolutionTest, ConcurrentSeparableConvolutionsDoNotInterfere) {
+  HostImage input = ImageUtils::createHostImage(32, 32, 1);
+  std::fill(input.data.begin(), input.data.end(), 0);
+  input.at(16, 16, 0) = 255;
+
+  GpuImage gpuInput = ImageUtils::uploadToGpu(input);
+  GpuImage horizontalOutput;
+  GpuImage verticalOutput;
+
+  std::vector<float> horizontal = {0.25f, 0.5f, 0.25f};
+  std::vector<float> identity = {0.0f, 1.0f, 0.0f};
+
+  cudaStream_t stream1 = nullptr;
+  cudaStream_t stream2 = nullptr;
+  CUDA_CHECK(cudaStreamCreate(&stream1));
+  CUDA_CHECK(cudaStreamCreate(&stream2));
+
+  ConvolutionEngine::separableConvolve(gpuInput, horizontalOutput,
+                                       horizontal.data(), identity.data(), 3,
+                                       stream1);
+  ConvolutionEngine::separableConvolve(gpuInput, verticalOutput, identity.data(),
+                                       horizontal.data(), 3, stream2);
+
+  CUDA_CHECK(cudaStreamSynchronize(stream1));
+  CUDA_CHECK(cudaStreamSynchronize(stream2));
+  CUDA_CHECK(cudaStreamDestroy(stream1));
+  CUDA_CHECK(cudaStreamDestroy(stream2));
+
+  HostImage horizontalResult = ImageUtils::downloadFromGpu(horizontalOutput);
+  HostImage verticalResult = ImageUtils::downloadFromGpu(verticalOutput);
+
+  EXPECT_EQ(horizontalResult.at(15, 16, 0), 64);
+  EXPECT_EQ(horizontalResult.at(16, 16, 0), 128);
+  EXPECT_EQ(horizontalResult.at(17, 16, 0), 64);
+  EXPECT_EQ(horizontalResult.at(16, 15, 0), 0);
+
+  EXPECT_EQ(verticalResult.at(16, 15, 0), 64);
+  EXPECT_EQ(verticalResult.at(16, 16, 0), 128);
+  EXPECT_EQ(verticalResult.at(16, 17, 0), 64);
+  EXPECT_EQ(verticalResult.at(15, 16, 0), 0);
+}
+
+TEST_F(ConvolutionTest, ConvolutionSimpleKernelMatchesReference) {
+  HostImage input = createTestImage(16, 16, 1);
+  std::vector<float> kernel = {0, 0, 0, 0, 1, 0, 0, 0, 0};
+
+  HostImage cpuOutput = ImageUtils::createHostImage(16, 16, 1);
+  cpuConvolve(input, cpuOutput, kernel, 3);
+
+  GpuImage gpuInput = ImageUtils::uploadToGpu(input);
+  GpuImage gpuOutput;
+  ConvolutionEngine::convolve(gpuInput, gpuOutput, kernel.data(), 3);
+  cudaDeviceSynchronize();
+
+  HostImage gpuResult = ImageUtils::downloadFromGpu(gpuOutput);
+  EXPECT_EQ(cpuOutput.data, gpuResult.data);
+}
+

@@ -7,6 +7,12 @@ using namespace gpu_image;
 class FiltersTest : public ::testing::Test {
 protected:
   void SetUp() override {
+    int deviceCount;
+    cudaError_t err = cudaGetDeviceCount(&deviceCount);
+    if (err != cudaSuccess || deviceCount == 0) {
+      GTEST_SKIP() << "CUDA not available";
+    }
+
     testImage = ImageUtils::createGpuImage(16, 16, 1);
     std::vector<unsigned char> data(256);
     for (int i = 0; i < 256; ++i) {
@@ -17,6 +23,28 @@ protected:
   }
 
   GpuImage testImage;
+};
+
+class ArithmeticTest : public ::testing::Test {
+protected:
+  void SetUp() override {
+    int deviceCount;
+    cudaError_t err = cudaGetDeviceCount(&deviceCount);
+    if (err != cudaSuccess || deviceCount == 0) {
+      GTEST_SKIP() << "CUDA not available";
+    }
+
+    image1 = ImageUtils::createGpuImage(8, 8, 1);
+    image2 = ImageUtils::createGpuImage(8, 8, 1);
+
+    std::vector<unsigned char> data1(64, 100);
+    std::vector<unsigned char> data2(64, 50);
+
+    cudaMemcpy(image1.buffer.data(), data1.data(), 64, cudaMemcpyHostToDevice);
+    cudaMemcpy(image2.buffer.data(), data2.data(), 64, cudaMemcpyHostToDevice);
+  }
+
+  GpuImage image1, image2;
 };
 
 TEST_F(FiltersTest, MedianFilter) {
@@ -78,21 +106,17 @@ TEST_F(FiltersTest, InvalidKernelSize) {
                std::invalid_argument);
 }
 
-class ArithmeticTest : public ::testing::Test {
-protected:
-  void SetUp() override {
-    image1 = ImageUtils::createGpuImage(8, 8, 1);
-    image2 = ImageUtils::createGpuImage(8, 8, 1);
-
-    std::vector<unsigned char> data1(64, 100);
-    std::vector<unsigned char> data2(64, 50);
-
-    cudaMemcpy(image1.buffer.data(), data1.data(), 64, cudaMemcpyHostToDevice);
-    cudaMemcpy(image2.buffer.data(), data2.data(), 64, cudaMemcpyHostToDevice);
-  }
-
-  GpuImage image1, image2;
-};
+TEST_F(FiltersTest, BilateralFilterRejectsInvalidSigma) {
+  GpuImage output;
+  EXPECT_THROW(Filters::bilateralFilter(testImage, output, 5, 0.0f, 50.0f),
+               std::invalid_argument);
+  EXPECT_THROW(Filters::bilateralFilter(testImage, output, 5, -1.0f, 50.0f),
+               std::invalid_argument);
+  EXPECT_THROW(Filters::bilateralFilter(testImage, output, 5, 10.0f, 0.0f),
+               std::invalid_argument);
+  EXPECT_THROW(Filters::bilateralFilter(testImage, output, 5, 10.0f, -1.0f),
+               std::invalid_argument);
+}
 
 TEST_F(ArithmeticTest, Add) {
   GpuImage output;

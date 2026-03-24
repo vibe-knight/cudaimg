@@ -88,7 +88,15 @@ TEST_F(ResizerTest, ApproximateRoundTrip) {
   const int height = 64;
   const int channels = 3;
 
-  HostImage original = createTestImage(width, height, channels);
+  HostImage original = ImageUtils::createHostImage(width, height, channels);
+  for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
+      original.at(x, y, 0) = static_cast<unsigned char>(x * 255 / (width - 1));
+      original.at(x, y, 1) = static_cast<unsigned char>(y * 255 / (height - 1));
+      original.at(x, y, 2) =
+          static_cast<unsigned char>((x + y) * 255 / (width + height - 2));
+    }
+  }
   GpuImage gpuOriginal = ImageUtils::uploadToGpu(original);
 
   // 放大 2x

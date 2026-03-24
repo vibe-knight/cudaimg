@@ -1,12 +1,28 @@
 #include "gpu_image/geometric.hpp"
 #include "gpu_image/gpu_image.hpp"
 #include <gtest/gtest.h>
+#include <vector>
 
 using namespace gpu_image;
+
+namespace {
+std::vector<unsigned char> downloadPixels(const GpuImage &image) {
+  std::vector<unsigned char> pixels(image.totalBytes());
+  cudaMemcpy(pixels.data(), image.buffer.data(), image.totalBytes(),
+             cudaMemcpyDeviceToHost);
+  return pixels;
+}
+} // namespace
 
 class GeometricTest : public ::testing::Test {
 protected:
   void SetUp() override {
+    int deviceCount;
+    cudaError_t err = cudaGetDeviceCount(&deviceCount);
+    if (err != cudaSuccess || deviceCount == 0) {
+      GTEST_SKIP() << "CUDA not available";
+    }
+
     // 创建 8x8 测试图像
     testImage = ImageUtils::createGpuImage(8, 8, 1);
     std::vector<unsigned char> data(64);
@@ -109,6 +125,36 @@ TEST_F(GeometricTest, AffineTransform_Identity) {
 
   EXPECT_EQ(output.width, 8);
   EXPECT_EQ(output.height, 8);
+
+  std::vector<unsigned char> original = downloadPixels(testImage);
+  std::vector<unsigned char> result = downloadPixels(output);
+  EXPECT_EQ(result, original);
+}
+
+TEST_F(GeometricTest, PerspectiveTransform_Identity) {
+  GpuImage output;
+  float matrix[9] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+  Geometric::perspectiveTransform(testImage, output, matrix, 8, 8);
+  cudaDeviceSynchronize();
+
+  EXPECT_EQ(output.width, 8);
+  EXPECT_EQ(output.height, 8);
+
+  std::vector<unsigned char> original = downloadPixels(testImage);
+  std::vector<unsigned char> result = downloadPixels(output);
+  EXPECT_EQ(result, original);
+}
+
+TEST_F(GeometricTest, PerspectiveTransform_BoundaryPreserved) {
+  GpuImage output;
+  float matrix[9] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+  Geometric::perspectiveTransform(testImage, output, matrix, 8, 8);
+  cudaDeviceSynchronize();
+
+  std::vector<unsigned char> result = downloadPixels(output);
+  EXPECT_EQ(result[7], 28);
+  EXPECT_EQ(result[56], 224);
+  EXPECT_EQ(result[63], 252);
 }
 
 TEST_F(GeometricTest, AffineTransform_Scale) {

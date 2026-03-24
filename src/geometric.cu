@@ -9,6 +9,33 @@ namespace gpu_image {
 #define M_PI 3.14159265358979323846
 #endif
 
+namespace {
+__device__ float sampleBilinearOrZero(const unsigned char *input, int srcWidth,
+                                      int srcHeight, int channels, float srcX,
+                                      float srcY, int channel) {
+  if (srcX < 0.0f || srcX > static_cast<float>(srcWidth - 1) || srcY < 0.0f ||
+      srcY > static_cast<float>(srcHeight - 1)) {
+    return 0.0f;
+  }
+
+  int x0 = static_cast<int>(floorf(srcX));
+  int y0 = static_cast<int>(floorf(srcY));
+  int x1 = min(x0 + 1, srcWidth - 1);
+  int y1 = min(y0 + 1, srcHeight - 1);
+
+  float fx = srcX - x0;
+  float fy = srcY - y0;
+
+  float v00 = input[(y0 * srcWidth + x0) * channels + channel];
+  float v10 = input[(y0 * srcWidth + x1) * channels + channel];
+  float v01 = input[(y1 * srcWidth + x0) * channels + channel];
+  float v11 = input[(y1 * srcWidth + x1) * channels + channel];
+
+  return v00 * (1 - fx) * (1 - fy) + v10 * fx * (1 - fy) +
+         v01 * (1 - fx) * fy + v11 * fx * fy;
+}
+} // namespace
+
 // 旋转 Kernel
 __global__ void rotateKernel(const unsigned char *input, unsigned char *output,
                              int srcWidth, int srcHeight, int dstWidth,
@@ -33,26 +60,8 @@ __global__ void rotateKernel(const unsigned char *input, unsigned char *output,
   float srcY = -sinAngle * dx + cosAngle * dy + centerY;
 
   for (int c = 0; c < channels; ++c) {
-    float value = 0.0f;
-
-    if (srcX >= 0 && srcX < srcWidth - 1 && srcY >= 0 && srcY < srcHeight - 1) {
-      // 双线性插值
-      int x0 = static_cast<int>(floorf(srcX));
-      int y0 = static_cast<int>(floorf(srcY));
-      int x1 = x0 + 1;
-      int y1 = y0 + 1;
-
-      float fx = srcX - x0;
-      float fy = srcY - y0;
-
-      float v00 = input[(y0 * srcWidth + x0) * channels + c];
-      float v10 = input[(y0 * srcWidth + x1) * channels + c];
-      float v01 = input[(y1 * srcWidth + x0) * channels + c];
-      float v11 = input[(y1 * srcWidth + x1) * channels + c];
-
-      value = v00 * (1 - fx) * (1 - fy) + v10 * fx * (1 - fy) +
-              v01 * (1 - fx) * fy + v11 * fx * fy;
-    }
+    float value =
+        sampleBilinearOrZero(input, srcWidth, srcHeight, channels, srcX, srcY, c);
 
     output[(y * dstWidth + x) * channels + c] =
         static_cast<unsigned char>(fminf(fmaxf(value, 0.0f), 255.0f));
@@ -155,25 +164,8 @@ __global__ void affineKernel(const unsigned char *input, unsigned char *output,
   float srcY = invC * x + invD * y + invTy;
 
   for (int ch = 0; ch < channels; ++ch) {
-    float value = 0.0f;
-
-    if (srcX >= 0 && srcX < srcWidth - 1 && srcY >= 0 && srcY < srcHeight - 1) {
-      int x0 = static_cast<int>(floorf(srcX));
-      int y0 = static_cast<int>(floorf(srcY));
-      int x1 = x0 + 1;
-      int y1 = y0 + 1;
-
-      float fx = srcX - x0;
-      float fy = srcY - y0;
-
-      float v00 = input[(y0 * srcWidth + x0) * channels + ch];
-      float v10 = input[(y0 * srcWidth + x1) * channels + ch];
-      float v01 = input[(y1 * srcWidth + x0) * channels + ch];
-      float v11 = input[(y1 * srcWidth + x1) * channels + ch];
-
-      value = v00 * (1 - fx) * (1 - fy) + v10 * fx * (1 - fy) +
-              v01 * (1 - fx) * fy + v11 * fx * fy;
-    }
+    float value = sampleBilinearOrZero(input, srcWidth, srcHeight, channels,
+                                       srcX, srcY, ch);
 
     output[(y * dstWidth + x) * channels + ch] =
         static_cast<unsigned char>(fminf(fmaxf(value, 0.0f), 255.0f));
@@ -231,26 +223,8 @@ __global__ void perspectiveKernel(const unsigned char *input,
   float srcY = (i10 * x + i11 * y + i12) / w;
 
   for (int c = 0; c < channels; ++c) {
-    float value = 0.0f;
-
-    if (srcX >= 0 && srcX < srcWidth - 1 && srcY >= 0 && srcY < srcHeight - 1) {
-      // 双线性插值
-      int x0 = static_cast<int>(floorf(srcX));
-      int y0 = static_cast<int>(floorf(srcY));
-      int x1 = x0 + 1;
-      int y1 = y0 + 1;
-
-      float fx = srcX - x0;
-      float fy = srcY - y0;
-
-      float v00 = input[(y0 * srcWidth + x0) * channels + c];
-      float v10 = input[(y0 * srcWidth + x1) * channels + c];
-      float v01 = input[(y1 * srcWidth + x0) * channels + c];
-      float v11 = input[(y1 * srcWidth + x1) * channels + c];
-
-      value = v00 * (1 - fx) * (1 - fy) + v10 * fx * (1 - fy) +
-              v01 * (1 - fx) * fy + v11 * fx * fy;
-    }
+    float value =
+        sampleBilinearOrZero(input, srcWidth, srcHeight, channels, srcX, srcY, c);
 
     output[(y * dstWidth + x) * channels + c] =
         static_cast<unsigned char>(fminf(fmaxf(value, 0.0f), 255.0f));

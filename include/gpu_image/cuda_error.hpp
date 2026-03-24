@@ -3,7 +3,7 @@
 #include <cuda_runtime.h>
 #include <stdexcept>
 #include <string>
-#include <variant>
+#include <utility>
 
 namespace gpu_image {
 
@@ -49,28 +49,30 @@ template <typename T> class Result {
 public:
   static Result<T> ok(T value) {
     Result<T> r;
-    r.data_ = std::move(value);
+    r.success_ = true;
+    r.value_ = std::move(value);
     return r;
   }
 
   static Result<T> error(std::string message) {
     Result<T> r;
-    r.data_ = std::move(message);
+    r.success_ = false;
+    r.errorMsg_ = std::move(message);
     return r;
   }
 
-  bool isOk() const { return std::holds_alternative<T>(data_); }
-  bool isError() const { return std::holds_alternative<std::string>(data_); }
+  bool isOk() const { return success_; }
+  bool isError() const { return !success_; }
 
-  T &value() { return std::get<T>(data_); }
-  const T &value() const { return std::get<T>(data_); }
+  T &value() { return value_; }
+  const T &value() const { return value_; }
 
-  const std::string &errorMessage() const {
-    return std::get<std::string>(data_);
-  }
+  const std::string &errorMessage() const { return errorMsg_; }
 
 private:
-  std::variant<T, std::string> data_;
+  bool success_ = false;
+  T value_{};
+  std::string errorMsg_;
 };
 
 // void 特化
