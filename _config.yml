@@ -1,6 +1,8 @@
 title: Mini-OpenCV
 description: >-
-  基于 CUDA 的高性能图像处理库 — 像素操作、卷积、形态学、几何变换、滤波、色彩空间转换与流水线处理
+  A high-performance CUDA-based image processing library — pixel operations, convolution,
+  morphology, geometric transforms, filters, color space conversion, and async pipeline processing.
+tagline: GPU-accelerated Mini OpenCV
 remote_theme: pages-themes/cayman@v0.2.0
 plugins:
   - jekyll-remote-theme
@@ -11,8 +13,14 @@ show_downloads: false
 # SEO & metadata
 url: https://lessup.github.io
 baseurl: /mini-opencv
-lang: zh-CN
+lang: en
 author: LessUp
+
+# Social links
+social:
+  name: LessUp
+  links:
+    - https://github.com/LessUp
 
 # Markdown rendering
 markdown: kramdown
@@ -20,6 +28,9 @@ kramdown:
   input: GFM
   hard_wrap: false
   syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    block:
+      line_numbers: false
 
 # Default layout for all pages
 defaults:
@@ -31,6 +42,19 @@ defaults:
       path: "changelog"
     values:
       layout: default
+
+# Navigation (for themes that support it)
+navigation:
+  - title: "Home"
+    url: "/"
+  - title: "English README"
+    url: "/README"
+  - title: "中文 README"
+    url: "/README.zh-CN"
+  - title: "Contributing"
+    url: "/CONTRIBUTING"
+  - title: "Changelog"
+    url: "/CHANGELOG"
 
 # Exclude irrelevant files from Jekyll build
 exclude:
@@ -49,8 +73,8 @@ exclude:
   - .clang-format
   - .clang-tidy
   - .gitignore
+  - .git
   - .github
-  - .vscode
   - .kiro
   - "*.cu"
   - "*.cuh"
@@ -60,3 +84,12 @@ exclude:
   - "*.a"
   - "*.so"
   - "*.exe"
+  - "*.sh"
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+# Include these files
+include:
+  - CHANGELOG.md

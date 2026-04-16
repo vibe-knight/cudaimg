@@ -1,0 +1,32 @@
+# CODEOWNERS
+
+# This file defines code owners for the repository.
+# Code owners are automatically requested for review when someone opens a pull request that modifies code that they own.
+
+# Default owners for everything in the repo
+* @LessUp
+
+# CUDA kernels and GPU code
+/src/*.cu @LessUp
+/src/*.cuh @LessUp
+/include/gpu_image/*.cuh @LessUp
+
+# CMake build system
+/CMakeLists.txt @LessUp
+/cmake/ @LessUp
+
+# CI/CD workflows
+/.github/workflows/ @LessUp
+
+# Documentation
+/README.md @LessUp
+/README.zh-CN.md @LessUp
+/index.md @LessUp
+/CHANGELOG.md @LessUp
+/CONTRIBUTING.md @LessUp
+
+# Tests
+/tests/ @LessUp
+
+# Examples
+/examples/ @LessUp

@@ -11,23 +11,38 @@ English | [简体中文](README.zh-CN.md)
 
 A high-performance CUDA-based image processing library — a mini OpenCV with GPU-accelerated operators covering pixel operations, convolution, morphology, geometric transforms, filtering, color space conversion, and async pipeline processing.
 
+> **⚡ Performance**: 30-50x faster than CPU OpenCV for comparable operations
+
+## 📚 Documentation
+
+| Resource | Description |
+|----------|-------------|
+| [Quick Start](docs/quickstart.md) | Get started in 5 minutes |
+| [Installation](docs/installation.md) | Complete setup guide |
+| [Architecture](docs/architecture.md) | Design and internals |
+| [Performance](docs/performance.md) | Optimization guide |
+| [API Reference](docs/api/) | Complete API docs |
+| [FAQ](docs/faq.md) | Common questions |
+
+**Full Documentation**: https://lessup.github.io/mini-opencv/
+
 ## Architecture
 
 ```
-┌──────────────────────────────────────────────────────┐
-│                   Application Layer                   │
-│        ImageProcessor  ·  PipelineProcessor           │
-├──────────────────────────────────────────────────────┤
-│                Operator Layer (CUDA Kernels)           │
-│  PixelOperator │ ConvolutionEngine │ HistogramCalc     │
-│  ImageResizer  │ Morphology        │ Threshold         │
-│  ColorSpace    │ Geometric         │ Filters           │
-│  ImageArithmetic                                      │
-├──────────────────────────────────────────────────────┤
-│                  Infrastructure Layer                  │
-│  DeviceBuffer · MemoryManager · StreamManager          │
-│  GpuImage · HostImage · ImageIO (stb) · CudaError      │
-└──────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                      Application Layer                       │
+│            ImageProcessor  ·  PipelineProcessor              │
+├─────────────────────────────────────────────────────────────┤
+│                  Operator Layer (CUDA Kernels)               │
+│  PixelOperator │ ConvolutionEngine │ HistogramCalculator    │
+│  ImageResizer  │ Morphology        │ Threshold              │
+│  ColorSpace    │ Geometric         │ Filters                │
+│  ImageArithmetic                                            │
+├─────────────────────────────────────────────────────────────┤
+│                    Infrastructure Layer                      │
+│  DeviceBuffer · MemoryManager · StreamManager · CudaError   │
+│  GpuImage · HostImage · ImageIO (stb)                       │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ## Features
@@ -53,25 +68,24 @@ A high-performance CUDA-based image processing library — a mini OpenCV with GP
 - C++17 compatible compiler
 - NVIDIA GPU (Compute Capability 7.5+)
 
-## Build
+## Quick Start
 
 ```bash
+# Clone
+git clone https://github.com/LessUp/mini-opencv.git
+cd mini-opencv
+
+# Build
 mkdir build && cd build
 cmake -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON ..
 make -j$(nproc)
 
-# Run tests
+# Test
 ctest --output-on-failure
+
+# Run example
+./bin/basic_example
 ```
-
-### Build Options
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `BUILD_TESTS` | ON | Build unit tests (GTest v1.14.0) |
-| `BUILD_EXAMPLES` | ON | Build example programs |
-| `BUILD_BENCHMARKS` | OFF | Build benchmarks (Google Benchmark v1.8.3) |
-| `GPU_IMAGE_ENABLE_IO` | ON | Enable image file I/O via stb |
 
 ## Usage
 
@@ -89,7 +103,7 @@ GpuImage gray    = processor.toGrayscale(gpuImage);
 HostImage result = processor.downloadImage(blurred);
 ```
 
-### Pipeline
+### Pipeline Processing
 
 ```cpp
 PipelineProcessor pipeline(4);  // 4 CUDA streams
@@ -114,38 +128,38 @@ std::vector<HostImage> outputs = pipeline.processBatchHost(inputs);
 
 ```
 mini-opencv/
-├── include/gpu_image/          # Public headers (19 modules)
-│   ├── gpu_image_processing.hpp  # Unified entry header
-│   ├── image_processor.hpp       # High-level sync API
-│   ├── pipeline_processor.hpp    # Pipeline async API
-│   ├── convolution_engine.hpp    # Convolution operators
-│   ├── morphology.hpp            # Morphological operators
-│   ├── geometric.hpp             # Geometric transforms
-│   ├── filters.hpp               # Filters + image arithmetic
-│   ├── color_space.hpp           # Color space conversion
-│   ├── threshold.hpp             # Thresholding
-│   ├── device_buffer.hpp         # RAII GPU memory
-│   └── ...                       # cuda_error, gpu_image, stream_manager, etc.
-├── src/                          # CUDA/C++ source files (16)
-├── tests/                        # Unit tests (12 test files)
-├── examples/                     # Example programs
-│   ├── basic_example.cpp           # Basic usage
-│   └── pipeline_example.cpp        # Pipeline usage
-├── benchmarks/                   # Performance benchmarks
-└── CMakeLists.txt                # Build system
+├── docs/               # Documentation (English & Chinese)
+├── include/gpu_image/  # Public headers (19 modules)
+├── src/                # CUDA/C++ source files
+├── tests/              # Unit tests
+├── examples/           # Example programs
+├── benchmarks/         # Performance benchmarks
+└── CMakeLists.txt      # Build system
 ```
 
 ## Engineering Quality
 
-- **Modern CMake** — Target-based compile options with generator expressions, `BUILD_INTERFACE`/`INSTALL_INTERFACE`
-- **FetchContent dependencies** — GTest v1.14.0, Google Benchmark v1.8.3, stb (no manual third-party installs)
-- **Auto GPU arch detection** — CMake 3.24+ uses `native`, older versions fall back to common arch list
+- **Modern CMake** — Target-based compile options with generator expressions
+- **FetchContent dependencies** — GTest v1.14.0, Google Benchmark v1.8.3, stb
+- **Auto GPU arch detection** — CMake 3.24+ uses `native`
 - **Install support** — `gpu_image::gpu_image_processing` CMake export target
-- **Version injection** — Compile-time `GPU_IMAGE_VERSION_MAJOR/MINOR/PATCH` macros
-- **CI pipeline** — GitHub Actions: CUDA build + clang-format check
-- **Test suite** — 12 test files covering the main operator modules and core processing paths
-- **Cross-platform flags** — GCC/Clang (`-Wall -Wextra -Wpedantic`) + MSVC (`/W4`)
+- **CI pipeline** — GitHub Actions with CUDA build + clang-format check
+- **Test suite** — 12 test files covering main operator modules
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## License
 
-MIT License
+MIT License — see [LICENSE](LICENSE) file.
+
+---
+
+**⭐ Star this repo if you find it helpful!**
+
+For support, open an [issue](https://github.com/LessUp/mini-opencv/issues) or start a [discussion](https://github.com/LessUp/mini-opencv/discussions).

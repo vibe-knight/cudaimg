@@ -1,18 +1,63 @@
-# 正确性与 CI 加固
+# 2026-03-24 Correctness and CI Hardening / 正确性与 CI 加固
 
-日期：2026-03-24
+## Summary / 摘要
 
-## 变更内容
+Focused on deterministic correctness fixes with minimal changes while hardening CI validation and improving test coverage.
 
-- 修复几何变换双线性采样在边界坐标上的错误清零问题
-- 移除卷积实现对全局共享常量卷积核的依赖，避免多 stream 下潜在的核数据互相污染
-- 为高斯模糊与双边滤波补充 sigma 参数有效性校验，并增加对应异常测试
-- 补充几何与卷积回归测试，覆盖 identity 变换与并发卷积场景
-- 更新 README / README.zh-CN / index 中的测试覆盖描述，并修正中文 README 的 benchmark 命令
-- 在 CI 中增加 `ctest --output-on-failure` 步骤，并新增仓库级 `.clang-format`
-- 调整构建兼容性：将 CUDA 语言标准收敛到 C++14 兼容范围，并移除少量会卡住旧版 NVCC 的 C++17 用法
-- 修正旧有不稳定项：收敛 Otsu/缩放往返测试假设，并降低 HSV/YUV 往返中的量化误差
+以最小的代价专注于确定性正确性修复，同时加固 CI 验证并改进测试覆盖率。
 
-## 背景
+## Changes / 变更内容
 
-本轮调整聚焦于最小代价修复确定性的正确性问题，并补足测试与工程契约，使项目在几何变换、卷积并发、参数校验和 CI 验证方面更可靠。
+### English
+
+#### Fixed
+- Geometric transform bilinear sampling boundary coordinate zeroing issue
+- Removed convolution dependency on global shared constant kernels
+- Gaussian blur and bilateral filter sigma parameter validation
+- Converged Otsu and scaling round-trip test assumptions
+
+#### Added
+- Geometric and convolution regression tests
+- Exception tests for invalid parameters
+- `ctest --output-on-failure` in CI
+- Repository-level `.clang-format`
+
+#### Changed
+- CUDA language standard to C++14 compatible
+- Removed C++17 features blocking older NVCC
+- Updated test coverage descriptions in documentation
+
+### 中文
+
+#### 修复
+- 几何变换双线性采样边界坐标清零问题
+- 移除卷积对全局共享常量卷积核的依赖
+- 高斯模糊和双边滤波 sigma 参数校验
+- 收敛 Otsu 和缩放往返测试假设
+
+#### 新增
+- 几何和卷积回归测试
+- 无效参数的异常测试
+- CI 中的 `ctest --output-on-failure`
+- 仓库级 `.clang-format`
+
+#### 变更
+- CUDA 语言标准至 C++14 兼容
+- 移除阻碍旧版 NVCC 的 C++17 特性
+- 更新文档中的测试覆盖率描述
+
+## Impact / 影响
+
+- More reliable geometric transforms
+- Safer multi-stream convolution
+- Better CI feedback on failures
+- Improved cross-compiler compatibility
+
+- 更可靠的几何变换
+- 更安全的跨流卷积
+- 更好的 CI 失败反馈
+- 改进的跨编译器兼容性
+
+## References / 参考
+
+- Related: [CHANGELOG.md v2.0.0](../CHANGELOG.md)

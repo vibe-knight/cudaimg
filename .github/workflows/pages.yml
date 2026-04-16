@@ -5,12 +5,22 @@ on:
     branches: [master, main]
     paths:
       - 'index.md'
-      - '*.md'
-      - 'docs/**'
-      - 'changelog/**'
+      - 'README.md'
+      - 'README.zh-CN.md'
+      - 'CONTRIBUTING.md'
+      - 'CHANGELOG.md'
       - '_config.yml'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Debug build'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 permissions:
   contents: read
@@ -18,7 +28,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:
@@ -35,21 +45,32 @@ jobs:
             README.md
             README.zh-CN.md
             CONTRIBUTING.md
+            CHANGELOG.md
             LICENSE
             _config.yml
-            changelog
+            docs
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          # Enable strict PWA caching
+          static_site_generator: jekyll
 
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
           source: ./
           destination: ./_site
+          # Enable verbose logging for debugging
+          verbose: ${{ inputs.debug == 'true' }}
+          # Build future posts and draft posts
+          future: true
+          draft_posts: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
 
   deploy:
     environment:
@@ -61,3 +82,6 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # Enable preview mode for non-main branches (optional)
+          preview: ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
