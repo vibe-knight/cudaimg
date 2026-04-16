@@ -1,51 +1,38 @@
-# 2026-03-10 Workflow Deep Standardization / 工作流深度标准化
+# Release v1.2.0 — Workflow Deep Standardization
 
-## Summary / 摘要
+**Release Date:** 2026-03-10  
+**Focus:** Comprehensive GitHub Actions standardization
 
-Second round of GitHub Actions standardization across all workflows with unified permissions, concurrency, and caching strategies.
+---
 
-所有工作流的第二轮 GitHub Actions 标准化，统一权限、并发和缓存策略。
+## Overview
 
-## Changes / 变更内容
+Second round of GitHub Actions standardization with unified permissions, concurrency, and caching strategies across all workflows.
 
-### English
+---
 
-#### Standardized
-- Unified `permissions: contents: read` across workflows
-- Consistent `concurrency` configuration
-- Added `actions/configure-pages@v5` to Pages workflow
-- `paths` trigger filters to reduce unnecessary builds
+## 🔧 Standardized
 
-#### Technical Improvements
-- Standardized job naming conventions
-- Consistent checkout depth (`fetch-depth: 1`)
-- Aligned timeout configurations
-- Unified artifact handling
+| Aspect | Standard |
+|--------|----------|
+| Permissions | `contents: read` |
+| Concurrency | Unified configuration |
+| Pages Workflow | `actions/configure-pages@v5` |
+| Triggers | Path filters for efficiency |
 
-### 中文
+---
 
-#### 标准化
-- 工作流统一 `permissions: contents: read`
-- 一致的 `concurrency` 配置
-- 在 Pages 工作流中添加 `actions/configure-pages@v5`
-- `paths` 触发器过滤以减少不必要的构建
+## Technical Improvements
 
-#### 技术改进
-- 标准化的任务命名约定
-- 一致的检出深度（`fetch-depth: 1`）
-- 对齐的超时配置
-- 统一的产物处理
+| Area | Change |
+|------|--------|
+| Naming | Standardized job naming conventions |
+| Checkout | Consistent `fetch-depth: 1` |
+| Timeouts | Aligned configurations |
+| Artifacts | Unified handling |
 
-## Impact / 影响
+---
 
-- Reduced CI resource usage
-- Faster feedback loops
-- Consistent security posture
+## Resources
 
-- 减少 CI 资源使用
-- 更快的反馈循环
-- 一致的安全态势
-
-## References / 参考
-
-- Related: [CHANGELOG.md v1.2.0](../CHANGELOG.md)
+- [CHANGELOG.md v1.2.0](../CHANGELOG.md)

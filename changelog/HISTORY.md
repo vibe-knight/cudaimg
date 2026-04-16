@@ -1,72 +1,180 @@
-# Development History / 开发历史
+# Development History
 
-Historical archive of project development milestones. For detailed release notes, see [CHANGELOG.md](../CHANGELOG.md).
+Historical archive of project development milestones and release history.
 
-项目开发里程碑的历史归档。详细的发布说明请参阅 [CHANGELOG.md](../CHANGELOG.md)。
+## Overview
 
----
-
-## Timeline
-
-| Date | Version | Key Changes |
-|------|---------|-------------|
-| 2026-03-24 | v2.0.0 | Correctness fixes, CI hardening, parameter validation / 正确性修复、CI 加固、参数校验 |
-| 2026-03-10 | v1.3.0 | GitHub Pages optimization, professional landing page / GitHub Pages 优化、专业落地页 |
-| 2026-03-10 | v1.2.0 | Workflow deep standardization / 工作流深度标准化 |
-| 2026-03-09 | v1.1.0 | Initial CI workflow setup / 初始 CI 工作流搭建 |
-| 2025-02-13 | v1.0.0 | Initial release / 初始版本发布 |
+| Version | Date | Focus | Highlights |
+|---------|------|-------|------------|
+| [v2.0.0](#v200) | 2026-03-24 | Correctness & Hardening | Bug fixes, CI improvement, parameter validation |
+| [v1.3.0](#v130) | 2026-03-10 | Documentation | GitHub Pages optimization, professional landing page |
+| [v1.2.0](#v120) | 2026-03-10 | CI/CD | Workflow deep standardization |
+| [v1.1.0](#v110) | 2026-03-09 | Infrastructure | Initial CI workflow setup |
+| [v1.0.0](#v100) | 2025-02-13 | Inception | Initial release with core GPU operators |
 
 ---
 
-## Detailed Milestones
+## v2.0.0
 
-### 2026-03-24: Correctness and CI Hardening / 正确性与 CI 加固
+**Released:** 2026-03-24  
+**Focus:** Deterministic correctness fixes with minimal changes
 
-**English:**
-- Fixed geometric transform bilinear sampling boundary issue
-- Removed global shared constant kernel dependency in convolution
-- Added parameter validation for Gaussian and bilateral filters
-- Enhanced CI pipeline with `ctest --output-on-failure`
+### 🐛 Bug Fixes
 
-**中文：**
-- 修复几何变换双线性采样边界问题
-- 移除卷积实现中的全局共享常量卷积核依赖
-- 为高斯和双边滤波添加参数校验
-- 使用 `ctest --output-on-failure` 增强 CI 流水线
+| Issue | Description |
+|-------|-------------|
+| Geometric Transform | Fixed bilinear sampling boundary coordinate zeroing issue |
+| Convolution Engine | Removed global shared constant kernel dependency, preventing data pollution in multi-stream scenarios |
+| Parameter Validation | Added sigma parameter validation for Gaussian blur and bilateral filter |
+| Test Convergence | Converged Otsu/scaling round-trip test assumptions, reduced HSV/YUV quantization error |
 
-### 2026-03-10: Pages Optimization / 页面优化
+### ✨ New Features
 
-**English:**
-- Professional landing page with architecture diagram
-- Complete feature matrix and GPU support table
-- SEO optimization in `_config.yml`
-- Bilingual README enhancement
+- Geometric and convolution regression tests
+- Exception tests for invalid parameters
+- Repository-level `.clang-format` configuration
 
-**中文：**
-- 带架构图的专业落地页
-- 完整的功能矩阵和 GPU 支持表
-- `_config.yml` 中的 SEO 优化
-- 双语 README 增强
+### 🔧 Changed
 
-### 2025-02-13: Project Foundation / 项目基础建设
+- CUDA language standard: C++14 compatible
+- Removed C++17 features blocking older NVCC versions
+- Updated test coverage descriptions in documentation
 
-**English:**
-- Initial project structure
+### Impact
+
+- More reliable geometric transforms
+- Safer multi-stream convolution
+- Better cross-compiler compatibility
+
+---
+
+## v1.3.0
+
+**Released:** 2026-03-10  
+**Focus:** GitHub Pages comprehensive optimization
+
+### ✨ New Features
+
+| Feature | Description |
+|---------|-------------|
+| Landing Page | Professional `index.md` with architecture diagram |
+| Feature Matrix | Complete operator and optimization technique documentation |
+| GPU Support Table | Architecture support from Turing to Hopper |
+| Badges | Complete set (CI/Pages/License/CUDA/C++/CMake) |
+| SEO | Optimized `_config.yml` with multi-line descriptions |
+
+### 🔧 Changed
+
+- Extended README.md with architecture and feature tables
+- Synchronized README.zh-CN.md content
+- Added Jekyll exclude list for faster builds
+
+### 🐛 Fixed
+
+- Badge layout issues in Chinese README
+
+---
+
+## v1.2.0
+
+**Released:** 2026-03-10  
+**Focus:** GitHub Actions deep standardization
+
+### Standardized
+
+| Aspect | Change |
+|--------|--------|
+| Permissions | Unified `contents: read` across workflows |
+| Concurrency | Consistent configuration |
+| Pages | Added `actions/configure-pages@v5` |
+| Triggers | Path filters to reduce unnecessary builds |
+
+### Technical Improvements
+
+- Standardized job naming conventions
+- Consistent checkout depth (`fetch-depth: 1`)
+- Aligned timeout configurations
+- Unified artifact handling
+
+---
+
+## v1.1.0
+
+**Released:** 2026-03-09  
+**Focus:** Initial CI/CD infrastructure
+
+### ✨ New Features
+
+- Standardized CI workflow (`.github/workflows/ci.yml`)
+- Triggers: `push`, `pull_request`, `workflow_dispatch`
+- CUDA container-based build validation
+- `clang-format` check job
+
+### Technical Details
+
+- CI runs in `nvidia/cuda:12.4.1-devel-ubuntu22.04`
+- Automatic build and test execution
+- Parallel job execution (build + format check)
+
+---
+
+## v1.0.0
+
+**Released:** 2025-02-13  
+**Focus:** Initial library release
+
+### ✨ Core Features
+
+| Category | Features |
+|----------|----------|
+| **Memory** | `DeviceBuffer`, `MemoryManager`, `StreamManager` |
+| **Processing** | `ImageProcessor`, `PipelineProcessor` |
+| **Pixel Ops** | Invert, grayscale, brightness |
+| **Convolution** | Gaussian blur, Sobel edge, custom kernels |
+| **Histogram** | Calculation, equalization |
+| **Scaling** | Bilinear, nearest-neighbor |
+| **Morphology** | Erosion, dilation, open/close, gradient |
+| **Threshold** | Global, adaptive, Otsu |
+| **Color Space** | RGB/HSV/YUV conversion |
+| **Geometric** | Rotate, flip, affine, perspective |
+| **Filters** | Median, bilateral, box, sharpen |
+| **Arithmetic** | Add, subtract, multiply, blend |
+| **Pipeline** | Multi-step chaining, batch async |
+
+### 📦 Deliverables
+
+- Complete CMake build system with CUDA support
+- Unit test suite (Google Test v1.14.0)
+- Example programs (`basic_example.cpp`, `pipeline_example.cpp`)
 - MIT License
-- Basic CI configuration
-- Core GPU image processing operators
-
-**中文：**
-- 初始项目结构
-- MIT 许可证
-- 基础 CI 配置
-- 核心 GPU 图像处理算子
+- `.editorconfig` for code formatting
 
 ---
 
-Original detailed logs can be found in individual files below:
-- `2025-02-13_project-infrastructure.md`
-- `2026-03-09_workflow-optimization.md`
-- `2026-03-10_pages-optimization.md`
-- `2026-03-10_workflow-deep-standardization.md`
-- `2026-03-24_correctness-and-ci-hardening.md`
+## Detailed Logs
+
+For detailed technical logs, see individual files:
+
+| File | Version | Focus |
+|------|---------|-------|
+| [2026-03-24_correctness-and-ci-hardening.md](2026-03-24_correctness-and-ci-hardening.md) | v2.0.0 | Correctness fixes |
+| [2026-03-10_pages-optimization.md](2026-03-10_pages-optimization.md) | v1.3.0 | Documentation |
+| [2026-03-10_workflow-deep-standardization.md](2026-03-10_workflow-deep-standardization.md) | v1.2.0 | CI/CD |
+| [2026-03-09_workflow-optimization.md](2026-03-09_workflow-optimization.md) | v1.1.0 | Infrastructure |
+| [2025-02-13_project-infrastructure.md](2025-02-13_project-infrastructure.md) | v1.0.0 | Inception |
+
+---
+
+## Versioning
+
+This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+| Version Component | Description |
+|-------------------|-------------|
+| MAJOR | Incompatible API changes |
+| MINOR | Backward-compatible functionality |
+| PATCH | Backward-compatible bug fixes |
+
+---
+
+*Last updated: 2026-04-16*
