@@ -1,6 +1,9 @@
 ---
 layout: default
 title: 常见问题
+title_en: FAQ
+parent: 中文文档
+nav_order: 5
 description: 关于 Mini-OpenCV 的常见问题解答 - 安装、使用、故障排除和最佳实践。
 ---
 

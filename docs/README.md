@@ -1,99 +1,96 @@
 ---
 layout: default
 title: Documentation
-description: Mini-OpenCV Documentation - Comprehensive guides and API reference for the GPU image processing library.
+description: Mini-OpenCV Documentation - Complete guide for GPU-accelerated image processing
 ---
 
 # Mini-OpenCV Documentation
 
-Welcome to the Mini-OpenCV documentation. This GPU-accelerated image processing library provides high-performance CUDA operators covering pixel operations, convolution, morphology, geometric transforms, and more.
+Welcome to the Mini-OpenCV documentation. This is a comprehensive guide for the high-performance CUDA-based image processing library.
 
-## Quick Links
+## 📚 Documentation Structure
 
-| Getting Started | User Guides | API Reference | Examples |
-|----------------|-------------|---------------|----------|
-| [Quick Start](quickstart) | [Installation](installation) | [API Overview](api/) | [Basic Usage](examples/basic-usage) |
-| [Architecture](architecture) | [Performance Guide](performance) | [ImageProcessor](api/image_processor) | [Pipeline Processing](examples/pipeline-processing) |
-| [FAQ](faq) | - | [PipelineProcessor](api/pipeline_processor) | - |
+### Getting Started
 
-## Documentation Structure
+| Guide | Description | Estimated Time |
+|-------|-------------|----------------|
+| [Quick Start](setup/quickstart.md) | Build, test, and run your first program | 5 minutes |
+| [Installation](setup/installation.md) | Complete setup and configuration guide | 15 minutes |
 
-```
-docs/
-├── README.md              # This file - documentation index
-├── quickstart.md          # 5-minute quick start guide
-├── installation.md        # Detailed installation instructions
-├── architecture.md        # Architecture and design overview
-├── performance.md         # Performance optimization guide
-├── faq.md                 # Frequently asked questions
-├── api/                   # API Reference (English)
-│   ├── README.md
-│   ├── image_processor.md
-│   ├── pipeline_processor.md
-│   └── ...
-├── api.zh-CN/             # API Reference (中文)
-└── examples/              # Extended examples
-```
+### Core Concepts
 
-## Language Selection
+| Guide | Description |
+|-------|-------------|
+| [Architecture Overview](architecture/architecture.md) | Three-layer design and internal workings |
+| [Performance Optimization](tutorials/performance.md) | Best practices for maximum throughput |
+
+### Practical Guides
+
+| Guide | Description | Level |
+|-------|-------------|-------|
+| [Basic Usage](tutorials/examples/basic-usage.md) | Load, process, and save images | Beginner |
+| [Pipeline Processing](tutorials/examples/pipeline-processing.md) | Batch async processing | Intermediate |
+| [API Reference](api/) | Complete module documentation | All levels |
+
+### Reference
+
+| Resource | Description |
+|----------|-------------|
+| [FAQ](tutorials/faq.md) | Frequently asked questions |
+| [API Reference](api/) | Complete API documentation |
+| [Examples](tutorials/examples/) | Code examples and tutorials |
+
+## 🔗 Specifications
+
+For technical requirements and design documents, see:
+
+| Document | Description |
+|----------|-------------|
+| [Product Requirements](../specs/product/gpu-image-processing-requirements.md) | Feature definitions and acceptance criteria |
+| [Architecture Design](../specs/rfc/0001-gpu-image-processing-design.md) | Technical design and architecture |
+| [Implementation Tasks](../specs/rfc/0001-gpu-image-processing-tasks.md) | Implementation task checklist |
+
+## 🚀 Quick Navigation
+
+### By Task
+
+| I want to... | Go to... |
+|--------------|----------|
+| Install the library | [Installation Guide](setup/installation.md) |
+| Process my first image | [Quick Start](setup/quickstart.md) |
+| Understand the design | [Architecture](architecture/architecture.md) |
+| Optimize performance | [Performance Guide](tutorials/performance.md) |
+| Find function reference | [API Reference](api/) |
+| Get help with errors | [FAQ](tutorials/faq.md) |
+
+### By Module
+
+| Module | Purpose |
+|--------|---------|
+| [ImageProcessor](api/image_processor.md) | High-level synchronous API |
+| [PipelineProcessor](api/pipeline_processor.md) | Async batch processing |
+| [ConvolutionEngine](api/convolution_engine.md) | Convolution operations |
+| [Geometric](api/geometric.md) | Geometric transformations |
+| [Filters](api/filters.md) | Image filtering |
+| [ColorSpace](api/color_space.md) | Color space conversions |
+
+## 🌐 Language Selection
 
 - **English** (this page)
-- [简体中文 (Chinese)](README.zh-CN)
+- [简体中文 (Chinese)](README.zh-CN.md)
 
-## Getting Started
+## 📖 Version Information
 
-New to Mini-OpenCV? Start with the [Quick Start Guide](quickstart) to get up and running in 5 minutes.
+**Current Version:** 2.0.0
 
-```cpp
-#include "gpu_image/gpu_image_processing.hpp"
-using namespace gpu_image;
+See [Changelog](../CHANGELOG.md) for version history.
 
-ImageProcessor processor;
-GpuImage image = processor.loadFromHost(hostImage);
-GpuImage blurred = processor.gaussianBlur(image, 5, 1.5f);
-```
+## 💡 Getting Help
 
-## What's Included
-
-### Image Processing Operators
-
-| Category | Operators |
-|----------|-----------|
-| **Pixel Operations** | Invert, grayscale, brightness adjustment |
-| **Convolution** | Gaussian blur, Sobel edge detection, custom kernels |
-| **Histogram** | Calculation, equalization |
-| **Scaling** | Bilinear, nearest-neighbor interpolation |
-| **Morphology** | Erosion, dilation, opening, closing, gradient |
-| **Threshold** | Global, adaptive, Otsu auto |
-| **Color Space** | RGB/HSV/YUV conversion, channel operations |
-| **Geometric** | Rotate, flip, affine, perspective, crop |
-| **Filters** | Median, bilateral, box, sharpen, Laplacian |
-| **Arithmetic** | Add, subtract, multiply, blend, weighted sum |
-| **Pipeline** | Multi-step async processing with CUDA streams |
-
-## Requirements
-
-- CUDA Toolkit 11.0+
-- CMake 3.18+
-- C++17 compatible compiler
-- NVIDIA GPU (Compute Capability 7.5+)
-
-See [Installation Guide](installation) for detailed system requirements.
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](../CONTRIBUTING) for guidelines on how to contribute to this project.
-
-## Support
-
-- **Issues**: [GitHub Issues](https://github.com/LessUp/mini-opencv/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/LessUp/mini-opencv/discussions)
-- **Documentation**: [GitHub Pages](https://lessup.github.io/mini-opencv/)
-
-## License
-
-MIT License - see [LICENSE](../LICENSE) file for details.
+- **Found a bug?** [Open an issue](https://github.com/LessUp/mini-opencv/issues)
+- **Have a question?** [Start a discussion](https://github.com/LessUp/mini-opencv/discussions)
+- **Want to contribute?** See [Contributing Guide](../CONTRIBUTING.md)
 
 ---
 
-*Last updated: 2026-04-16*
+*Last updated: 2026-04-17*

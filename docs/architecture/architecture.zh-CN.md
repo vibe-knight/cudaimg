@@ -1,6 +1,9 @@
 ---
 layout: default
 title: 架构说明
+title_en: Architecture
+parent: 中文文档
+nav_order: 3
 description: 深入了解 Mini-OpenCV 架构 - 三层设计、内存管理和 CUDA 流并发机制。
 ---
 

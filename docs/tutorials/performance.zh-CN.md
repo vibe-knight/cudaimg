@@ -1,6 +1,9 @@
 ---
 layout: default
 title: 性能优化
+title_en: Performance
+parent: 中文文档
+nav_order: 4
 description: Mini-OpenCV 优化指南 - GPU 选择、内存管理和最佳实践，实现最大吞吐量。
 ---
 

@@ -1,40 +1,43 @@
 ---
 layout: default
 title: 安装指南
-description: Mini-OpenCV 完整安装指南 - 系统要求、CUDA 配置和构建选项。
+title_en: Installation
+parent: 中文文档
+nav_order: 2
+description: Mini-OpenCV 完整安装指南 - 系统要求、CUDA 配置、构建选项和集成方法
 ---
 
 # 安装指南
 
-本指南涵盖安装和构建 Mini-OpenCV 的所有方面，从系统要求到高级构建配置。
+从源码安装和构建 Mini-OpenCV 的完整指南。
 
 ## 系统要求
 
 ### 最低要求
 
 | 组件 | 最低版本 | 说明 |
-|-----|---------|------|
+|------|----------|------|
 | CUDA Toolkit | 11.0 | 需要 nvcc 编译器 |
-| CMake | 3.18 | 用于基于 target 的配置 |
-| C++ 编译器 | C++17 | GCC 7+、Clang 7+ 或 MSVC 2019+ |
+| CMake | 3.18 | 基于目标的配置 |
+| C++ 编译器 | C++17 | GCC 7+, Clang 7+, 或 MSVC 2019+ |
 | NVIDIA 驱动 | 450.80.02+ | 用于 CUDA 11.0 |
-| GPU | 计算能力 7.5+ | Turing 架构或更新 |
+| GPU | Compute Capability 7.5+ | Turing 架构或更新 |
 
 ### 推荐配置
 
-| 组件 | 推荐配置 | 最佳性能配置 |
-|-----|---------|------------|
+| 组件 | 推荐配置 | 最佳性能 |
+|------|----------|----------|
 | CUDA Toolkit | 12.x | 最新稳定版本 |
-| CMake | 3.24+ | 支持原生 GPU 架构检测 |
+| CMake | 3.24+ | 原生 GPU 架构检测 |
 | GPU | RTX 30/40 系列 | Ampere/Ada Lovelace |
-| 内存 | 16 GB+ | 用于处理大图像 |
+| 内存 | 16 GB+ | 用于大图像处理 |
 
 ## 平台特定设置
 
 ### Linux (Ubuntu/Debian)
 
 ```bash
-# 安装 CUDA Toolkit（方法1：包管理器）
+# 安装 CUDA Toolkit
 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb
 sudo dpkg -i cuda-keyring_1.0-1_all.deb
 sudo apt-get update
@@ -47,21 +50,23 @@ sudo apt-get install -y cmake ninja-build g++ git
 nvcc --version  # 应显示 CUDA 11.0+
 ```
 
-### macOS
-
-注意：macOS 上的 CUDA 支持有限。建议使用支持 CUDA 的 Docker。
+### Linux (CentOS/RHEL/Fedora)
 
 ```bash
-# 安装 CMake 和构建工具
-brew install cmake ninja
+# Fedora
+sudo dnf install cmake ninja-build gcc-c++ git
 
-# 使用 Docker 进行 CUDA 开发
-docker run --gpus all -it nvidia/cuda:12.4.1-devel-ubuntu22.04
+# CentOS/RHEL (先启用 EPEL)
+sudo yum install epel-release
+sudo yum install cmake3 ninja-build gcc-c++ git
+
+# CUDA 从 NVIDIA 仓库安装
+# 参考 https://developer.download.nvidia.com/compute/cuda/repos/ 选择你的发行版
 ```
 
 ### Windows
 
-1. **安装 Visual Studio 2019+** 并选择 C++ 工作负载
+1. **安装 Visual Studio 2019+** 带 C++ 工作负载
 2. **安装 CUDA Toolkit** 从 [NVIDIA 官网](https://developer.nvidia.com/cuda-downloads)
 3. **安装 CMake** 从 [cmake.org](https://cmake.org/download/)
 
@@ -73,6 +78,18 @@ cmake --version
 # 使用 Visual Studio 生成器构建
 cmake -S . -B build -G "Visual Studio 17 2022"
 cmake --build build --config Release
+```
+
+### macOS
+
+macOS 上的 CUDA 支持有限。使用带 CUDA 支持的 Docker：
+
+```bash
+# 安装 CMake 和构建工具
+brew install cmake ninja
+
+# 使用 Docker 进行 CUDA 开发
+docker run --gpus all -it nvidia/cuda:12.4.1-devel-ubuntu22.04
 ```
 
 ## 从源码构建
@@ -92,7 +109,7 @@ cmake --build build -j$(nproc)  # Linux/macOS
 cmake --build build --config Release  # Windows
 ```
 
-### 完整功能构建
+### 全选项构建
 
 ```bash
 cmake -S . -B build \
@@ -109,25 +126,25 @@ cmake --build build -j$(nproc)
 ### 构建选项参考
 
 | 选项 | 默认值 | 说明 |
-|-----|-------|------|
+|------|--------|------|
 | `BUILD_TESTS` | ON | 构建 Google Test v1.14.0 测试 |
 | `BUILD_EXAMPLES` | ON | 构建示例程序 |
-| `BUILD_BENCHMARKS` | OFF | 构建 Google Benchmark v1.8.3 基准测试 |
+| `BUILD_BENCHMARKS` | OFF | 构建 Google Benchmark v1.8.3 |
 | `GPU_IMAGE_ENABLE_IO` | ON | 通过 stb 启用图像 I/O |
 | `CMAKE_CUDA_ARCHITECTURES` | 自动 | 目标 GPU 架构 |
 
 ### GPU 架构选择
 
-使用 CMake 3.24+ 时，CMake 会自动检测您的 GPU 架构：
+CMake 自动检测 GPU 架构（CMake 3.24+）：
 
 ```bash
-# 自动检测（CMake 3.24+）
+# 自动检测 (CMake 3.24+)
 cmake -S . -B build
 
 # 手动指定
 cmake -S . -B build -DCMAKE_CUDA_ARCHITECTURES="75;80;86"
 
-# 常用架构：
+# 常见架构：
 # 75 = Turing (RTX 20xx, T4)
 # 80 = Ampere A100
 # 86 = Ampere GeForce (RTX 30xx)
@@ -135,7 +152,7 @@ cmake -S . -B build -DCMAKE_CUDA_ARCHITECTURES="75;80;86"
 # 90 = Hopper (H100)
 ```
 
-## 安装库
+## 安装
 
 ### 系统级安装
 
@@ -153,7 +170,7 @@ cmake --install build --prefix /usr/local
 ```bash
 cmake --install build --prefix $HOME/.local
 
-# 在您的 CMake 项目中添加：
+# 在你的 CMake 项目中添加：
 # list(APPEND CMAKE_PREFIX_PATH "$ENV{HOME}/.local")
 # find_package(gpu_image_processing REQUIRED)
 # target_link_libraries(your_target gpu_image::gpu_image_processing)
@@ -161,10 +178,10 @@ cmake --install build --prefix $HOME/.local
 
 ## 作为依赖使用
 
-### 选项1：CMake FetchContent
+### 选项 1: CMake FetchContent（推荐）
 
 ```cmake
-# 在您的 CMakeLists.txt 中
+# 在你的 CMakeLists.txt 中
 include(FetchContent)
 FetchContent_Declare(
     gpu_image_processing
@@ -176,19 +193,19 @@ FetchContent_MakeAvailable(gpu_image_processing)
 target_link_libraries(your_target gpu_image::gpu_image_processing)
 ```
 
-### 选项2：Git 子模块
+### 选项 2: Git 子模块
 
 ```bash
 # 添加为子模块
 git submodule add https://github.com/LessUp/mini-opencv.git third_party/mini-opencv
 git submodule update --init
 
-# 在您的 CMakeLists.txt 中
+# 在你的 CMakeLists.txt 中
 add_subdirectory(third_party/mini-opencv)
 target_link_libraries(your_target gpu_image::gpu_image_processing)
 ```
 
-### 选项3：预构建库
+### 选项 3: 预编译库
 
 ```bash
 # 下载并安装发布版本
@@ -210,13 +227,13 @@ docker run --gpus all -it \
     -v $(pwd):/workspace \
     nvidia/cuda:12.4.1-devel-ubuntu22.04
 
-# 在容器内
+# 容器内
 apt-get update && apt-get install -y cmake ninja-build g++ git
 cd /workspace
 cmake -S . -B build && cmake --build build
 ```
 
-### 为您的项目创建 Dockerfile
+### 项目的 Dockerfile
 
 ```dockerfile
 FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
@@ -234,7 +251,7 @@ RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && \
 ENTRYPOINT ["./build/bin/your_app"]
 ```
 
-## 云端开发
+## 云开发
 
 ### Google Colab
 
@@ -251,7 +268,7 @@ ENTRYPOINT ["./build/bin/your_app"]
 !cd mini-opencv/build && ctest --output-on-failure
 ```
 
-## 验证安装
+## 验证
 
 ### 测试安装
 
@@ -270,18 +287,18 @@ nm -C build/lib/libgpu_image_processing.a | grep "T gpu_image::"
 ### 故障排除
 
 | 问题 | 解决方案 |
-|-----|---------|
-| `nvcc not found` | 将 `/usr/local/cuda/bin` 添加到 PATH |
+|------|----------|
+| `nvcc not found` | 添加 `/usr/local/cuda/bin` 到 PATH |
 | `CUDA_ARCHITECTURES empty` | 手动设置：`-DCMAKE_CUDA_ARCHITECTURES=80` |
 | `undefined reference to cuda*` | 链接 `CUDA::cudart` |
 | `stb_image not found` | 启用 IO：`-DGPU_IMAGE_ENABLE_IO=ON` |
 
 ## 下一步
 
-- [快速入门](quickstart.zh-CN) - 构建您的第一个程序
-- [架构说明](architecture.zh-CN) - 理解设计原理
-- [性能优化](performance.zh-CN) - 针对您的硬件进行优化
+- [快速入门](quickstart.zh-CN.md) - 构建你的第一个程序
+- [架构概览](architecture.zh-CN.md) - 了解设计
+- [性能指南](performance.zh-CN.md) - 针对你的硬件优化
 
 ---
 
-*如需更多帮助，请参阅 [常见问题](faq.zh-CN) 或 [GitHub Issues](https://github.com/LessUp/mini-opencv/issues)*
+*如需额外帮助，请参阅 [FAQ](faq.zh-CN.md) 或 [GitHub Issues](https://github.com/LessUp/mini-opencv/issues)*

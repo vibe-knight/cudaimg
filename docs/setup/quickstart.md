@@ -1,12 +1,14 @@
 ---
 layout: default
 title: Quick Start
-description: Get started with Mini-OpenCV in 5 minutes - build, test, and run your first GPU image processing program.
+nav_order: 2
+parent: Documentation
+description: Get started with Mini-OpenCV in 5 minutes - build, test, and run your first GPU image processing program
 ---
 
 # Quick Start Guide
 
-Get started with Mini-OpenCV in 5 minutes. This guide will walk you through building the library, running tests, and processing your first image.
+Get started with Mini-OpenCV in 5 minutes. This guide walks you through building the library, running tests, and processing your first image.
 
 ## Prerequisites Check
 
@@ -37,14 +39,14 @@ nvidia-smi
 git clone https://github.com/LessUp/mini-opencv.git
 cd mini-opencv
 
-# Create build directory
-mkdir build && cd build
-
 # Configure with tests and examples
-cmake -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON ..
+cmake -S . -B build \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_TESTS=ON \
+    -DBUILD_EXAMPLES=ON
 
 # Build with all available cores
-make -j$(nproc)
+cmake --build build -j$(nproc)
 ```
 
 Build time: ~2-5 minutes depending on your hardware.
@@ -55,13 +57,13 @@ Verify the installation by running the test suite:
 
 ```bash
 # Run all tests
-ctest --output-on-failure
+ctest --test-dir build --output-on-failure
 
 # Or run the test binary directly
-./bin/gpu_image_tests
+./build/bin/gpu_image_tests
 
-# Run a specific test
-./bin/gpu_image_tests --gtest_filter=FiltersTest.*
+# Run a specific test suite
+./build/bin/gpu_image_tests --gtest_filter=FiltersTest.*
 ```
 
 All tests should pass. If tests fail, check [Troubleshooting](#troubleshooting).
@@ -72,10 +74,10 @@ Try the included examples to see the library in action:
 
 ```bash
 # Run basic example
-./bin/basic_example
+./build/bin/basic_example
 
 # Run pipeline example (async processing demo)
-./bin/pipeline_example
+./build/bin/pipeline_example
 ```
 
 Expected output for `basic_example`:
@@ -111,17 +113,17 @@ Create a simple program that loads, processes, and saves an image:
 using namespace gpu_image;
 
 int main() {
-    // Check CUDA availability
+    // Step 1: Check CUDA availability
     if (!isCudaAvailable()) {
         std::cerr << "CUDA not available!" << std::endl;
         return 1;
     }
     std::cout << getDeviceInfo() << std::endl;
 
-    // Create processor
+    // Step 2: Create processor
     ImageProcessor processor;
 
-    // Create a test image
+    // Step 3: Create a test image
     HostImage hostImage = ImageUtils::createHostImage(512, 512, 3);
     
     // Fill with gradient pattern
@@ -133,15 +135,15 @@ int main() {
         }
     }
 
-    // Load to GPU
+    // Step 4: Load to GPU
     GpuImage gpuImage = processor.loadFromHost(hostImage);
 
-    // Apply operations
+    // Step 5: Apply operations
     GpuImage blurred = processor.gaussianBlur(gpuImage, 5, 1.5f);
     GpuImage edges = processor.sobelEdgeDetection(gpuImage);
     GpuImage gray = processor.toGrayscale(gpuImage);
 
-    // Download results
+    // Step 6: Download results
     HostImage resultBlur = processor.downloadImage(blurred);
     HostImage resultEdges = processor.downloadImage(edges);
     HostImage resultGray = processor.downloadImage(gray);
@@ -160,7 +162,8 @@ int main() {
 ```bash
 # Using CMake (recommended)
 # Add to your CMakeLists.txt:
-# target_link_libraries(your_target gpu_image_processing)
+# find_package(gpu_image_processing REQUIRED)
+# target_link_libraries(your_target gpu_image::gpu_image_processing)
 
 # Or compile directly with nvcc
 nvcc -std=c++17 my_program.cpp \
@@ -229,14 +232,14 @@ int main() {
 
 ## Next Steps
 
-- [Installation Guide](installation) - Detailed installation options
-- [Architecture Overview](architecture) - Understanding the library design
-- [Performance Guide](performance) - Optimization tips
+- [Installation Guide](installation.md) - Detailed installation options
+- [Architecture Overview](architecture.md) - Understanding the library design
+- [Performance Guide](performance.md) - Optimization tips
 - [API Reference](api/) - Complete API documentation
 
 ## Getting Help
 
-- Check the [FAQ](faq)
+- Check the [FAQ](faq.md)
 - Search [GitHub Issues](https://github.com/LessUp/mini-opencv/issues)
 - Join [GitHub Discussions](https://github.com/LessUp/mini-opencv/discussions)
 

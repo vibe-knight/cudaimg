@@ -1,7 +1,9 @@
 ---
 layout: default
-title: Frequently Asked Questions
-description: Common questions and answers about Mini-OpenCV - installation, usage, troubleshooting, and best practices.
+title: FAQ
+parent: Documentation
+nav_order: 5
+description: Common questions and answers about Mini-OpenCV - installation, usage, troubleshooting, and best practices
 ---
 
 # Frequently Asked Questions
@@ -12,7 +14,7 @@ Quick answers to common questions about Mini-OpenCV.
 
 ### What is Mini-OpenCV?
 
-Mini-OpenCV is a high-performance CUDA-based image processing library that provides GPU-accelerated implementations of common computer vision operations. It offers a modern C++ API similar to OpenCV but optimized for NVIDIA GPUs.
+Mini-OpenCV is a high-performance CUDA-based image processing library providing GPU-accelerated implementations of common computer vision operations. It offers a modern C++ API optimized for NVIDIA GPUs.
 
 ### How does it compare to OpenCV?
 
@@ -26,27 +28,27 @@ Mini-OpenCV is a high-performance CUDA-based image processing library that provi
 
 ### Is it a replacement for OpenCV?
 
-No. Mini-OpenCV focuses specifically on GPU-accelerated operators and is designed to complement OpenCV, not replace it. Use OpenCV for CPU fallback, I/O operations, and algorithms not yet implemented in Mini-OpenCV.
+No. Mini-OpenCV focuses on GPU-accelerated operators and complements OpenCV. Use OpenCV for CPU fallback, I/O operations, and algorithms not yet implemented here.
 
 ## Installation
 
 ### What GPU do I need?
 
-Minimum: NVIDIA GPU with Compute Capability 7.5+ (Turing architecture)
+**Minimum:** NVIDIA GPU with Compute Capability 7.5+ (Turing architecture)
 - RTX 20 series, T4, and newer
 - GTX 16 series (limited support)
 
-Recommended: Ampere (RTX 30 series) or newer for best performance.
+**Recommended:** Ampere (RTX 30 series) or newer for best performance.
 
 ### Can I use it without a GPU?
 
-No. A CUDA-capable NVIDIA GPU is required to build and run Mini-OpenCV. The library is designed specifically for GPU acceleration.
+No. A CUDA-capable NVIDIA GPU is required. The library is designed specifically for GPU acceleration.
 
 ### Which CUDA version should I use?
 
-- Minimum: CUDA 11.0
-- Recommended: CUDA 12.x (latest stable)
-- The library is tested with CUDA 11.0 through 12.4
+- **Minimum:** CUDA 11.0
+- **Recommended:** CUDA 12.x (latest stable)
+- **Tested:** CUDA 11.0 through 12.4
 
 ### CMake can't find CUDA
 
@@ -89,7 +91,7 @@ For other formats, use OpenCV or other libraries to load, then transfer to Mini-
 
 ### Can I process video?
 
-Mini-OpenCV doesn't include video I/O, but you can use it with OpenCV:
+Mini-OpenCV doesn't include video I/O, but works with OpenCV:
 
 ```cpp
 #include <opencv2/opencv.hpp>
@@ -102,12 +104,12 @@ while (cap.read(frame)) {
     // Convert OpenCV Mat to HostImage
     HostImage host = ImageUtils::createHostImage(
         frame.cols, frame.rows, frame.channels());
-    std::memcpy(host.data.data(), frame.data, frame.total() * frame.elemSize());
+    std::memcpy(host.data.data(), frame.data, 
+                frame.total() * frame.elemSize());
     
     // Process with Mini-OpenCV
     GpuImage gpu = processor.loadFromHost(host);
     GpuImage result = processor.gaussianBlur(gpu, 5, 1.5f);
-    // ... continue processing
 }
 ```
 
@@ -120,22 +122,21 @@ HostImage result = processor.downloadImage(gpuImage);
 // Save to file
 ImageIO::save("output.jpg", result);
 
-// Or access raw data directly
+// Or access raw data
 std::vector<unsigned char>& data = result.data;
 int width = result.width;
 int height = result.height;
-int channels = result.channels;
 ```
 
 ## Performance
 
 ### Why is the first operation slow?
 
-CUDA kernel compilation (JIT) happens on first use. This is normal and typically adds 1-2 seconds to the first operation. Subsequent calls are fast.
+CUDA kernel compilation (JIT) happens on first use. This adds 1-2 seconds to the first operation. Subsequent calls are fast.
 
 To avoid this in production:
 - Warm up the GPU with a dummy operation
-- Or use pipeline processing where this is amortized across many images
+- Use pipeline processing where overhead is amortized
 
 ### How can I process images faster?
 
@@ -156,12 +157,12 @@ Solution: Use `PipelineProcessor` with batch size of 8-16.
 ### Out of memory errors
 
 ```cpp
-// Check available memory before processing
+// Check available memory
 size_t free, total;
 cudaMemGetInfo(&free, &total);
 
 // Estimate required memory
-size_t required = width * height * channels * 4; // 4 bytes per operation
+size_t required = width * height * channels * 4;
 
 if (required > free) {
     // Process in tiles or reduce resolution
@@ -200,11 +201,11 @@ ConvolutionEngine::gaussianBlur(input, output, 5, 1.5f, stream);
 
 ### Thread safety
 
-- `ImageProcessor` - Not thread-safe. Create one per thread.
-- `PipelineProcessor` - Not thread-safe.
-- Operator functions (ConvolutionEngine, etc.) - Thread-safe if:
-  - Each thread uses different GPU images
-  - Or each thread uses different CUDA streams
+| Component | Thread Safety |
+|-----------|---------------|
+| `ImageProcessor` | Not thread-safe. Create one per thread. |
+| `PipelineProcessor` | Not thread-safe. |
+| Operator functions | Thread-safe with different images/streams |
 
 ```cpp
 // Thread-safe usage
@@ -212,7 +213,6 @@ void processThread(int threadId, const HostImage& input) {
     ImageProcessor processor;  // Per-thread processor
     GpuImage gpu = processor.loadFromHost(input);
     GpuImage result = processor.gaussianBlur(gpu, 5, 1.5f);
-    // ...
 }
 ```
 
@@ -220,16 +220,13 @@ void processThread(int threadId, const HostImage& input) {
 
 ```cpp
 try {
-    GpuImage result = processor.gaussianBlur(image, 5, -1.0f);  // Invalid sigma
+    GpuImage result = processor.gaussianBlur(image, 5, -1.0f);
 } catch (const CudaException& e) {
     // CUDA runtime error
     std::cerr << "CUDA Error: " << e.what() << std::endl;
 } catch (const std::invalid_argument& e) {
     // Invalid parameter
     std::cerr << "Invalid argument: " << e.what() << std::endl;
-} catch (const std::runtime_error& e) {
-    // Other runtime error
-    std::cerr << "Runtime error: " << e.what() << std::endl;
 }
 ```
 
@@ -237,17 +234,17 @@ try {
 
 ### Build fails with "CUDA not found"
 
-1. Verify CUDA installation: `nvcc --version`
-2. Check CMake version: `cmake --version` (need 3.18+)
+1. Verify CUDA: `nvcc --version`
+2. Check CMake: `cmake --version` (need 3.18+)
 3. Set CUDA path: `export CUDAToolkit_ROOT=/usr/local/cuda`
 
 ### Tests fail
 
 ```bash
 # Run with verbose output
-./build/bin/gpu_image_tests --gtest_filter=* --gtest_also_run_disabled_tests
+./build/bin/gpu_image_tests --gtest_filter=*
 
-# Check if CUDA is available
+# Check CUDA availability
 ./build/bin/basic_example
 ```
 
@@ -257,7 +254,7 @@ Minor numerical differences are expected due to:
 - Different floating-point implementations
 - Order of operations in reductions
 
-These differences are usually < 1 pixel value and not visually noticeable.
+Differences are usually < 1 pixel value and not visually noticeable.
 
 ### Program crashes at startup
 
@@ -272,17 +269,14 @@ Check: `nvidia-smi` should show GPU information.
 
 ### How can I contribute?
 
-See [Contributing Guide](../CONTRIBUTING) for guidelines on:
+See [ContributING.md](../CONTRIBUTING.md) for:
 - Reporting bugs
 - Requesting features
 - Submitting pull requests
 
 ### Where is the roadmap?
 
-Check [GitHub Issues](https://github.com/LessUp/mini-opencv/issues) for:
-- Planned features
-- Known bugs
-- Feature requests
+Check [GitHub Issues](https://github.com/LessUp/mini-opencv/issues) for planned features and known bugs.
 
 ## Getting Help
 

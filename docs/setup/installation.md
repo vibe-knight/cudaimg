@@ -1,12 +1,14 @@
 ---
 layout: default
 title: Installation
-description: Complete installation guide for Mini-OpenCV - system requirements, CUDA setup, and build options.
+nav_order: 3
+parent: Documentation
+description: Complete installation guide for Mini-OpenCV - system requirements, CUDA setup, build options, and integration
 ---
 
 # Installation Guide
 
-This guide covers all aspects of installing and building Mini-OpenCV, from system requirements to advanced build configurations.
+Complete guide for installing and building Mini-OpenCV from source.
 
 ## System Requirements
 
@@ -15,7 +17,7 @@ This guide covers all aspects of installing and building Mini-OpenCV, from syste
 | Component | Minimum Version | Notes |
 |-----------|-----------------|-------|
 | CUDA Toolkit | 11.0 | nvcc compiler required |
-| CMake | 3.18 | For target-based configuration |
+| CMake | 3.18 | Target-based configuration |
 | C++ Compiler | C++17 | GCC 7+, Clang 7+, or MSVC 2019+ |
 | NVIDIA Driver | 450.80.02+ | For CUDA 11.0 |
 | GPU | Compute Capability 7.5+ | Turing architecture or newer |
@@ -25,7 +27,7 @@ This guide covers all aspects of installing and building Mini-OpenCV, from syste
 | Component | Recommended | For Best Performance |
 |-----------|-------------|---------------------|
 | CUDA Toolkit | 12.x | Latest stable version |
-| CMake | 3.24+ | For native GPU arch detection |
+| CMake | 3.24+ | Native GPU arch detection |
 | GPU | RTX 30/40 series | Ampere/Ada Lovelace |
 | RAM | 16 GB+ | For large image processing |
 
@@ -34,7 +36,7 @@ This guide covers all aspects of installing and building Mini-OpenCV, from syste
 ### Linux (Ubuntu/Debian)
 
 ```bash
-# Install CUDA Toolkit (method 1: package manager)
+# Install CUDA Toolkit
 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb
 sudo dpkg -i cuda-keyring_1.0-1_all.deb
 sudo apt-get update
@@ -47,16 +49,18 @@ sudo apt-get install -y cmake ninja-build g++ git
 nvcc --version  # Should show CUDA 11.0+
 ```
 
-### macOS
-
-Note: CUDA support on macOS is limited. Consider using Docker with CUDA support.
+### Linux (CentOS/RHEL/Fedora)
 
 ```bash
-# Install CMake and build tools
-brew install cmake ninja
+# Fedora
+sudo dnf install cmake ninja-build gcc-c++ git
 
-# Use Docker for CUDA development
-docker run --gpus all -it nvidia/cuda:12.4.1-devel-ubuntu22.04
+# CentOS/RHEL (enable EPEL first)
+sudo yum install epel-release
+sudo yum install cmake3 ninja-build gcc-c++ git
+
+# CUDA from NVIDIA repository
+# Follow https://developer.nvidia.com/cuda-downloads for your distro
 ```
 
 ### Windows
@@ -73,6 +77,18 @@ cmake --version
 # Build using Visual Studio generator
 cmake -S . -B build -G "Visual Studio 17 2022"
 cmake --build build --config Release
+```
+
+### macOS
+
+CUDA support on macOS is limited. Use Docker with CUDA support:
+
+```bash
+# Install CMake and build tools
+brew install cmake ninja
+
+# Use Docker for CUDA development
+docker run --gpus all -it nvidia/cuda:12.4.1-devel-ubuntu22.04
 ```
 
 ## Building from Source
@@ -112,13 +128,13 @@ cmake --build build -j$(nproc)
 |--------|---------|-------------|
 | `BUILD_TESTS` | ON | Build Google Test v1.14.0 tests |
 | `BUILD_EXAMPLES` | ON | Build example programs |
-| `BUILD_BENCHMARKS` | OFF | Build Google Benchmark v1.8.3 benchmarks |
+| `BUILD_BENCHMARKS` | OFF | Build Google Benchmark v1.8.3 |
 | `GPU_IMAGE_ENABLE_IO` | ON | Enable image I/O via stb |
 | `CMAKE_CUDA_ARCHITECTURES` | Auto | Target GPU architectures |
 
 ### GPU Architecture Selection
 
-CMake automatically detects your GPU architecture when using CMake 3.24+:
+CMake automatically detects your GPU architecture (CMake 3.24+):
 
 ```bash
 # Auto-detection (CMake 3.24+)
@@ -161,7 +177,7 @@ cmake --install build --prefix $HOME/.local
 
 ## Using as a Dependency
 
-### Option 1: CMake FetchContent
+### Option 1: CMake FetchContent (Recommended)
 
 ```cmake
 # In your CMakeLists.txt
@@ -278,10 +294,10 @@ nm -C build/lib/libgpu_image_processing.a | grep "T gpu_image::"
 
 ## Next Steps
 
-- [Quick Start](quickstart) - Build your first program
-- [Architecture](architecture) - Understand the design
-- [Performance Guide](performance) - Optimize for your hardware
+- [Quick Start](quickstart.md) - Build your first program
+- [Architecture](architecture.md) - Understand the design
+- [Performance Guide](performance.md) - Optimize for your hardware
 
 ---
 
-*For additional help, see [FAQ](faq) or [GitHub Issues](https://github.com/LessUp/mini-opencv/issues)*
+*For additional help, see [FAQ](faq.md) or [GitHub Issues](https://github.com/LessUp/mini-opencv/issues)*

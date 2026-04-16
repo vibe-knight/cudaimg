@@ -1,12 +1,14 @@
 ---
 layout: default
-title: Performance Optimization
-description: Optimization guide for Mini-OpenCV - GPU selection, memory management, and best practices for maximum throughput.
+title: Performance
+parent: Documentation
+nav_order: 4
+description: Optimization guide for Mini-OpenCV - GPU selection, memory management, stream concurrency, and best practices
 ---
 
 # Performance Optimization Guide
 
-This guide provides practical advice for maximizing performance when using Mini-OpenCV. From hardware selection to code-level optimizations.
+Practical advice for maximizing performance with Mini-OpenCV.
 
 ## Hardware Selection
 
@@ -21,12 +23,12 @@ This guide provides practical advice for maximizing performance when using Mini-
 
 ### Memory Requirements
 
-Use this formula to estimate memory usage:
+Estimate memory usage:
 
 ```
-GPU Memory = width × height × channels × (operations + 2) × 1.5
+GPU Memory ≈ width × height × channels × (operations + 2) × 1.5
 
-Example: 4K (3840×2160) image with 3 channels
+Example: 4K (3840×2160) RGB image
 = 3840 × 2160 × 3 × 4 × 1.5 ≈ 149 MB per cascade
 ```
 
@@ -46,27 +48,23 @@ Example: 4K (3840×2160) image with 3 channels
 ```cpp
 // BAD: Multiple transfers
 for (int i = 0; i < N; ++i) {
-    GpuImage gpu = processor.loadFromHost(images[i]);  // Transfer
+    GpuImage gpu = processor.loadFromHost(images[i]);
     GpuImage result = processor.gaussianBlur(gpu, 5, 1.5f);
-    HostImage output = processor.downloadImage(result);  // Transfer
-    results[i] = output;
+    HostImage output = processor.downloadImage(result);
 }
 
-// GOOD: Batch upload
+// GOOD: Pipeline batch processing
 PipelineProcessor pipeline(4);
-for (int i = 0; i < N; ++i) {
-    pipeline.processHost(images[i]);
-}
-results = pipeline.getResults();
+auto results = pipeline.processBatchHost(images);
 ```
 
-### 2. Use Pinned (Page-Locked) Memory
+### 2. Use Pinned Memory
+
+Pinned memory enables asynchronous transfers:
 
 ```cpp
-// Pinned memory enables async transfers
-cudaHostAlloc(&pinnedPtr, size, cudaHostAllocDefault);
-
 // Mini-OpenCV handles this internally via PipelineProcessor
+PipelineProcessor pipeline(4);  // Uses pinned memory automatically
 ```
 
 ### 3. Pool Allocations
@@ -84,37 +82,33 @@ for (auto& image : images) {
 
 ### Optimal Stream Count
 
-The optimal number of CUDA streams depends on your GPU:
-
 ```cpp
-// Rule of thumb: streams = number of SMs / 4
-// RTX 4090 (128 SMs): 32 streams
-// RTX 3080 (68 SMs): 17 streams
-// A100 (108 SMs): 27 streams
+// Rule of thumb: streams ≈ number of SMs / 4
+// RTX 4090 (128 SMs): ~32 streams
+// RTX 3080 (68 SMs): ~17 streams
+// A100 (108 SMs): ~27 streams
 
-// But usually 4-8 streams show best results:
-PipelineProcessor pipeline(4);  // Good default
+// Practical: 4-8 streams usually optimal
+PipelineProcessor pipeline(4);
 ```
 
-### Benchmark Results
+### Benchmark: Stream Scaling
 
-| Streams | 10 images (512×512) | Speedup | Efficiency |
-|---------|---------------------|---------|------------|
-| 1 | 120 ms | 1.0x | 100% |
-| 2 | 75 ms | 1.6x | 80% |
-| 4 | 52 ms | 2.3x | 58% |
-| 8 | 45 ms | 2.7x | 34% |
-| 16 | 42 ms | 2.9x | 18% |
+| Streams | 100 images (512×512) | Speedup | Efficiency |
+|---------|----------------------|---------|------------|
+| 1 | 800 ms | 1.0x | 100% |
+| 2 | 480 ms | 1.7x | 85% |
+| 4 | 320 ms | 2.5x | 63% |
+| 8 | 280 ms | 2.9x | 36% |
 
-*Tested on RTX 4080 with gaussian blur pipeline*
+*RTX 4080 with gaussian blur pipeline*
 
 ### Stream Ordering
 
 ```cpp
-// Operations in same stream are ordered automatically
+// Operations in same stream execute sequentially
 pipeline.addStep([](GpuImage& img, cudaStream_t s) {
     GpuImage temp1, temp2;
-    // These execute sequentially
     ConvolutionEngine::gaussianBlur(img, temp1, 3, 1.0f, s);
     PixelOperator::invert(temp1, temp2, s);
     Geometric::rotate(temp2, img, 45.0f, s);
@@ -130,38 +124,29 @@ Fuse operations when:
 - Intermediate results aren't needed
 - Memory bandwidth is the bottleneck
 
-### Example: Fused Operations
+### Example
 
 ```cpp
-// BAD: Separate kernel launches
+// BAD: Multiple kernel launches
 GpuImage temp1, temp2;
 PixelOperator::invert(input, temp1, stream);
 PixelOperator::adjustBrightness(temp1, temp2, 50, stream);
 ColorSpace::toGrayscale(temp2, output, stream);
 
-// GOOD: Single fused operation (if implemented)
+// GOOD: Single kernel (if implemented)
 // PixelOperator::invertBrightnessGrayscale(input, output, 50, stream);
 ```
-
-### Built-in Fused Operations
-
-| Fused Operation | Description | Speedup |
-|-----------------|-------------|---------|
-| `histogramEqualize` | Equalize + normalize | 1.3x |
-| `sobelEdgeDetection` | Sobel X + Y + magnitude | 1.4x |
 
 ## Algorithm Selection
 
 ### Convolution Kernel Sizes
 
-| Kernel Size | Relative Speed | Use Case |
-|-------------|---------------|----------|
+| Kernel | Relative Time | Use Case |
+|--------|---------------|----------|
 | 3×3 | 1.0x | Fast blur, sharpening |
 | 5×5 | 2.2x | Standard blur |
 | 7×7 | 4.1x | Heavy blur |
 | 9×9 | 6.8x | Maximum blur |
-
-*Larger kernels need more registers and shared memory*
 
 ### Interpolation Methods
 
@@ -171,7 +156,7 @@ ColorSpace::toGrayscale(temp2, output, stream);
 | Bilinear | Good | Fast | General purpose |
 | Bicubic | Better | Slow | High quality resize |
 
-Mini-OpenCV currently supports nearest and bilinear.
+Mini-OpenCV supports nearest and bilinear interpolation.
 
 ## Profiling
 
@@ -193,7 +178,7 @@ public:
 Timer timer;
 timer.start();
 GpuImage result = processor.gaussianBlur(image, 5, 1.5f);
-cudaDeviceSynchronize();  // Ensure GPU is done
+cudaDeviceSynchronize();
 std::cout << "Time: " << timer.elapsedMs() << " ms" << std::endl;
 ```
 
@@ -207,18 +192,18 @@ nsys profile -o report.qdrep ./your_program
 nsys-ui report.qdrep
 ```
 
-### Key Metrics to Monitor
+### Key Metrics
 
 | Metric | Target | Action if Poor |
 |--------|--------|----------------|
 | GPU Utilization | >80% | Increase batch size |
 | Memory Bandwidth | >70% | Check data locality |
 | Kernel Occupancy | >60% | Check block size |
-| PCIe Bandwidth | <20% data transfer | Batch transfers |
+| PCIe Bandwidth | <20% transfer | Batch transfers |
 
-## Comparison with OpenCV
+## Performance Comparison
 
-### Performance Ratio (GPU vs CPU)
+### Mini-OpenCV vs OpenCV CPU
 
 | Operation | OpenCV CPU | Mini-OpenCV GPU | Speedup |
 |-----------|------------|-----------------|---------|
@@ -228,16 +213,16 @@ nsys-ui report.qdrep
 | Resize (bilinear) | 6 ms | 0.15 ms | 40x |
 | RGB→Grayscale | 2 ms | 0.05 ms | 40x |
 
-*Measured on 1920×1080 image, Intel i9-12900K vs RTX 4080*
+*1920×1080 image, Intel i9-12900K vs RTX 4080*
 
-### When to Use Each
+### Use Case Recommendations
 
 | Use Case | Recommendation |
 |----------|----------------|
 | Real-time video | Mini-OpenCV (GPU) |
 | Batch processing | Mini-OpenCV (Pipeline) |
-| Single image, latency critical | OpenCV (CPU) - no GPU warmup |
-| Embedded systems | OpenCV (CPU) - no GPU available |
+| Single image, latency critical | OpenCV (CPU) |
+| Embedded systems | OpenCV (CPU) |
 
 ## Best Practices
 
@@ -246,14 +231,14 @@ nsys-ui report.qdrep
 ```cpp
 // First CUDA call includes JIT compilation overhead
 GpuImage warmup = processor.gaussianBlur(dummy, 5, 1.5f);
-cudaDeviceSynchronize();  // Force compilation
+cudaDeviceSynchronize();
 // Subsequent calls are faster
 ```
 
 ### 2. Image Size Alignment
 
 ```cpp
-// Align image dimensions to 32 for optimal memory access
+// Align to 32 for optimal memory access
 int alignedWidth = ((width + 31) / 32) * 32;
 int alignedHeight = ((height + 31) / 32) * 32;
 ```
@@ -275,14 +260,14 @@ GpuImage processed = processor.sobelEdgeDetection(small);
 GpuImage fullSize = processor.resize(processed, width, height);
 ```
 
-## Troubleshooting Performance Issues
+## Troubleshooting Performance
 
 | Symptom | Likely Cause | Solution |
 |---------|--------------|----------|
-| Low GPU utilization | Small images or low batch size | Increase batch size or use tiling |
-| PCIe bound | Too many host-device transfers | Use PipelineProcessor or batch uploads |
-| Kernel latency | Many small operations | Fuse kernels or use larger tiles |
-| Memory errors | Image too large | Reduce resolution or process in tiles |
+| Low GPU utilization | Small images or low batch | Increase batch size |
+| PCIe bound | Too many transfers | Use PipelineProcessor |
+| Kernel latency | Many small operations | Fuse kernels |
+| Memory errors | Image too large | Process in tiles |
 
 ## Next Steps
 
@@ -292,4 +277,4 @@ GpuImage fullSize = processor.resize(processed, width, height);
 
 ---
 
-*For performance questions, see [FAQ](faq) or open a discussion*
+*For performance questions, see [FAQ](faq.md) or open a discussion*

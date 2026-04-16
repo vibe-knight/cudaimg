@@ -1,12 +1,14 @@
 ---
 layout: default
 title: Architecture
-description: Deep dive into Mini-OpenCV architecture - three-layer design, memory management, and CUDA stream concurrency.
+parent: Documentation
+nav_order: 3
+description: Deep dive into Mini-OpenCV architecture - three-layer design, memory management, and CUDA stream concurrency
 ---
 
 # Architecture Overview
 
-Mini-OpenCV is designed with a three-layer architecture that separates concerns between user-facing APIs, operator implementations, and infrastructure services. This document explains the design principles and how they affect your usage.
+Mini-OpenCV uses a three-layer architecture separating user APIs, operator implementations, and infrastructure services.
 
 ## Three-Layer Architecture
 
@@ -64,13 +66,13 @@ High-level APIs for end users:
 | `ImageProcessor` | One-stop image processing | Synchronous |
 | `PipelineProcessor` | Multi-step batch processing | Asynchronous |
 
-**Usage Example:**
+**Usage:**
 ```cpp
-// Synchronous - simple operations
+// Synchronous
 ImageProcessor processor;
 GpuImage blurred = processor.gaussianBlur(image, 5, 1.5f);
 
-// Asynchronous - batch processing with streams
+// Asynchronous
 PipelineProcessor pipeline(4);
 pipeline.addStep([](GpuImage& img, cudaStream_t s) {
     ConvolutionEngine::gaussianBlur(img, temp, 3, 1.0f, s);
@@ -93,18 +95,15 @@ Low-level CUDA kernel implementations:
 | `Geometric` | Rotate, flip, affine | Bilinear interpolation |
 | `Filters` | Median, bilateral, box | Edge-preserving |
 
-Operator modules are designed to be **stateless** and **stream-aware**:
+Operators are **stateless** and **stream-aware**:
 
 ```cpp
-// Stateless - no internal state kept between calls
+// Stateless - no internal state
 namespace ConvolutionEngine {
     void gaussianBlur(const GpuImage& src, GpuImage& dst, 
                       int kernelSize, float sigma, 
                       cudaStream_t stream = nullptr);
 }
-
-// Stream-aware - all operations accept optional cudaStream_t
-void myOperation(GpuImage& img, cudaStream_t stream = nullptr);
 ```
 
 #### 3. Infrastructure Layer
@@ -120,62 +119,48 @@ Memory and execution management:
 | `HostImage` | Host memory image container |
 | `CudaError` | Exception-based error handling |
 
-## Memory Management Model
+## Memory Management
 
-### RAII-Based Design
+### RAII Design
 
 ```cpp
-// DeviceBuffer automatically manages GPU memory
+// Automatic GPU memory management
 {
-    DeviceBuffer buffer(1024 * 1024);  // Allocate 1MB GPU memory
-    // Use buffer...
+    DeviceBuffer buffer(1024 * 1024);  // 1MB GPU memory
     void* ptr = buffer.data();
-    size_t size = buffer.size();
-}  // Automatically freed when buffer goes out of scope
+}  // Automatically freed when out of scope
 ```
 
-### Memory Transfer Patterns
+### Memory Patterns
 
 ```cpp
-// Pattern 1: Load-Process-Download (typical workflow)
+// Pattern: Load-Process-Download
 HostImage host = loadImage("input.jpg");
 GpuImage gpu = processor.loadFromHost(host);
 GpuImage result = processor.gaussianBlur(gpu, 5, 1.5f);
 HostImage output = processor.downloadImage(result);
-saveImage("output.jpg", output);
-
-// Pattern 2: Zero-copy (when using unified memory)
-// Not yet supported, planned for future release
-
-// Pattern 3: Batch upload with pinned memory
-std::vector<HostImage> batch = loadBatch(100);
-std::vector<GpuImage> gpuBatch;
-for (auto& host : batch) {
-    gpuBatch.push_back(processor.loadFromHost(host));
-}
 ```
 
 ### Memory Layout
 
-Images are stored in **interleaved format** (planar for grayscale):
+Images stored in **interleaved format**:
 
 ```
-RGB Image Layout (width=4, height=3, channels=3):
+RGB Image (width=4, height=3, channels=3):
 
 Memory: [R0 G0 B0 R1 G1 B1 R2 G2 B2 R3 G3 B3]
         [R4 G4 B4 R5 G5 B5 R6 G6 B6 R7 G7 B7]
         [R8 G8 B8 R9 G9 B9 R10 G10 B10 R11 G11 B11]
 
 Stride: row_stride = width * channels (padded to alignment)
-        total_size = row_stride * height
 ```
 
 ## CUDA Stream Concurrency
 
-### Stream Architecture
+### Stream Usage
 
 ```cpp
-// Default stream (nullptr) - synchronous with host
+// Default stream - synchronous with host
 ConvolutionEngine::gaussianBlur(src, dst, 5, 1.5f, nullptr);
 
 // Explicit stream - asynchronous execution
@@ -183,54 +168,51 @@ cudaStream_t stream;
 cudaStreamCreate(&stream);
 ConvolutionEngine::gaussianBlur(src, dst, 5, 1.5f, stream);
 cudaStreamSynchronize(stream);
-cudaStreamDestroy(stream);
 ```
 
-### Pipeline Processor Concurrency Model
+### Pipeline Concurrency Model
 
 ```cpp
 PipelineProcessor pipeline(4);  // 4 concurrent streams
 
 // Internally:
-// Stream 0: [Upload] -> [Op1] -> [Op2] -> [Download]
-// Stream 1: [Upload] -> [Op1] -> [Op2] -> [Download]
-// Stream 2: [Upload] -> [Op1] -> [Op2] -> [Download]
-// Stream 3: [Upload] -> [Op1] -> [Op2] -> [Download]
+// Stream 0: [Upload] → [Op1] → [Op2] → [Download]
+// Stream 1: [Upload] → [Op1] → [Op2] → [Download]
+// Stream 2: [Upload] → [Op1] → [Op2] → [Download]
+// Stream 3: [Upload] → [Op1] → [Op2] → [Download]
 // Timeline overlap maximizes GPU utilization
 ```
 
 ### Stream Safety
 
-All operator modules are **stream-safe** when:
+Operations are **stream-safe** when:
 - Input and output images are different (no in-place)
-- Or using stream-specific versions (e.g., `invertInPlace`)
+- Or using stream-specific in-place methods
 
 ```cpp
 // Safe: different input/output
 GpuImage temp;
 ConvolutionEngine::gaussianBlur(input, temp, 5, 1.5f, stream);
-ConvolutionEngine::sobelEdgeDetection(temp, output, stream);
 
 // Safe: in-place with stream-aware method
 PixelOperator::invertInPlace(image, stream);
 ```
 
-## Error Handling Strategy
+## Error Handling
 
 ### Exception Hierarchy
 
 ```
 std::exception
-    └── CudaException (our custom exception)
-            └── CUDA runtime errors + context
+    └── CudaException (CUDA runtime errors + context)
 ```
 
-### Error Handling Patterns
+### Patterns
 
 ```cpp
 // Pattern 1: Let exceptions propagate
 try {
-    GpuImage result = processor.gaussianBlur(image, 5, -1.0f);  // Invalid sigma
+    GpuImage result = processor.gaussianBlur(image, 5, -1.0f);
 } catch (const CudaException& e) {
     std::cerr << "CUDA error: " << e.what() << std::endl;
 }
@@ -239,17 +221,11 @@ try {
 if (sigma <= 0) {
     throw std::invalid_argument("Sigma must be positive");
 }
-GpuImage result = processor.gaussianBlur(image, kernelSize, sigma);
-
-// Pattern 3: Defensive programming
-if (!image.isValid()) {
-    return GpuImage();  // Return empty image
-}
 ```
 
 ## Design Principles
 
-1. **Separation of Concerns**: Each layer has a single responsibility
+1. **Separation of Concerns**: Each layer has single responsibility
 2. **Zero-Copy When Possible**: Minimize host-device transfers
 3. **Stream-Aware**: All operations support async execution
 4. **RAII Memory**: Automatic resource management
@@ -272,4 +248,4 @@ if (!image.isValid()) {
 
 ---
 
-*For questions about architecture, see [FAQ](faq) or open a discussion* 
+*For architecture questions, see [FAQ](faq.md) or open a discussion*
