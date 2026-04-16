@@ -1,8 +1,9 @@
-# Design Document: GPU Image Processing Library
+# RFC 0001: GPU Image Processing Library Design
 
-[← Back to Specs](.) | [Requirements](requirements.md) | [Tasks](tasks.md)
-
----
+**Status:** Implemented  
+**Created:** 2024  
+**Updated:** 2026-04-17  
+**Author:** mini-opencv contributors
 
 ## Table of Contents
 
@@ -21,7 +22,7 @@
 
 ## Overview
 
-本设计文档描述了一个基于 CUDA 的高性能图像处理库的架构和实现细节。该库采用分层架构，将内存管理、计算内核和高级 API 分离，以实现良好的可维护性和可扩展性。
+This design document describes the architecture and implementation details of a CUDA-based high-performance image processing library. The library uses a layered architecture, separating memory management, compute kernels, and high-level APIs to achieve good maintainability and extensibility.
 
 **Core Design Principles:**
 
@@ -54,7 +55,7 @@
 │                   Processing Layer                           │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────────┐    │
 │  │PixelOperator │ │ConvolutionEng│ │HistogramCalc     │    │
-│  └──────────────┘ └──────────────┘ └──────────────────────┘│
+│  └──────────────┘ └──────────────┘ └──────────────────┘    │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────────┐    │
 │  │ ImageResizer │ │  Morphology  │ │   Threshold      │    │
 │  └──────────────┘ └──────────────┘ └──────────────────┘    │
@@ -68,7 +69,7 @@
 │                   Memory Management Layer                    │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────────┐    │
 │  │MemoryManager │ │ DeviceBuffer │ │ StreamManager    │    │
-│  └──────────────┘ └──────────────┘ └──────────────────────┘│
+│  └──────────────┘ └──────────────┘ └──────────────────┘    │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -85,7 +86,7 @@
 
 #### DeviceBuffer
 
-管理单个 GPU 内存缓冲区的生命周期。
+Manages the lifecycle of a single GPU memory buffer.
 
 ```cpp
 class DeviceBuffer {
@@ -127,7 +128,7 @@ private:
 
 #### MemoryManager
 
-管理内存分配和传输，提供内存池功能。
+Manages memory allocation and transfer, providing memory pool functionality.
 
 ```cpp
 class MemoryManager {
@@ -160,7 +161,7 @@ private:
 
 #### StreamManager
 
-管理 CUDA Streams 用于异步操作。
+Manages CUDA Streams for async operations.
 
 ```cpp
 class StreamManager {
@@ -194,7 +195,7 @@ private:
 
 #### GpuImage
 
-GPU 上的图像表示。
+GPU image representation.
 
 ```cpp
 struct GpuImage {
@@ -210,7 +211,7 @@ struct GpuImage {
 
 #### PixelOperator
 
-像素级操作的实现。
+Implementation of pixel-level operations.
 
 ```cpp
 class PixelOperator {
@@ -234,7 +235,7 @@ public:
 
 #### ConvolutionEngine
 
-卷积操作的实现，使用 Shared Memory 优化。
+Implementation of convolution operations, using Shared Memory optimization.
 
 ```cpp
 class ConvolutionEngine {
@@ -267,7 +268,7 @@ private:
 
 #### HistogramCalculator
 
-直方图计算，使用原子操作和并行规约。
+Histogram calculation using atomic operations and parallel reduction.
 
 ```cpp
 class HistogramCalculator {
@@ -287,7 +288,7 @@ public:
 
 #### ImageResizer
 
-图像缩放，使用双线性插值。
+Image scaling using bilinear interpolation.
 
 ```cpp
 class ImageResizer {
@@ -313,7 +314,7 @@ private:
 
 #### ImageProcessor
 
-主要的用户接口类。
+Main user-facing API class.
 
 ```cpp
 class ImageProcessor {
@@ -353,7 +354,7 @@ public:
 
 #### PipelineProcessor
 
-流水线处理器，用于高效处理多张图像。
+Pipeline processor for efficient batch image processing.
 
 ```cpp
 class PipelineProcessor {
@@ -477,9 +478,9 @@ struct ProcessorConfig {
 
 ## Correctness Properties
 
-*正确性属性是指在系统所有有效执行中都应该保持为真的特征或行为。属性是人类可读规范与机器可验证正确性保证之间的桥梁。*
+*Correctness properties are invariants or behaviors that should hold across all valid executions of the system. Properties bridge human-readable specifications and machine-verifiable correctness guarantees.*
 
-基于需求分析，以下是本系统需要验证的核心正确性属性：
+Based on requirements analysis, here are the core correctness properties to verify for this system:
 
 | # | Property | Type | Validates |
 |---|----------|------|-----------|
@@ -496,73 +497,73 @@ struct ProcessorConfig {
 ### Property Details
 
 <details>
-<summary>Property 1: 数据传输往返一致性 (Round-Trip)</summary>
+<summary>Property 1: Data Transfer Round-Trip Consistency</summary>
 
-*For any* 有效的图像数据，将其从 Host 上传到 Device，然后从 Device 下载回 Host，得到的数据应该与原始数据完全相同。
+*For any* valid image data, uploading from Host to Device and then downloading back to Host should yield data identical to the original.
 
 **Validates: Requirements 1.1, 1.2**
 </details>
 
 <details>
-<summary>Property 2: 反色操作自逆性 (Involution)</summary>
+<summary>Property 2: Invert Operation Involution</summary>
 
-*For any* 有效的图像，对其执行两次反色操作后，结果应该与原始图像完全相同。即 `invert(invert(image)) == image`。
+*For any* valid image, applying the invert operation twice should yield the original image. That is, `invert(invert(image)) == image`.
 
 **Validates: Requirement 2.1**
 </details>
 
 <details>
-<summary>Property 3: 灰度化公式正确性 (Invariant)</summary>
+<summary>Property 3: Grayscale Formula Correctness</summary>
 
-*For any* 有效的 RGB 图像中的任意像素 (R, G, B)，灰度化后的输出值应该等于 `round(0.299*R + 0.587*G + 0.114*B)`，且结果在 [0, 255] 范围内。
+*For any* valid RGB image and any pixel (R, G, B), the grayscale output should equal `round(0.299*R + 0.587*G + 0.114*B)` and be within [0, 255] range.
 
 **Validates: Requirement 2.2**
 </details>
 
 <details>
-<summary>Property 4: 亮度调整范围不变性 (Invariant)</summary>
+<summary>Property 4: Brightness Adjustment Range Invariance</summary>
 
-*For any* 有效的图像和任意亮度偏移量，亮度调整后的所有像素值应该在 [0, 255] 范围内。
+*For any* valid image and any brightness offset, all pixel values after brightness adjustment should remain within [0, 255] range.
 
 **Validates: Requirement 2.3**
 </details>
 
 <details>
-<summary>Property 5: 卷积操作与参考实现一致性 (Model-Based)</summary>
+<summary>Property 5: Convolution Consistency with Reference</summary>
 
-*For any* 有效的图像和卷积核，GPU 卷积操作的结果应该与 CPU 参考实现的结果在数值精度范围内一致（允许 ±1 的舍入误差）。
+*For any* valid image and convolution kernel, the GPU convolution result should match the CPU reference implementation within numerical precision (allowing ±1 rounding error).
 
 **Validates: Requirements 3.1, 3.2**
 </details>
 
 <details>
-<summary>Property 6: 边界处理正确性 (Invariant)</summary>
+<summary>Property 6: Boundary Handling Correctness</summary>
 
-*For any* 使用零填充的卷积操作，边界像素的计算应该将图像外部的像素视为 0。
+*For any* convolution operation with zero-padding, boundary pixels should treat pixels outside the image as 0.
 
 **Validates: Requirement 3.4**
 </details>
 
 <details>
-<summary>Property 7: 直方图总和不变性 (Invariant)</summary>
+<summary>Property 7: Histogram Sum Invariance</summary>
 
-*For any* 有效的灰度图像，其直方图所有 bin 的总和应该等于图像的总像素数（width × height）。
+*For any* valid grayscale image, the sum of all histogram bins should equal the total pixel count (width × height).
 
 **Validates: Requirement 4.1**
 </details>
 
 <details>
-<summary>Property 8: 缩放操作近似可逆性 (Approximate Round-Trip)</summary>
+<summary>Property 8: Scaling Approximate Round-Trip</summary>
 
-*For any* 有效的图像，先放大再缩小回原尺寸（或先缩小再放大），结果应该与原图像在视觉上相似（PSNR > 30dB 或 SSIM > 0.9）。
+*For any* valid image, scaling up then down (or down then up) should yield a result visually similar to the original (PSNR > 30dB or SSIM > 0.9).
 
 **Validates: Requirement 5.1**
 </details>
 
 <details>
-<summary>Property 9: 流水线处理结果一致性 (Confluence)</summary>
+<summary>Property 9: Pipeline Processing Consistency</summary>
 
-*For any* 有效的图像和处理步骤序列，使用流水线处理和使用同步处理应该产生相同的结果。
+*For any* valid image and processing sequence, pipeline processing and synchronous processing should produce identical results.
 
 **Validates: Requirement 6.4**
 </details>
@@ -605,27 +606,27 @@ enum class ErrorCode {
 | **Parameter Validation** | All public APIs validate parameters before execution |
 | **CUDA Error Checking** | Every CUDA API call is wrapped with `CUDA_CHECK` macro |
 | **Resource Cleanup** | RAII ensures resource release |
-| **Error Recovery** | System remains consistent state after error |
+| **Error Recovery** | System remains in consistent state after error |
 
 #### Validation Rules
 
-1. **参数验证**：所有公共 API 在执行前验证参数
-   - 图像尺寸必须 > 0
-   - 卷积核大小必须为奇数且 >= 3
-   - 通道数必须为 1、3 或 4
-   - 指针不能为空
+1. **Parameter Validation**: All public APIs validate parameters before execution
+   - Image dimensions must be > 0
+   - Kernel size must be odd and >= 3
+   - Channel count must be 1, 3, or 4
+   - Pointers must not be null
 
-2. **CUDA 错误检查**：每个 CUDA API 调用后检查错误
-   - 使用 `CUDA_CHECK` 宏包装所有 CUDA 调用
-   - 错误信息包含文件名、行号和 CUDA 错误描述
+2. **CUDA Error Checking**: Check errors after every CUDA API call
+   - Wrap all CUDA calls with `CUDA_CHECK` macro
+   - Error messages include filename, line number, and CUDA error description
 
-3. **资源清理**：使用 RAII 确保资源释放
-   - `DeviceBuffer` 析构函数自动释放内存
-   - 异常安全：即使发生异常也不泄漏资源
+3. **Resource Cleanup**: Use RAII to ensure resource release
+   - `DeviceBuffer` destructor automatically releases memory
+   - Exception safety: no resource leaks even when exceptions occur
 
-4. **错误恢复**：错误后系统保持一致状态
-   - 失败的操作不修改输入数据
-   - 部分完成的操作会回滚
+4. **Error Recovery**: Maintain consistent state after errors
+   - Failed operations don't modify input data
+   - Partially completed operations are rolled back
 
 ---
 
@@ -641,23 +642,23 @@ enum class ErrorCode {
 
 ### Dual Testing Approach
 
-本项目采用单元测试和属性测试相结合的方法：
+This project uses a combination of unit tests and property-based tests:
 
 #### Unit Tests
 
-验证特定示例和边界情况：
+Verify specific examples and edge cases:
 
-- 测试已知输入的预期输出
-- 测试边界条件（空图像、单像素图像、最大尺寸图像）
-- 测试错误处理路径
+- Test expected output for known inputs
+- Test boundary conditions (empty images, single-pixel images, maximum size images)
+- Test error handling paths
 
 #### Property Tests
 
-验证跨所有输入的通用属性：
+Verify universal properties across all inputs:
 
-- 每个属性测试运行至少 100 次迭代
-- 使用随机生成的图像数据
-- 测试数学不变性和往返属性
+- Each property test runs at least 100 iterations
+- Use randomly generated image data
+- Test mathematical invariants and round-trip properties
 
 ### Property Test Configuration
 
@@ -680,7 +681,7 @@ rc::Gen<HostImage> arbitraryImage() {
 
 ### Test Annotation Format
 
-每个属性测试必须包含以下注释：
+Each property test must include the following annotation:
 
 ```cpp
 // Feature: gpu-image-processing, Property 1: Data Transfer Round-Trip Consistency
@@ -694,20 +695,20 @@ RC_GTEST_PROP(MemoryTransfer, RoundTrip, ()) {
 
 | Requirement | Unit Test | Property Test |
 |-------------|-----------|---------------|
-| 1.1, 1.2 数据传输 | ✓ Basic transfer | ✓ Property 1 |
-| 2.1 反色 | ✓ Known image | ✓ Property 2 |
-| 2.2 灰度化 | ✓ Known pixels | ✓ Property 3 |
-| 2.3 亮度调整 | ✓ Boundary values | ✓ Property 4 |
-| 3.1, 3.2 卷积 | ✓ Small images | ✓ Property 5 |
-| 3.4 边界处理 | ✓ Boundary pixels | ✓ Property 6 |
-| 4.1 直方图 | ✓ Known distribution | ✓ Property 7 |
-| 5.1 缩放 | ✓ Integer scaling | ✓ Property 8 |
-| 6.4 流水线 | ✓ Multi-image | ✓ Property 9 |
-| 7.x 错误处理 | ✓ Various errors | - |
+| 1.1, 1.2 Data Transfer | ✓ Basic transfer | ✓ Property 1 |
+| 2.1 Invert | ✓ Known image | ✓ Property 2 |
+| 2.2 Grayscale | ✓ Known pixels | ✓ Property 3 |
+| 2.3 Brightness | ✓ Boundary values | ✓ Property 4 |
+| 3.1, 3.2 Convolution | ✓ Small images | ✓ Property 5 |
+| 3.4 Boundary | ✓ Boundary pixels | ✓ Property 6 |
+| 4.1 Histogram | ✓ Known distribution | ✓ Property 7 |
+| 5.1 Scaling | ✓ Integer scaling | ✓ Property 8 |
+| 6.4 Pipeline | ✓ Multi-image | ✓ Property 9 |
+| 7.x Error Handling | ✓ Various errors | - |
 
 ---
 
 ## Related Documents
 
-- [Requirements Document](requirements.md) - Detailed requirements specification
-- [Tasks Document](tasks.md) - Implementation task checklist
+- [Requirements Document](../product/gpu-image-processing-requirements.md) - Detailed requirements specification
+- [Tasks Document](0001-gpu-image-processing-tasks.md) - Implementation task checklist

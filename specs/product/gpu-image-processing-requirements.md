@@ -1,8 +1,4 @@
-# Requirements Document
-
-[← Back to Specs](.) | [Design](design.md) | [Tasks](tasks.md)
-
----
+# Requirements Document: GPU Image Processing Library
 
 ## Table of Contents
 
@@ -23,7 +19,7 @@
 
 ## Introduction
 
-本项目旨在构建一个基于 GPU 加速的高性能图像处理库，类似于 OpenCV 的迷你版本，但底层全部使用 CUDA 加速。该库将帮助开发者理解异构计算的核心概念，包括 Host-Device 数据传输、并行算法（Map、Reduce、Stencil）以及 GPU 内存优化技术。
+This project aims to build a GPU-accelerated image processing library based on CUDA, similar to a mini version of OpenCV, but with all底层 operations using CUDA acceleration. This library will help developers understand the core concepts of heterogeneous computing, including Host-Device data transfer, parallel algorithms (Map, Reduce, Stencil), and GPU memory optimization techniques.
 
 ### Project Goals
 
@@ -58,105 +54,105 @@
 
 ### Requirement 1: Image Data Management
 
-**User Story:** 作为开发者，我希望能够方便地在 CPU 和 GPU 之间传输图像数据，以便进行 GPU 加速处理。
+**User Story:** As a developer, I want to be able to conveniently transfer image data between CPU and GPU, so that I can perform GPU-accelerated processing.
 
 #### Acceptance Criteria
 
 | ID | Condition | Expected Behavior |
 |----|-----------|-------------------|
-| 1.1 | 用户加载一张图像 | Memory_Manager SHALL 将图像数据从 Host 内存复制到 Device 内存 |
-| 1.2 | GPU 处理完成 | Memory_Manager SHALL 将结果数据从 Device 内存复制回 Host 内存 |
-| 1.3 | 用户请求释放资源 | Memory_Manager SHALL 释放所有已分配的 Device 内存 |
-| 1.4 | 内存分配失败 | Memory_Manager SHALL 返回明确的错误信息并保持系统稳定状态 |
+| 1.1 | User loads an image | Memory_Manager SHALL copy image data from Host memory to Device memory |
+| 1.2 | GPU processing completes | Memory_Manager SHALL copy result data from Device memory back to Host memory |
+| 1.3 | User requests resource release | Memory_Manager SHALL release all allocated Device memory |
+| 1.4 | Memory allocation fails | Memory_Manager SHALL return clear error information and maintain system stability |
 
 ---
 
 ### Requirement 2: Pixel-Level Operations
 
-**User Story:** 作为开发者，我希望能够对图像执行基础的像素级操作，以便进行简单的图像变换。
+**User Story:** As a developer, I want to perform basic pixel-level operations on images, so that I can apply simple image transformations.
 
 #### Acceptance Criteria
 
 | ID | Condition | Expected Behavior |
 |----|-----------|-------------------|
-| 2.1 | 用户请求图像反色操作 | Pixel_Operator SHALL 将每个像素值变换为 (255 - 原值) |
-| 2.2 | 用户请求灰度化操作 | Pixel_Operator SHALL 使用加权公式 (0.299*R + 0.587*G + 0.114*B) 将 RGB 图像转换为灰度图像 |
-| 2.3 | 用户请求亮度调整操作 | Pixel_Operator SHALL 将每个像素值加上指定的偏移量并裁剪到 [0, 255] 范围内 |
-| 2.4 | 处理大尺寸图像 | Pixel_Operator SHALL 利用 GPU 并行性实现比 CPU 串行处理更快的执行速度 |
+| 2.1 | User requests image invert | Pixel_Operator SHALL transform each pixel value to (255 - original value) |
+| 2.2 | User requests grayscale | Pixel_Operator SHALL convert RGB image to grayscale using weighted formula (0.299*R + 0.587*G + 0.114*B) |
+| 2.3 | User requests brightness adjustment | Pixel_Operator SHALL add specified offset to each pixel value and clamp to [0, 255] range |
+| 2.4 | Processing large images | Pixel_Operator SHALL leverage GPU parallelism to achieve faster execution than CPU serial processing |
 
 ---
 
 ### Requirement 3: Convolution Operations
 
-**User Story:** 作为开发者，我希望能够对图像执行卷积操作，以便实现模糊和边缘检测等效果。
+**User Story:** As a developer, I want to perform convolution operations on images, so that I can implement effects like blur and edge detection.
 
 #### Acceptance Criteria
 
 | ID | Condition | Expected Behavior |
 |----|-----------|-------------------|
-| 3.1 | 用户请求高斯模糊操作 | Convolution_Engine SHALL 使用指定大小的高斯核对图像进行卷积 |
-| 3.2 | 用户请求 Sobel 边缘检测 | Convolution_Engine SHALL 分别计算水平和垂直方向的梯度并合成边缘强度图 |
-| 3.3 | 执行卷积操作 | Convolution_Engine SHALL 使用 Shared_Memory 优化卷积核的访存模式 |
-| 3.4 | 处理图像边界像素 | Convolution_Engine SHALL 使用零填充或镜像填充策略处理边界条件 |
+| 3.1 | User requests Gaussian blur | Convolution_Engine SHALL convolve image with specified Gaussian kernel |
+| 3.2 | User requests Sobel edge detection | Convolution_Engine SHALL compute horizontal and vertical gradients and synthesize edge magnitude |
+| 3.3 | Executing convolution | Convolution_Engine SHALL use Shared_Memory to optimize convolution memory access patterns |
+| 3.4 | Processing boundary pixels | Convolution_Engine SHALL use zero-padding or mirroring strategy for boundary conditions |
 
 ---
 
 ### Requirement 4: Histogram Statistics
 
-**User Story:** 作为开发者，我希望能够计算图像的直方图，以便分析图像的亮度分布。
+**User Story:** As a developer, I want to compute image histograms, so that I can analyze image brightness distribution.
 
 #### Acceptance Criteria
 
 | ID | Condition | Expected Behavior |
 |----|-----------|-------------------|
-| 4.1 | 用户请求计算直方图 | Histogram_Calculator SHALL 返回包含 256 个 bin 的灰度直方图数组 |
-| 4.2 | 多个线程同时更新同一 bin | Histogram_Calculator SHALL 使用 Atomic_Operation 保证计数正确性 |
-| 4.3 | 计算完成 | Histogram_Calculator SHALL 使用 Parallel Reduction 技术合并各线程块的局部直方图 |
+| 4.1 | User requests histogram | Histogram_Calculator SHALL return grayscale histogram array with 256 bins |
+| 4.2 | Multiple threads update same bin | Histogram_Calculator SHALL use Atomic_Operation to ensure counting correctness |
+| 4.3 | Calculation completes | Histogram_Calculator SHALL use Parallel Reduction to merge local histograms from thread blocks |
 
 ---
 
 ### Requirement 5: Image Scaling
 
-**User Story:** 作为开发者，我希望能够对图像进行缩放操作，以便调整图像尺寸。
+**User Story:** As a developer, I want to scale images, so that I can adjust image dimensions.
 
 #### Acceptance Criteria
 
 | ID | Condition | Expected Behavior |
 |----|-----------|-------------------|
-| 5.1 | 用户请求缩放图像 | Image_Processor SHALL 使用双线性插值算法计算目标像素值 |
-| 5.2 | 目标像素位置对应源图像的非整数坐标 | Image_Processor SHALL 使用周围四个像素进行加权插值 |
-| 5.3 | 缩放比例小于 1 | Image_Processor SHALL 正确处理下采样情况 |
-| 5.4 | 缩放比例大于 1 | Image_Processor SHALL 正确处理上采样情况 |
+| 5.1 | User requests scaling | Image_Processor SHALL use bilinear interpolation to calculate target pixel values |
+| 5.2 | Target pixel maps to non-integer source coordinates | Image_Processor SHALL use weighted interpolation from surrounding 4 pixels |
+| 5.3 | Scale ratio < 1 | Image_Processor SHALL correctly handle downsampling |
+| 5.4 | Scale ratio > 1 | Image_Processor SHALL correctly handle upsampling |
 
 ---
 
 ### Requirement 6: Pipeline Processing
 
-**User Story:** 作为开发者，我希望能够使用流水线方式处理多张图像，以便最大化 GPU 利用率。
+**User Story:** As a developer, I want to use pipeline-based processing for multiple images, so that I can maximize GPU utilization.
 
 #### Acceptance Criteria
 
 | ID | Condition | Expected Behavior |
 |----|-----------|-------------------|
-| 6.1 | 用户启用流水线模式 | Image_Processor SHALL 使用 CUDA_Stream 实现异步操作 |
-| 6.2 | 流水线运行中 | Image_Processor SHALL 同时执行上传、处理和下载操作 |
-| 6.3 | 处理多张图像 | Image_Processor SHALL 通过流水线重叠隐藏数据传输延迟 |
-| 6.4 | 用户请求同步 | Image_Processor SHALL 等待所有流中的操作完成 |
+| 6.1 | User enables pipeline mode | Image_Processor SHALL use CUDA_Stream for async operations |
+| 6.2 | Pipeline running | Image_Processor SHALL simultaneously execute upload, processing, and download |
+| 6.3 | Processing multiple images | Image_Processor SHALL hide data transfer latency through pipeline overlap |
+| 6.4 | User requests synchronization | Image_Processor SHALL wait for all operations in all streams to complete |
 
 ---
 
 ### Requirement 7: Error Handling & Resource Management
 
-**User Story:** 作为开发者，我希望库能够正确处理错误并管理资源，以便编写健壮的应用程序。
+**User Story:** As a developer, I want the library to handle errors properly and manage resources, so that I can write robust applications.
 
 #### Acceptance Criteria
 
 | ID | Condition | Expected Behavior |
 |----|-----------|-------------------|
-| 7.1 | CUDA 运行时返回错误 | Image_Processor SHALL 捕获错误并提供有意义的错误消息 |
-| 7.2 | 对象销毁时 | Memory_Manager SHALL 自动释放所有关联的 GPU 资源 |
-| 7.3 | 用户传入无效参数 | Image_Processor SHALL 在执行前验证参数并返回错误 |
-| 7.4 | 发生错误 | Image_Processor SHALL 保持系统处于一致状态，不泄漏资源 |
+| 7.1 | CUDA runtime returns error | Image_Processor SHALL capture error and provide meaningful error message |
+| 7.2 | Object destroyed | Memory_Manager SHALL automatically release all associated GPU resources |
+| 7.3 | User passes invalid parameters | Image_Processor SHALL validate parameters before execution and return error |
+| 7.4 | Error occurs | Image_Processor SHALL maintain consistent system state without resource leaks |
 
 ---
 
@@ -221,5 +217,5 @@
 
 ## Related Documents
 
-- [Design Document](design.md) - Architecture and implementation details
-- [Tasks Document](tasks.md) - Implementation task checklist
+- [Design Document](../rfc/0001-gpu-image-processing-design.md) - Architecture and implementation details
+- [Tasks Document](../rfc/0001-gpu-image-processing-tasks.md) - Implementation task checklist
