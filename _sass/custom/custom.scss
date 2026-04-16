@@ -1,0 +1,373 @@
+// ═════════════════════════════════════════════════════════════════════════════
+// Mini-OpenCV Custom Styles
+// Just the Docs Theme Customizations - CUDA/AI Dark Theme
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ═════════════════════════════════════════════════════════════════════════════
+// COLOR PALETTE - NVIDIA/CUDA Green Dark Theme
+// ═════════════════════════════════════════════════════════════════════════════
+
+:root {
+  --nvidia-green: #76b900;
+  --nvidia-green-light: #8bc34a;
+  --nvidia-green-dark: #558b00;
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-accent: #58a6ff;
+  --border-primary: #30363d;
+  --border-secondary: #21262d;
+  --code-bg: #1c2128;
+  --code-border: #30363d;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// NAVIGATION SIDEBAR STYLING
+// ═════════════════════════════════════════════════════════════════════════════
+
+.side-bar {
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-primary);
+}
+
+.site-title {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  
+  &:hover {
+    background: linear-gradient(90deg, var(--nvidia-green), var(--nvidia-green-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.nav-list .nav-list-item {
+  .nav-list-link {
+    border-radius: 6px;
+    margin: 2px 8px;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: var(--bg-tertiary);
+      color: var(--nvidia-green);
+    }
+    
+    &.active {
+      background: linear-gradient(90deg, rgba(118, 185, 0, 0.15), transparent);
+      color: var(--nvidia-green);
+      border-left: 3px solid var(--nvidia-green);
+      font-weight: 600;
+    }
+  }
+}
+
+.nav-list-item .nav-list-item .nav-list-link {
+  padding-left: 32px;
+  font-size: 0.9em;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// MAIN CONTENT STYLING
+// ═════════════════════════════════════════════════════════════════════════════
+
+.main-content {
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-primary);
+    padding-bottom: 0.5rem;
+  }
+  
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    
+    &::before {
+      content: "▸";
+      color: var(--nvidia-green);
+      margin-right: 0.5rem;
+    }
+  }
+  
+  h3 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    color: var(--text-secondary);
+  }
+  
+  p {
+    line-height: 1.8;
+    margin-bottom: 1.2rem;
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// LINKS
+// ═════════════════════════════════════════════════════════════════════════════
+
+a {
+  color: var(--text-accent);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    color: var(--nvidia-green);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+a[href^="http"]:not([href*="lessup.github.io"])::after {
+  content: "↗";
+  font-size: 0.75em;
+  margin-left: 2px;
+  opacity: 0.7;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// CODE BLOCKS - ENHANCED SYNTAX HIGHLIGHTING
+// ═════════════════════════════════════════════════════════════════════════════
+
+div.highlighter-rouge {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  overflow: hidden;
+  
+  div.highlight {
+    background: transparent;
+    
+    pre {
+      background: transparent;
+      padding: 1.25rem;
+      margin: 0;
+      overflow-x: auto;
+      font-size: 0.9em;
+      line-height: 1.6;
+      
+      &::-webkit-scrollbar {
+        height: 8px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: var(--bg-tertiary);
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-primary);
+        border-radius: 4px;
+      }
+    }
+  }
+}
+
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.85em;
+  color: var(--nvidia-green-light);
+}
+
+// Syntax highlighting
+.highlight {
+  .k, .kd, .kn, .kp, .kr, .kt { color: #ff7b72; }
+  .na, .nc, .nf { color: #d2a8ff; }
+  .s, .sb, .sc, .sd, .s2 { color: #a5d6ff; }
+  .mi, .mf, .mh, .il { color: #79c0ff; }
+  .c, .cm, .c1, .cp { color: #8b949e; }
+  .nv, .vc, .vg, .vi { color: #ffa657; }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// TABLES - MODERN STYLING
+// ═════════════════════════════════════════════════════════════════════════════
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  border: 1px solid var(--border-primary);
+  overflow: hidden;
+  margin: 2rem 0;
+  width: 100%;
+  
+  th {
+    background: var(--bg-tertiary);
+    color: var(--nvidia-green);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.05em;
+    padding: 14px 16px;
+    border-bottom: 2px solid var(--nvidia-green);
+  }
+  
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-secondary);
+  }
+  
+  tr:hover {
+    background: rgba(118, 185, 0, 0.05);
+  }
+  
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// BLOCKQUOTES
+// ═════════════════════════════════════════════════════════════════════════════
+
+blockquote {
+  border-left: 4px solid var(--nvidia-green);
+  background: linear-gradient(90deg, rgba(118, 185, 0, 0.1), transparent);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 0 8px 8px 0;
+  
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// BUTTONS
+// ═════════════════════════════════════════════════════════════════════════════
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  
+  &.btn-primary {
+    background: linear-gradient(135deg, var(--nvidia-green), var(--nvidia-green-dark));
+    color: white;
+    box-shadow: 0 4px 14px rgba(118, 185, 0, 0.3);
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(118, 185, 0, 0.4);
+      text-decoration: none;
+    }
+  }
+  
+  &.btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+    
+    &:hover {
+      background: var(--border-primary);
+      border-color: var(--nvidia-green);
+      text-decoration: none;
+    }
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// FOOTER
+// ═════════════════════════════════════════════════════════════════════════════
+
+.site-footer {
+  border-top: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9em;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SEARCH STYLING
+// ═════════════════════════════════════════════════════════════════════════════
+
+.search .search-input {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--text-primary);
+  
+  &:focus {
+    border-color: var(--nvidia-green);
+    box-shadow: 0 0 0 3px rgba(118, 185, 0, 0.2);
+    outline: none;
+  }
+  
+  &::placeholder {
+    color: var(--text-secondary);
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SCROLLBAR
+// ═════════════════════════════════════════════════════════════════════════════
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 5px;
+  
+  &:hover {
+    background: var(--nvidia-green);
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SELECTION
+// ═════════════════════════════════════════════════════════════════════════════
+
+::selection {
+  background: rgba(118, 185, 0, 0.3);
+  color: var(--text-primary);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RESPONSIVE
+// ═════════════════════════════════════════════════════════════════════════════
+
+@media (max-width: 800px) {
+  .main-content h1 {
+    font-size: 2rem;
+  }
+  
+  .main-content h2 {
+    font-size: 1.5rem;
+  }
+  
+  table {
+    font-size: 0.9em;
+    
+    th, td {
+      padding: 10px 12px;
+    }
+  }
+}
