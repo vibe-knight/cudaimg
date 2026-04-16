@@ -16,40 +16,40 @@ public:
   explicit DeviceBuffer(size_t size);
 
   // 从已有原始指针接管所有权（用于内存池）
-  [[nodiscard]] static DeviceBuffer fromRaw(void *ptr, size_t size) noexcept;
+  [[nodiscard]] static DeviceBuffer fromRaw(void* ptr, size_t size) noexcept;
 
   // 析构函数：自动释放 Device 内存
   ~DeviceBuffer();
 
   // 禁用拷贝
-  DeviceBuffer(const DeviceBuffer &) = delete;
-  DeviceBuffer &operator=(const DeviceBuffer &) = delete;
+  DeviceBuffer(const DeviceBuffer&) = delete;
+  DeviceBuffer& operator=(const DeviceBuffer&) = delete;
 
   // 启用移动语义
-  DeviceBuffer(DeviceBuffer &&other) noexcept;
-  DeviceBuffer &operator=(DeviceBuffer &&other) noexcept;
+  DeviceBuffer(DeviceBuffer&& other) noexcept;
+  DeviceBuffer& operator=(DeviceBuffer&& other) noexcept;
 
   // 从 Host 复制数据到 Device
-  void copyFromHost(const void *hostPtr, size_t size);
+  void copyFromHost(const void* hostPtr, size_t size);
 
   // 从 Device 复制数据到 Host
-  void copyToHost(void *hostPtr, size_t size) const;
+  void copyToHost(void* hostPtr, size_t size) const;
 
   // 异步版本（使用指定的 stream）
-  void copyFromHostAsync(const void *hostPtr, size_t size, cudaStream_t stream);
-  void copyToHostAsync(void *hostPtr, size_t size, cudaStream_t stream) const;
+  void copyFromHostAsync(const void* hostPtr, size_t size, cudaStream_t stream);
+  void copyToHostAsync(void* hostPtr, size_t size, cudaStream_t stream) const;
 
   // 获取 Device 指针
-  [[nodiscard]] void *data() noexcept { return devicePtr_; }
-  [[nodiscard]] const void *data() const noexcept { return devicePtr_; }
+  [[nodiscard]] void* data() noexcept { return devicePtr_; }
+  [[nodiscard]] const void* data() const noexcept { return devicePtr_; }
 
   // 模板版本
-  template <typename T> [[nodiscard]] T *dataAs() noexcept {
-    return static_cast<T *>(devicePtr_);
+  template <typename T> [[nodiscard]] T* dataAs() noexcept {
+    return static_cast<T*>(devicePtr_);
   }
 
-  template <typename T> [[nodiscard]] const T *dataAs() const noexcept {
-    return static_cast<const T *>(devicePtr_);
+  template <typename T> [[nodiscard]] const T* dataAs() const noexcept {
+    return static_cast<const T*>(devicePtr_);
   }
 
   // 获取缓冲区大小
@@ -65,10 +65,10 @@ public:
 
   // 放弃所有权，返回原始指针和大小（不释放内存）
   // 调用者负责后续释放
-  std::pair<void *, size_t> detach() noexcept;
+  std::pair<void*, size_t> detach() noexcept;
 
 private:
-  void *devicePtr_;
+  void* devicePtr_;
   size_t size_;
 };
 

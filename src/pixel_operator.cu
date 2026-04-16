@@ -5,7 +5,7 @@
 namespace gpu_image {
 
 // CUDA Kernels
-__global__ void invertKernel(const unsigned char *input, unsigned char *output,
+__global__ void invertKernel(const unsigned char* input, unsigned char* output,
                              int width, int height, int channels) {
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -18,7 +18,7 @@ __global__ void invertKernel(const unsigned char *input, unsigned char *output,
   }
 }
 
-__global__ void invertInPlaceKernel(unsigned char *data, int width, int height,
+__global__ void invertInPlaceKernel(unsigned char* data, int width, int height,
                                     int channels) {
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -31,8 +31,8 @@ __global__ void invertInPlaceKernel(unsigned char *data, int width, int height,
   }
 }
 
-__global__ void toGrayscaleKernel(const unsigned char *input,
-                                  unsigned char *output, int width, int height,
+__global__ void toGrayscaleKernel(const unsigned char* input,
+                                  unsigned char* output, int width, int height,
                                   int inputChannels) {
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -50,8 +50,8 @@ __global__ void toGrayscaleKernel(const unsigned char *input,
   }
 }
 
-__global__ void adjustBrightnessKernel(const unsigned char *input,
-                                       unsigned char *output, int width,
+__global__ void adjustBrightnessKernel(const unsigned char* input,
+                                       unsigned char* output, int width,
                                        int height, int channels, int offset) {
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -65,7 +65,7 @@ __global__ void adjustBrightnessKernel(const unsigned char *input,
   }
 }
 
-__global__ void adjustBrightnessInPlaceKernel(unsigned char *data, int width,
+__global__ void adjustBrightnessInPlaceKernel(unsigned char* data, int width,
                                               int height, int channels,
                                               int offset) {
   int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -81,14 +81,14 @@ __global__ void adjustBrightnessInPlaceKernel(unsigned char *data, int width,
 }
 
 // 辅助函数：计算 grid 和 block 大小
-static void calculateGridBlock(int width, int height, dim3 &grid, dim3 &block) {
+static void calculateGridBlock(int width, int height, dim3& grid, dim3& block) {
   block = dim3(16, 16);
   grid =
       dim3((width + block.x - 1) / block.x, (height + block.y - 1) / block.y);
 }
 
 // PixelOperator 实现
-void PixelOperator::invert(const GpuImage &input, GpuImage &output,
+void PixelOperator::invert(const GpuImage& input, GpuImage& output,
                            cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -112,7 +112,7 @@ void PixelOperator::invert(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void PixelOperator::invertInPlace(GpuImage &image, cudaStream_t stream) {
+void PixelOperator::invertInPlace(GpuImage& image, cudaStream_t stream) {
   if (!image.isValid()) {
     throw std::invalid_argument("Invalid image");
   }
@@ -127,7 +127,7 @@ void PixelOperator::invertInPlace(GpuImage &image, cudaStream_t stream) {
   CUDA_CHECK(cudaGetLastError());
 }
 
-void PixelOperator::toGrayscale(const GpuImage &input, GpuImage &output,
+void PixelOperator::toGrayscale(const GpuImage& input, GpuImage& output,
                                 cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -154,7 +154,7 @@ void PixelOperator::toGrayscale(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void PixelOperator::adjustBrightness(const GpuImage &input, GpuImage &output,
+void PixelOperator::adjustBrightness(const GpuImage& input, GpuImage& output,
                                      int offset, cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -177,7 +177,7 @@ void PixelOperator::adjustBrightness(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void PixelOperator::adjustBrightnessInPlace(GpuImage &image, int offset,
+void PixelOperator::adjustBrightnessInPlace(GpuImage& image, int offset,
                                             cudaStream_t stream) {
   if (!image.isValid()) {
     throw std::invalid_argument("Invalid image");
@@ -210,7 +210,7 @@ GpuImage createGpuImage(int width, int height, int channels) {
   return image;
 }
 
-GpuImage uploadToGpu(const HostImage &hostImage) {
+GpuImage uploadToGpu(const HostImage& hostImage) {
   if (!hostImage.isValid()) {
     throw std::invalid_argument("Invalid host image");
   }
@@ -222,7 +222,7 @@ GpuImage uploadToGpu(const HostImage &hostImage) {
   return gpuImage;
 }
 
-HostImage downloadFromGpu(const GpuImage &gpuImage) {
+HostImage downloadFromGpu(const GpuImage& gpuImage) {
   if (!gpuImage.isValid()) {
     throw std::invalid_argument("Invalid GPU image");
   }
@@ -234,7 +234,7 @@ HostImage downloadFromGpu(const GpuImage &gpuImage) {
   return hostImage;
 }
 
-void uploadToGpuAsync(const HostImage &hostImage, GpuImage &gpuImage,
+void uploadToGpuAsync(const HostImage& hostImage, GpuImage& gpuImage,
                       cudaStream_t stream) {
   if (!hostImage.isValid()) {
     throw std::invalid_argument("Invalid host image");
@@ -251,7 +251,7 @@ void uploadToGpuAsync(const HostImage &hostImage, GpuImage &gpuImage,
                                     hostImage.totalBytes(), stream);
 }
 
-void downloadFromGpuAsync(const GpuImage &gpuImage, HostImage &hostImage,
+void downloadFromGpuAsync(const GpuImage& gpuImage, HostImage& hostImage,
                           cudaStream_t stream) {
   if (!gpuImage.isValid()) {
     throw std::invalid_argument("Invalid GPU image");

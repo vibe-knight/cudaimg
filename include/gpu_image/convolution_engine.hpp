@@ -17,25 +17,25 @@ enum class BorderMode {
 class ConvolutionEngine {
 public:
   // 通用卷积操作
-  static void convolve(const GpuImage &input, GpuImage &output,
-                       const float *kernel, int kernelSize,
+  static void convolve(const GpuImage& input, GpuImage& output,
+                       const float* kernel, int kernelSize,
                        BorderMode borderMode = BorderMode::Zero,
                        cudaStream_t stream = nullptr);
 
   // 高斯模糊
   // kernelSize 必须为奇数，sigma 控制模糊程度
-  static void gaussianBlur(const GpuImage &input, GpuImage &output,
+  static void gaussianBlur(const GpuImage& input, GpuImage& output,
                            int kernelSize, float sigma,
                            cudaStream_t stream = nullptr);
 
   // Sobel 边缘检测
   // 返回梯度幅值图像
-  static void sobelEdgeDetection(const GpuImage &input, GpuImage &output,
+  static void sobelEdgeDetection(const GpuImage& input, GpuImage& output,
                                  cudaStream_t stream = nullptr);
 
   // 可分离卷积（更高效的实现）
-  static void separableConvolve(const GpuImage &input, GpuImage &output,
-                                const float *rowKernel, const float *colKernel,
+  static void separableConvolve(const GpuImage& input, GpuImage& output,
+                                const float* rowKernel, const float* colKernel,
                                 int kernelSize, cudaStream_t stream = nullptr);
 
   // 生成高斯核

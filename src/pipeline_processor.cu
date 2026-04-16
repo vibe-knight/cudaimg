@@ -36,7 +36,7 @@ void PipelineProcessor::addStep(ProcessingStep step) {
 
 void PipelineProcessor::clearSteps() { steps_.clear(); }
 
-GpuImage PipelineProcessor::process(const GpuImage &input) {
+GpuImage PipelineProcessor::process(const GpuImage& input) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
   }
@@ -59,7 +59,7 @@ GpuImage PipelineProcessor::process(const GpuImage &input) {
                              stream));
 
   // 执行所有处理步骤
-  for (const auto &step : steps_) {
+  for (const auto& step : steps_) {
     step(current, stream);
   }
 
@@ -68,7 +68,7 @@ GpuImage PipelineProcessor::process(const GpuImage &input) {
   return current;
 }
 
-HostImage PipelineProcessor::processHost(const HostImage &input) {
+HostImage PipelineProcessor::processHost(const HostImage& input) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
   }
@@ -82,7 +82,7 @@ HostImage PipelineProcessor::processHost(const HostImage &input) {
                                     stream);
 
   // 执行处理步骤
-  for (const auto &step : steps_) {
+  for (const auto& step : steps_) {
     step(gpuImage, stream);
   }
 
@@ -98,7 +98,7 @@ HostImage PipelineProcessor::processHost(const HostImage &input) {
 }
 
 std::vector<GpuImage>
-PipelineProcessor::processBatch(const std::vector<GpuImage> &inputs) {
+PipelineProcessor::processBatch(const std::vector<GpuImage>& inputs) {
   if (inputs.empty()) {
     return {};
   }
@@ -125,7 +125,7 @@ PipelineProcessor::processBatch(const std::vector<GpuImage> &inputs) {
                                stream));
 
     // 执行处理步骤
-    for (const auto &step : steps_) {
+    for (const auto& step : steps_) {
       step(output, stream);
     }
 
@@ -139,7 +139,7 @@ PipelineProcessor::processBatch(const std::vector<GpuImage> &inputs) {
 }
 
 std::vector<HostImage>
-PipelineProcessor::processBatchHost(const std::vector<HostImage> &inputs) {
+PipelineProcessor::processBatchHost(const std::vector<HostImage>& inputs) {
   if (inputs.empty()) {
     return {};
   }
@@ -167,7 +167,7 @@ PipelineProcessor::processBatchHost(const std::vector<HostImage> &inputs) {
                                       inputs[i].totalBytes(), stream);
 
     // 执行处理步骤
-    for (const auto &step : steps_) {
+    for (const auto& step : steps_) {
       step(gpuImage, stream);
     }
 

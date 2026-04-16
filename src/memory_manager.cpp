@@ -4,7 +4,7 @@
 
 namespace gpu_image {
 
-MemoryManager &MemoryManager::instance() {
+MemoryManager& MemoryManager::instance() {
   static MemoryManager instance;
   return instance;
 }
@@ -30,7 +30,7 @@ DeviceBuffer MemoryManager::allocate(size_t size) {
 
     auto it = memoryPool_.find(alignedSize);
     if (it != memoryPool_.end() && !it->second.empty()) {
-      void *ptr = it->second.back();
+      void* ptr = it->second.back();
       it->second.pop_back();
       poolSize_ -= alignedSize;
 
@@ -53,7 +53,7 @@ DeviceBuffer MemoryManager::allocate(size_t size) {
   return buffer;
 }
 
-void MemoryManager::deallocate(DeviceBuffer &&buffer) {
+void MemoryManager::deallocate(DeviceBuffer&& buffer) {
   if (!buffer.isValid()) {
     return;
   }
@@ -66,7 +66,7 @@ void MemoryManager::deallocate(DeviceBuffer &&buffer) {
     // 池未满时回收，否则直接释放
     if (poolSize_ + alignedSize <= maxPoolSize_) {
       auto detached = buffer.detach();
-      void *ptr = detached.first;
+      void* ptr = detached.first;
       memoryPool_[alignedSize].push_back(ptr);
       poolSize_ += alignedSize;
       return;
@@ -79,8 +79,8 @@ void MemoryManager::deallocate(DeviceBuffer &&buffer) {
 void MemoryManager::clearPool() {
   std::lock_guard<std::mutex> lock(mutex_);
 
-  for (auto &[sz, ptrs] : memoryPool_) {
-    for (void *ptr : ptrs) {
+  for (auto& [sz, ptrs] : memoryPool_) {
+    for (void* ptr : ptrs) {
       cudaFree(ptr);
     }
   }

@@ -32,7 +32,7 @@ protected:
   }
 
   // 计算 PSNR
-  double calculatePSNR(const HostImage &img1, const HostImage &img2) {
+  double calculatePSNR(const HostImage& img1, const HostImage& img2) {
     if (img1.data.size() != img2.data.size()) {
       return 0.0;
     }

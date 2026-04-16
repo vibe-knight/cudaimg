@@ -43,7 +43,7 @@ HostImage createTestImage(int width, int height, int channels) {
 }
 
 // 打印图像统计信息
-void printImageStats(const HostImage &image, const std::string &name) {
+void printImageStats(const HostImage& image, const std::string& name) {
   if (!image.isValid()) {
     std::cout << name << ": Invalid image" << std::endl;
     return;
@@ -167,10 +167,10 @@ int main() {
 
     std::cout << "\n=== Demo Complete ===" << std::endl;
 
-  } catch (const CudaException &e) {
+  } catch (const CudaException& e) {
     std::cerr << "CUDA Error: " << e.what() << std::endl;
     return 1;
-  } catch (const std::exception &e) {
+  } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
     return 1;
   }

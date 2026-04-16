@@ -37,7 +37,7 @@ TEST_F(PipelineTest, BasicPipeline) {
   PipelineProcessor pipeline(2);
 
   // 添加反色步骤
-  pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+  pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
     PixelOperator::invertInPlace(img, stream);
   });
 
@@ -71,13 +71,13 @@ TEST_F(PipelineTest, PipelineConsistency) {
   // 流水线处理
   PipelineProcessor pipeline(2);
 
-  pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+  pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
     GpuImage temp;
     PixelOperator::adjustBrightness(img, temp, 30, stream);
     img = std::move(temp);
   });
 
-  pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+  pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
     PixelOperator::invertInPlace(img, stream);
   });
 
@@ -114,7 +114,7 @@ TEST_F(PipelineTest, BatchProcessing) {
   }
 
   PipelineProcessor pipeline(3);
-  pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+  pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
     PixelOperator::invertInPlace(img, stream);
   });
 
@@ -153,7 +153,7 @@ TEST_F(PipelineTest, EmptyPipeline) {
 TEST_F(PipelineTest, ClearSteps) {
   PipelineProcessor pipeline(2);
 
-  pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+  pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
     PixelOperator::invertInPlace(img, stream);
   });
 
@@ -169,19 +169,19 @@ TEST_F(PipelineTest, MultiStepPipeline) {
   PipelineProcessor pipeline(2);
 
   // 步骤 1: 亮度 +50
-  pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+  pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
     GpuImage temp;
     PixelOperator::adjustBrightness(img, temp, 50, stream);
     img = std::move(temp);
   });
 
   // 步骤 2: 反色
-  pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+  pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
     PixelOperator::invertInPlace(img, stream);
   });
 
   // 步骤 3: 亮度 -30
-  pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+  pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
     GpuImage temp;
     PixelOperator::adjustBrightness(img, temp, -30, stream);
     img = std::move(temp);
@@ -221,7 +221,7 @@ TEST_F(PipelineTest, InvalidParameters) {
 TEST_F(PipelineTest, Synchronization) {
   PipelineProcessor pipeline(4);
 
-  pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+  pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
     PixelOperator::invertInPlace(img, stream);
   });
 
@@ -259,7 +259,7 @@ TEST_F(PipelineTest, GpuImageBatchProcessing) {
   }
 
   PipelineProcessor pipeline(2);
-  pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+  pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
     PixelOperator::invertInPlace(img, stream);
   });
 

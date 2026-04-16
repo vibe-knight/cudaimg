@@ -91,7 +91,7 @@ int main() {
     timer.start();
     std::vector<HostImage> sequentialResults;
 
-    for (const auto &hostImage : testImages) {
+    for (const auto& hostImage : testImages) {
       // 上传
       GpuImage gpuImage = processor.loadFromHost(hostImage);
 
@@ -117,19 +117,19 @@ int main() {
     PipelineProcessor pipeline(4);
 
     // 添加处理步骤
-    pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+    pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
       GpuImage temp;
       PixelOperator::adjustBrightness(img, temp, 20, stream);
       img = std::move(temp);
     });
 
-    pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+    pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
       GpuImage temp;
       ConvolutionEngine::gaussianBlur(img, temp, 3, 1.0f, stream);
       img = std::move(temp);
     });
 
-    pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+    pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
       PixelOperator::invertInPlace(img, stream);
     });
 
@@ -194,19 +194,19 @@ int main() {
     for (int numStreams : {1, 2, 4, 8}) {
       PipelineProcessor testPipeline(numStreams);
 
-      testPipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+      testPipeline.addStep([](GpuImage& img, cudaStream_t stream) {
         GpuImage temp;
         PixelOperator::adjustBrightness(img, temp, 20, stream);
         img = std::move(temp);
       });
 
-      testPipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+      testPipeline.addStep([](GpuImage& img, cudaStream_t stream) {
         GpuImage temp;
         ConvolutionEngine::gaussianBlur(img, temp, 3, 1.0f, stream);
         img = std::move(temp);
       });
 
-      testPipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+      testPipeline.addStep([](GpuImage& img, cudaStream_t stream) {
         PixelOperator::invertInPlace(img, stream);
       });
 
@@ -220,10 +220,10 @@ int main() {
 
     std::cout << "\n=== Pipeline Demo Complete ===" << std::endl;
 
-  } catch (const CudaException &e) {
+  } catch (const CudaException& e) {
     std::cerr << "CUDA Error: " << e.what() << std::endl;
     return 1;
-  } catch (const std::exception &e) {
+  } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
     return 1;
   }

@@ -18,17 +18,17 @@ struct MemoryStats {
 // 内存管理器单例类
 class MemoryManager {
 public:
-  static MemoryManager &instance();
+  static MemoryManager& instance();
 
   // 禁用拷贝和移动
-  MemoryManager(const MemoryManager &) = delete;
-  MemoryManager &operator=(const MemoryManager &) = delete;
+  MemoryManager(const MemoryManager&) = delete;
+  MemoryManager& operator=(const MemoryManager&) = delete;
 
   // 分配 Device 内存（可能从池中获取）
   DeviceBuffer allocate(size_t size);
 
   // 释放内存回池
-  void deallocate(DeviceBuffer &&buffer);
+  void deallocate(DeviceBuffer&& buffer);
 
   // 清空内存池
   void clearPool();
@@ -47,7 +47,7 @@ private:
   // 将大小对齐到 256 字节边界
   static size_t alignSize(size_t size);
 
-  std::unordered_map<size_t, std::vector<void *>> memoryPool_;
+  std::unordered_map<size_t, std::vector<void*>> memoryPool_;
   mutable std::mutex mutex_;
 
   size_t totalAllocated_ = 0;

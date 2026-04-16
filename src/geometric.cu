@@ -10,7 +10,7 @@ namespace gpu_image {
 #endif
 
 namespace {
-__device__ float sampleBilinearOrZero(const unsigned char *input, int srcWidth,
+__device__ float sampleBilinearOrZero(const unsigned char* input, int srcWidth,
                                       int srcHeight, int channels, float srcX,
                                       float srcY, int channel) {
   if (srcX < 0.0f || srcX > static_cast<float>(srcWidth - 1) || srcY < 0.0f ||
@@ -31,13 +31,13 @@ __device__ float sampleBilinearOrZero(const unsigned char *input, int srcWidth,
   float v01 = input[(y1 * srcWidth + x0) * channels + channel];
   float v11 = input[(y1 * srcWidth + x1) * channels + channel];
 
-  return v00 * (1 - fx) * (1 - fy) + v10 * fx * (1 - fy) +
-         v01 * (1 - fx) * fy + v11 * fx * fy;
+  return v00 * (1 - fx) * (1 - fy) + v10 * fx * (1 - fy) + v01 * (1 - fx) * fy +
+         v11 * fx * fy;
 }
 } // namespace
 
 // 旋转 Kernel
-__global__ void rotateKernel(const unsigned char *input, unsigned char *output,
+__global__ void rotateKernel(const unsigned char* input, unsigned char* output,
                              int srcWidth, int srcHeight, int dstWidth,
                              int dstHeight, int channels, float cosAngle,
                              float sinAngle, float centerX, float centerY) {
@@ -60,8 +60,8 @@ __global__ void rotateKernel(const unsigned char *input, unsigned char *output,
   float srcY = -sinAngle * dx + cosAngle * dy + centerY;
 
   for (int c = 0; c < channels; ++c) {
-    float value =
-        sampleBilinearOrZero(input, srcWidth, srcHeight, channels, srcX, srcY, c);
+    float value = sampleBilinearOrZero(input, srcWidth, srcHeight, channels,
+                                       srcX, srcY, c);
 
     output[(y * dstWidth + x) * channels + c] =
         static_cast<unsigned char>(fminf(fmaxf(value, 0.0f), 255.0f));
@@ -69,8 +69,8 @@ __global__ void rotateKernel(const unsigned char *input, unsigned char *output,
 }
 
 // 90度旋转 Kernel
-__global__ void rotate90Kernel(const unsigned char *input,
-                               unsigned char *output, int srcWidth,
+__global__ void rotate90Kernel(const unsigned char* input,
+                               unsigned char* output, int srcWidth,
                                int srcHeight, int dstWidth, int dstHeight,
                                int channels, int times) {
 
@@ -108,7 +108,7 @@ __global__ void rotate90Kernel(const unsigned char *input,
 }
 
 // 翻转 Kernel
-__global__ void flipKernel(const unsigned char *input, unsigned char *output,
+__global__ void flipKernel(const unsigned char* input, unsigned char* output,
                            int width, int height, int channels, int direction) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -133,7 +133,7 @@ __global__ void flipKernel(const unsigned char *input, unsigned char *output,
 }
 
 // 仿射变换 Kernel
-__global__ void affineKernel(const unsigned char *input, unsigned char *output,
+__global__ void affineKernel(const unsigned char* input, unsigned char* output,
                              int srcWidth, int srcHeight, int dstWidth,
                              int dstHeight, int channels, float a, float b,
                              float tx, float c_val, float d, float ty) {
@@ -173,8 +173,8 @@ __global__ void affineKernel(const unsigned char *input, unsigned char *output,
 }
 
 // 透视变换 Kernel (真正的 3x3 齐次矩阵)
-__global__ void perspectiveKernel(const unsigned char *input,
-                                  unsigned char *output, int srcWidth,
+__global__ void perspectiveKernel(const unsigned char* input,
+                                  unsigned char* output, int srcWidth,
                                   int srcHeight, int dstWidth, int dstHeight,
                                   int channels, float h00, float h01, float h02,
                                   float h10, float h11, float h12, float h20,
@@ -223,8 +223,8 @@ __global__ void perspectiveKernel(const unsigned char *input,
   float srcY = (i10 * x + i11 * y + i12) / w;
 
   for (int c = 0; c < channels; ++c) {
-    float value =
-        sampleBilinearOrZero(input, srcWidth, srcHeight, channels, srcX, srcY, c);
+    float value = sampleBilinearOrZero(input, srcWidth, srcHeight, channels,
+                                       srcX, srcY, c);
 
     output[(y * dstWidth + x) * channels + c] =
         static_cast<unsigned char>(fminf(fmaxf(value, 0.0f), 255.0f));
@@ -232,7 +232,7 @@ __global__ void perspectiveKernel(const unsigned char *input,
 }
 
 // 裁剪 Kernel
-__global__ void cropKernel(const unsigned char *input, unsigned char *output,
+__global__ void cropKernel(const unsigned char* input, unsigned char* output,
                            int srcWidth, int srcHeight, int dstWidth,
                            int dstHeight, int channels, int offsetX,
                            int offsetY) {
@@ -257,7 +257,7 @@ __global__ void cropKernel(const unsigned char *input, unsigned char *output,
 }
 
 // 填充 Kernel
-__global__ void padKernel(const unsigned char *input, unsigned char *output,
+__global__ void padKernel(const unsigned char* input, unsigned char* output,
                           int srcWidth, int srcHeight, int dstWidth,
                           int dstHeight, int channels, int top, int left,
                           unsigned char padValue) {
@@ -282,7 +282,7 @@ __global__ void padKernel(const unsigned char *input, unsigned char *output,
 }
 
 // Geometric 实现
-void Geometric::rotate(const GpuImage &input, GpuImage &output,
+void Geometric::rotate(const GpuImage& input, GpuImage& output,
                        float angleDegrees, cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -321,7 +321,7 @@ void Geometric::rotate(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Geometric::rotate90(const GpuImage &input, GpuImage &output, int times,
+void Geometric::rotate90(const GpuImage& input, GpuImage& output, int times,
                          cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -349,7 +349,7 @@ void Geometric::rotate90(const GpuImage &input, GpuImage &output, int times,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Geometric::flip(const GpuImage &input, GpuImage &output,
+void Geometric::flip(const GpuImage& input, GpuImage& output,
                      FlipDirection direction, cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -373,8 +373,8 @@ void Geometric::flip(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Geometric::affineTransform(const GpuImage &input, GpuImage &output,
-                                const float *matrix, int outputWidth,
+void Geometric::affineTransform(const GpuImage& input, GpuImage& output,
+                                const float* matrix, int outputWidth,
                                 int outputHeight, cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -405,8 +405,8 @@ void Geometric::affineTransform(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Geometric::perspectiveTransform(const GpuImage &input, GpuImage &output,
-                                     const float *matrix, int outputWidth,
+void Geometric::perspectiveTransform(const GpuImage& input, GpuImage& output,
+                                     const float* matrix, int outputWidth,
                                      int outputHeight, cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -438,7 +438,7 @@ void Geometric::perspectiveTransform(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Geometric::crop(const GpuImage &input, GpuImage &output, int x, int y,
+void Geometric::crop(const GpuImage& input, GpuImage& output, int x, int y,
                      int width, int height, cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -463,7 +463,7 @@ void Geometric::crop(const GpuImage &input, GpuImage &output, int x, int y,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Geometric::pad(const GpuImage &input, GpuImage &output, int top,
+void Geometric::pad(const GpuImage& input, GpuImage& output, int top,
                     int bottom, int left, int right, unsigned char padValue,
                     cudaStream_t stream) {
   if (!input.isValid()) {

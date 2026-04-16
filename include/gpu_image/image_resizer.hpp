@@ -16,20 +16,20 @@ enum class InterpolationMode {
 class ImageResizer {
 public:
   // 双线性插值缩放
-  static void resize(const GpuImage &input, GpuImage &output, int newWidth,
+  static void resize(const GpuImage& input, GpuImage& output, int newWidth,
                      int newHeight,
                      InterpolationMode mode = InterpolationMode::Bilinear,
                      cudaStream_t stream = nullptr);
 
   // 按比例缩放
   static void
-  resizeByScale(const GpuImage &input, GpuImage &output, float scaleX,
+  resizeByScale(const GpuImage& input, GpuImage& output, float scaleX,
                 float scaleY,
                 InterpolationMode mode = InterpolationMode::Bilinear,
                 cudaStream_t stream = nullptr);
 
   // 保持宽高比缩放（适应指定尺寸）
-  static void resizeFit(const GpuImage &input, GpuImage &output, int maxWidth,
+  static void resizeFit(const GpuImage& input, GpuImage& output, int maxWidth,
                         int maxHeight,
                         InterpolationMode mode = InterpolationMode::Bilinear,
                         cudaStream_t stream = nullptr);

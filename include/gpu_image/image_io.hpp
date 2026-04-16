@@ -9,24 +9,24 @@ namespace gpu_image {
 class ImageIO {
 public:
   // 从文件加载图像
-  static HostImage loadFromFile(const std::string &filepath);
+  static HostImage loadFromFile(const std::string& filepath);
 
   // 保存图像到文件
   // 支持格式: PNG, JPG, BMP, TGA
-  static bool saveToFile(const HostImage &image, const std::string &filepath);
+  static bool saveToFile(const HostImage& image, const std::string& filepath);
 
   // 从内存加载图像
-  static HostImage loadFromMemory(const unsigned char *data, size_t size);
+  static HostImage loadFromMemory(const unsigned char* data, size_t size);
 
   // 编码图像到内存
-  static std::vector<unsigned char> encodeToMemory(const HostImage &image,
-                                                   const std::string &format);
+  static std::vector<unsigned char> encodeToMemory(const HostImage& image,
+                                                   const std::string& format);
 
   // 获取支持的格式
   static std::vector<std::string> getSupportedFormats();
 
   // 检查文件格式是否支持
-  static bool isFormatSupported(const std::string &filepath);
+  static bool isFormatSupported(const std::string& filepath);
 };
 
 } // namespace gpu_image

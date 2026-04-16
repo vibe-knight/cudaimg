@@ -6,7 +6,7 @@
 using namespace gpu_image;
 
 namespace {
-std::vector<unsigned char> downloadPixels(const GpuImage &image) {
+std::vector<unsigned char> downloadPixels(const GpuImage& image) {
   std::vector<unsigned char> pixels(image.totalBytes());
   cudaMemcpy(pixels.data(), image.buffer.data(), image.totalBytes(),
              cudaMemcpyDeviceToHost);

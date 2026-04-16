@@ -8,9 +8,9 @@
 
 #include "gpu_image/gpu_image_processing.hpp"
 #include <cmath>
+#include <cuda_runtime.h>
 #include <gtest/gtest.h>
 #include <vector>
-#include <cuda_runtime.h>
 
 using namespace gpu_image;
 
@@ -25,8 +25,8 @@ protected:
   }
 
   // CPU 参考实现
-  void cpuConvolve(const HostImage &input, HostImage &output,
-                   const std::vector<float> &kernel, int kernelSize) {
+  void cpuConvolve(const HostImage& input, HostImage& output,
+                   const std::vector<float>& kernel, int kernelSize) {
     int half = kernelSize / 2;
 
     for (int y = 0; y < input.height; ++y) {
@@ -314,8 +314,8 @@ TEST_F(ConvolutionTest, ConcurrentDifferentKernelsDoNotInterfere) {
   CUDA_CHECK(cudaStreamCreate(&stream1));
   CUDA_CHECK(cudaStreamCreate(&stream2));
 
-  ConvolutionEngine::convolve(gpuInput, identityOutput, identityKernel.data(), 3,
-                              BorderMode::Zero, stream1);
+  ConvolutionEngine::convolve(gpuInput, identityOutput, identityKernel.data(),
+                              3, BorderMode::Zero, stream1);
   ConvolutionEngine::convolve(gpuInput, blurOutput, blurKernel.data(), 3,
                               BorderMode::Zero, stream2);
 
@@ -353,8 +353,8 @@ TEST_F(ConvolutionTest, ConcurrentSeparableConvolutionsDoNotInterfere) {
   ConvolutionEngine::separableConvolve(gpuInput, horizontalOutput,
                                        horizontal.data(), identity.data(), 3,
                                        stream1);
-  ConvolutionEngine::separableConvolve(gpuInput, verticalOutput, identity.data(),
-                                       horizontal.data(), 3, stream2);
+  ConvolutionEngine::separableConvolve(
+      gpuInput, verticalOutput, identity.data(), horizontal.data(), 3, stream2);
 
   CUDA_CHECK(cudaStreamSynchronize(stream1));
   CUDA_CHECK(cudaStreamSynchronize(stream2));
@@ -390,4 +390,3 @@ TEST_F(ConvolutionTest, ConvolutionSimpleKernelMatchesReference) {
   HostImage gpuResult = ImageUtils::downloadFromGpu(gpuOutput);
   EXPECT_EQ(cpuOutput.data, gpuResult.data);
 }
-

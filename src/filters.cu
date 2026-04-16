@@ -6,8 +6,8 @@
 namespace gpu_image {
 
 // 中值滤波 Kernel（使用排序网络）
-__global__ void medianFilterKernel(const unsigned char *input,
-                                   unsigned char *output, int width, int height,
+__global__ void medianFilterKernel(const unsigned char* input,
+                                   unsigned char* output, int width, int height,
                                    int channels, int kernelSize) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -48,8 +48,8 @@ __global__ void medianFilterKernel(const unsigned char *input,
 }
 
 // 双边滤波 Kernel
-__global__ void bilateralFilterKernel(const unsigned char *input,
-                                      unsigned char *output, int width,
+__global__ void bilateralFilterKernel(const unsigned char* input,
+                                      unsigned char* output, int width,
                                       int height, int channels, int kernelSize,
                                       float sigmaSpace, float sigmaColor) {
 
@@ -96,8 +96,8 @@ __global__ void bilateralFilterKernel(const unsigned char *input,
 }
 
 // 盒式滤波 Kernel
-__global__ void boxFilterKernel(const unsigned char *input,
-                                unsigned char *output, int width, int height,
+__global__ void boxFilterKernel(const unsigned char* input,
+                                unsigned char* output, int width, int height,
                                 int channels, int kernelSize) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -126,7 +126,7 @@ __global__ void boxFilterKernel(const unsigned char *input,
 }
 
 // 锐化 Kernel
-__global__ void sharpenKernel(const unsigned char *input, unsigned char *output,
+__global__ void sharpenKernel(const unsigned char* input, unsigned char* output,
                               int width, int height, int channels,
                               float strength) {
 
@@ -156,8 +156,8 @@ __global__ void sharpenKernel(const unsigned char *input, unsigned char *output,
 }
 
 // 拉普拉斯 Kernel
-__global__ void laplacianKernel(const unsigned char *input,
-                                unsigned char *output, int width, int height,
+__global__ void laplacianKernel(const unsigned char* input,
+                                unsigned char* output, int width, int height,
                                 int channels) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -187,8 +187,8 @@ __global__ void laplacianKernel(const unsigned char *input,
 }
 
 // 图像加法 Kernel
-__global__ void addKernel(const unsigned char *src1, const unsigned char *src2,
-                          unsigned char *output, int size) {
+__global__ void addKernel(const unsigned char* src1, const unsigned char* src2,
+                          unsigned char* output, int size) {
 
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (idx >= size)
@@ -199,8 +199,8 @@ __global__ void addKernel(const unsigned char *src1, const unsigned char *src2,
 }
 
 // 图像减法 Kernel
-__global__ void subtractKernel(const unsigned char *src1,
-                               const unsigned char *src2, unsigned char *output,
+__global__ void subtractKernel(const unsigned char* src1,
+                               const unsigned char* src2, unsigned char* output,
                                int size) {
 
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -212,8 +212,8 @@ __global__ void subtractKernel(const unsigned char *src1,
 }
 
 // 图像乘法 Kernel
-__global__ void multiplyKernel(const unsigned char *src1,
-                               const unsigned char *src2, unsigned char *output,
+__global__ void multiplyKernel(const unsigned char* src1,
+                               const unsigned char* src2, unsigned char* output,
                                int size, float scale) {
 
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -225,8 +225,8 @@ __global__ void multiplyKernel(const unsigned char *src1,
 }
 
 // 图像混合 Kernel
-__global__ void blendKernel(const unsigned char *src1,
-                            const unsigned char *src2, unsigned char *output,
+__global__ void blendKernel(const unsigned char* src1,
+                            const unsigned char* src2, unsigned char* output,
                             int size, float alpha) {
 
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -238,9 +238,9 @@ __global__ void blendKernel(const unsigned char *src1,
 }
 
 // 加权和 Kernel
-__global__ void addWeightedKernel(const unsigned char *src1,
-                                  const unsigned char *src2,
-                                  unsigned char *output, int size, float alpha,
+__global__ void addWeightedKernel(const unsigned char* src1,
+                                  const unsigned char* src2,
+                                  unsigned char* output, int size, float alpha,
                                   float beta, float gamma) {
 
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -252,8 +252,8 @@ __global__ void addWeightedKernel(const unsigned char *src1,
 }
 
 // 绝对差 Kernel
-__global__ void absDiffKernel(const unsigned char *src1,
-                              const unsigned char *src2, unsigned char *output,
+__global__ void absDiffKernel(const unsigned char* src1,
+                              const unsigned char* src2, unsigned char* output,
                               int size) {
 
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -264,8 +264,8 @@ __global__ void absDiffKernel(const unsigned char *src1,
 }
 
 // 标量加法 Kernel
-__global__ void addScalarKernel(const unsigned char *input,
-                                unsigned char *output, int size, int value) {
+__global__ void addScalarKernel(const unsigned char* input,
+                                unsigned char* output, int size, int value) {
 
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (idx >= size)
@@ -276,8 +276,8 @@ __global__ void addScalarKernel(const unsigned char *input,
 }
 
 // 标量乘法 Kernel
-__global__ void multiplyScalarKernel(const unsigned char *input,
-                                     unsigned char *output, int size,
+__global__ void multiplyScalarKernel(const unsigned char* input,
+                                     unsigned char* output, int size,
                                      float scale) {
 
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -289,7 +289,7 @@ __global__ void multiplyScalarKernel(const unsigned char *input,
 }
 
 // Filters 实现
-void Filters::medianFilter(const GpuImage &input, GpuImage &output,
+void Filters::medianFilter(const GpuImage& input, GpuImage& output,
                            int kernelSize, cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -316,7 +316,7 @@ void Filters::medianFilter(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Filters::bilateralFilter(const GpuImage &input, GpuImage &output,
+void Filters::bilateralFilter(const GpuImage& input, GpuImage& output,
                               int kernelSize, float sigmaSpace,
                               float sigmaColor, cudaStream_t stream) {
   if (!input.isValid()) {
@@ -350,7 +350,7 @@ void Filters::bilateralFilter(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Filters::boxFilter(const GpuImage &input, GpuImage &output, int kernelSize,
+void Filters::boxFilter(const GpuImage& input, GpuImage& output, int kernelSize,
                         cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -377,7 +377,7 @@ void Filters::boxFilter(const GpuImage &input, GpuImage &output, int kernelSize,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Filters::sharpen(const GpuImage &input, GpuImage &output, float strength,
+void Filters::sharpen(const GpuImage& input, GpuImage& output, float strength,
                       cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -401,7 +401,7 @@ void Filters::sharpen(const GpuImage &input, GpuImage &output, float strength,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Filters::laplacian(const GpuImage &input, GpuImage &output,
+void Filters::laplacian(const GpuImage& input, GpuImage& output,
                         cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -426,8 +426,8 @@ void Filters::laplacian(const GpuImage &input, GpuImage &output,
 }
 
 // ImageArithmetic 实现
-void ImageArithmetic::add(const GpuImage &src1, const GpuImage &src2,
-                          GpuImage &output, cudaStream_t stream) {
+void ImageArithmetic::add(const GpuImage& src1, const GpuImage& src2,
+                          GpuImage& output, cudaStream_t stream) {
   if (!src1.isValid() || !src2.isValid()) {
     throw std::invalid_argument("Invalid input images");
   }
@@ -452,8 +452,8 @@ void ImageArithmetic::add(const GpuImage &src1, const GpuImage &src2,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ImageArithmetic::subtract(const GpuImage &src1, const GpuImage &src2,
-                               GpuImage &output, cudaStream_t stream) {
+void ImageArithmetic::subtract(const GpuImage& src1, const GpuImage& src2,
+                               GpuImage& output, cudaStream_t stream) {
   if (!src1.isValid() || !src2.isValid()) {
     throw std::invalid_argument("Invalid input images");
   }
@@ -478,8 +478,8 @@ void ImageArithmetic::subtract(const GpuImage &src1, const GpuImage &src2,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ImageArithmetic::multiply(const GpuImage &src1, const GpuImage &src2,
-                               GpuImage &output, float scale,
+void ImageArithmetic::multiply(const GpuImage& src1, const GpuImage& src2,
+                               GpuImage& output, float scale,
                                cudaStream_t stream) {
   if (!src1.isValid() || !src2.isValid()) {
     throw std::invalid_argument("Invalid input images");
@@ -505,8 +505,8 @@ void ImageArithmetic::multiply(const GpuImage &src1, const GpuImage &src2,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ImageArithmetic::blend(const GpuImage &src1, const GpuImage &src2,
-                            GpuImage &output, float alpha,
+void ImageArithmetic::blend(const GpuImage& src1, const GpuImage& src2,
+                            GpuImage& output, float alpha,
                             cudaStream_t stream) {
   if (!src1.isValid() || !src2.isValid()) {
     throw std::invalid_argument("Invalid input images");
@@ -532,9 +532,9 @@ void ImageArithmetic::blend(const GpuImage &src1, const GpuImage &src2,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ImageArithmetic::addWeighted(const GpuImage &src1, float alpha,
-                                  const GpuImage &src2, float beta,
-                                  GpuImage &output, float gamma,
+void ImageArithmetic::addWeighted(const GpuImage& src1, float alpha,
+                                  const GpuImage& src2, float beta,
+                                  GpuImage& output, float gamma,
                                   cudaStream_t stream) {
   if (!src1.isValid() || !src2.isValid()) {
     throw std::invalid_argument("Invalid input images");
@@ -560,8 +560,8 @@ void ImageArithmetic::addWeighted(const GpuImage &src1, float alpha,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ImageArithmetic::absDiff(const GpuImage &src1, const GpuImage &src2,
-                              GpuImage &output, cudaStream_t stream) {
+void ImageArithmetic::absDiff(const GpuImage& src1, const GpuImage& src2,
+                              GpuImage& output, cudaStream_t stream) {
   if (!src1.isValid() || !src2.isValid()) {
     throw std::invalid_argument("Invalid input images");
   }
@@ -586,7 +586,7 @@ void ImageArithmetic::absDiff(const GpuImage &src1, const GpuImage &src2,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ImageArithmetic::addScalar(const GpuImage &input, GpuImage &output,
+void ImageArithmetic::addScalar(const GpuImage& input, GpuImage& output,
                                 unsigned char value, cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -609,7 +609,7 @@ void ImageArithmetic::addScalar(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ImageArithmetic::multiplyScalar(const GpuImage &input, GpuImage &output,
+void ImageArithmetic::multiplyScalar(const GpuImage& input, GpuImage& output,
                                      float scale, cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");

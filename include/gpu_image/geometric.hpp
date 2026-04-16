@@ -16,37 +16,37 @@ enum class FlipDirection {
 class Geometric {
 public:
   // 图像旋转（角度，顺时针）
-  static void rotate(const GpuImage &input, GpuImage &output,
+  static void rotate(const GpuImage& input, GpuImage& output,
                      float angleDegrees, cudaStream_t stream = nullptr);
 
   // 90度旋转（更高效）
-  static void rotate90(const GpuImage &input, GpuImage &output,
+  static void rotate90(const GpuImage& input, GpuImage& output,
                        int times = 1, // 1=90°, 2=180°, 3=270°
                        cudaStream_t stream = nullptr);
 
   // 图像翻转
-  static void flip(const GpuImage &input, GpuImage &output,
+  static void flip(const GpuImage& input, GpuImage& output,
                    FlipDirection direction, cudaStream_t stream = nullptr);
 
   // 仿射变换
   // matrix: 2x3 变换矩阵 [a, b, tx, c, d, ty]
-  static void affineTransform(const GpuImage &input, GpuImage &output,
-                              const float *matrix, int outputWidth,
+  static void affineTransform(const GpuImage& input, GpuImage& output,
+                              const float* matrix, int outputWidth,
                               int outputHeight, cudaStream_t stream = nullptr);
 
   // 透视变换
   // matrix: 3x3 变换矩阵
-  static void perspectiveTransform(const GpuImage &input, GpuImage &output,
-                                   const float *matrix, int outputWidth,
+  static void perspectiveTransform(const GpuImage& input, GpuImage& output,
+                                   const float* matrix, int outputWidth,
                                    int outputHeight,
                                    cudaStream_t stream = nullptr);
 
   // 图像裁剪
-  static void crop(const GpuImage &input, GpuImage &output, int x, int y,
+  static void crop(const GpuImage& input, GpuImage& output, int x, int y,
                    int width, int height, cudaStream_t stream = nullptr);
 
   // 图像填充
-  static void pad(const GpuImage &input, GpuImage &output, int top, int bottom,
+  static void pad(const GpuImage& input, GpuImage& output, int top, int bottom,
                   int left, int right, unsigned char padValue = 0,
                   cudaStream_t stream = nullptr);
 };

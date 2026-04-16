@@ -10,7 +10,7 @@ DeviceBuffer::DeviceBuffer(size_t size) : devicePtr_(nullptr), size_(size) {
   }
 }
 
-DeviceBuffer DeviceBuffer::fromRaw(void *ptr, size_t size) noexcept {
+DeviceBuffer DeviceBuffer::fromRaw(void* ptr, size_t size) noexcept {
   DeviceBuffer buf;
   buf.devicePtr_ = ptr;
   buf.size_ = size;
@@ -19,13 +19,13 @@ DeviceBuffer DeviceBuffer::fromRaw(void *ptr, size_t size) noexcept {
 
 DeviceBuffer::~DeviceBuffer() { release(); }
 
-DeviceBuffer::DeviceBuffer(DeviceBuffer &&other) noexcept
+DeviceBuffer::DeviceBuffer(DeviceBuffer&& other) noexcept
     : devicePtr_(other.devicePtr_), size_(other.size_) {
   other.devicePtr_ = nullptr;
   other.size_ = 0;
 }
 
-DeviceBuffer &DeviceBuffer::operator=(DeviceBuffer &&other) noexcept {
+DeviceBuffer& DeviceBuffer::operator=(DeviceBuffer&& other) noexcept {
   if (this != &other) {
     release();
     devicePtr_ = other.devicePtr_;
@@ -36,7 +36,7 @@ DeviceBuffer &DeviceBuffer::operator=(DeviceBuffer &&other) noexcept {
   return *this;
 }
 
-void DeviceBuffer::copyFromHost(const void *hostPtr, size_t copySize) {
+void DeviceBuffer::copyFromHost(const void* hostPtr, size_t copySize) {
   if (hostPtr == nullptr) {
     throw std::invalid_argument("Host pointer is null");
   }
@@ -46,7 +46,7 @@ void DeviceBuffer::copyFromHost(const void *hostPtr, size_t copySize) {
   CUDA_CHECK(cudaMemcpy(devicePtr_, hostPtr, copySize, cudaMemcpyHostToDevice));
 }
 
-void DeviceBuffer::copyToHost(void *hostPtr, size_t copySize) const {
+void DeviceBuffer::copyToHost(void* hostPtr, size_t copySize) const {
   if (hostPtr == nullptr) {
     throw std::invalid_argument("Host pointer is null");
   }
@@ -56,7 +56,7 @@ void DeviceBuffer::copyToHost(void *hostPtr, size_t copySize) const {
   CUDA_CHECK(cudaMemcpy(hostPtr, devicePtr_, copySize, cudaMemcpyDeviceToHost));
 }
 
-void DeviceBuffer::copyFromHostAsync(const void *hostPtr, size_t copySize,
+void DeviceBuffer::copyFromHostAsync(const void* hostPtr, size_t copySize,
                                      cudaStream_t stream) {
   if (hostPtr == nullptr) {
     throw std::invalid_argument("Host pointer is null");
@@ -68,7 +68,7 @@ void DeviceBuffer::copyFromHostAsync(const void *hostPtr, size_t copySize,
                              cudaMemcpyHostToDevice, stream));
 }
 
-void DeviceBuffer::copyToHostAsync(void *hostPtr, size_t copySize,
+void DeviceBuffer::copyToHostAsync(void* hostPtr, size_t copySize,
                                    cudaStream_t stream) const {
   if (hostPtr == nullptr) {
     throw std::invalid_argument("Host pointer is null");
@@ -88,7 +88,7 @@ void DeviceBuffer::release() {
   }
 }
 
-std::pair<void *, size_t> DeviceBuffer::detach() noexcept {
+std::pair<void*, size_t> DeviceBuffer::detach() noexcept {
   auto result = std::make_pair(devicePtr_, size_);
   devicePtr_ = nullptr;
   size_ = 0;

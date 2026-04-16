@@ -10,11 +10,11 @@ namespace gpu_image {
 // CUDA Stream 管理器单例类
 class StreamManager {
 public:
-  static StreamManager &instance();
+  static StreamManager& instance();
 
   // 禁用拷贝和移动
-  StreamManager(const StreamManager &) = delete;
-  StreamManager &operator=(const StreamManager &) = delete;
+  StreamManager(const StreamManager&) = delete;
+  StreamManager& operator=(const StreamManager&) = delete;
 
   // 获取一个可用的 stream
   cudaStream_t acquireStream();
@@ -51,8 +51,8 @@ public:
   ScopedStream() : stream_(StreamManager::instance().acquireStream()) {}
   ~ScopedStream() { StreamManager::instance().releaseStream(stream_); }
 
-  ScopedStream(const ScopedStream &) = delete;
-  ScopedStream &operator=(const ScopedStream &) = delete;
+  ScopedStream(const ScopedStream&) = delete;
+  ScopedStream& operator=(const ScopedStream&) = delete;
 
   cudaStream_t get() const { return stream_; }
   operator cudaStream_t() const { return stream_; }

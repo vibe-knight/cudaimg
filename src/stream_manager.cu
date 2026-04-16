@@ -3,7 +3,7 @@
 
 namespace gpu_image {
 
-StreamManager &StreamManager::instance() {
+StreamManager& StreamManager::instance() {
   static StreamManager instance;
   return instance;
 }

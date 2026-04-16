@@ -56,7 +56,7 @@ TEST_F(DeviceBufferTest, ZeroSizeAllocation) {
 TEST_F(DeviceBufferTest, MoveSemantics) {
   const size_t size = 1024;
   DeviceBuffer buffer1(size);
-  void *originalPtr = buffer1.data();
+  void* originalPtr = buffer1.data();
 
   // 移动构造
   DeviceBuffer buffer2(std::move(buffer1));

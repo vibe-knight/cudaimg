@@ -6,8 +6,8 @@
 namespace gpu_image {
 
 // RGB to HSV Kernel
-__global__ void rgbToHsvKernel(const unsigned char *input,
-                               unsigned char *output, int width, int height) {
+__global__ void rgbToHsvKernel(const unsigned char* input,
+                               unsigned char* output, int width, int height) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -44,8 +44,8 @@ __global__ void rgbToHsvKernel(const unsigned char *input,
   }
 
   // 归一化到 0-255，使用四舍五入减小往返误差
-  output[idx] =
-      static_cast<unsigned char>(fminf(fmaxf(h * 255.0f / 360.0f + 0.5f, 0.0f), 255.0f));
+  output[idx] = static_cast<unsigned char>(
+      fminf(fmaxf(h * 255.0f / 360.0f + 0.5f, 0.0f), 255.0f));
   output[idx + 1] =
       static_cast<unsigned char>(fminf(fmaxf(s * 255.0f + 0.5f, 0.0f), 255.0f));
   output[idx + 2] =
@@ -53,8 +53,8 @@ __global__ void rgbToHsvKernel(const unsigned char *input,
 }
 
 // HSV to RGB Kernel
-__global__ void hsvToRgbKernel(const unsigned char *input,
-                               unsigned char *output, int width, int height) {
+__global__ void hsvToRgbKernel(const unsigned char* input,
+                               unsigned char* output, int width, int height) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -109,8 +109,8 @@ __global__ void hsvToRgbKernel(const unsigned char *input,
 }
 
 // RGB to YUV Kernel
-__global__ void rgbToYuvKernel(const unsigned char *input,
-                               unsigned char *output, int width, int height) {
+__global__ void rgbToYuvKernel(const unsigned char* input,
+                               unsigned char* output, int width, int height) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -138,8 +138,8 @@ __global__ void rgbToYuvKernel(const unsigned char *input,
 }
 
 // YUV to RGB Kernel
-__global__ void yuvToRgbKernel(const unsigned char *input,
-                               unsigned char *output, int width, int height) {
+__global__ void yuvToRgbKernel(const unsigned char* input,
+                               unsigned char* output, int width, int height) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -167,8 +167,8 @@ __global__ void yuvToRgbKernel(const unsigned char *input,
 
 // RGB to CIE L*a*b* Kernel
 // 使用 D65 白点，sRGB gamma
-__global__ void rgbToLabKernel(const unsigned char *input,
-                               unsigned char *output, int width, int height) {
+__global__ void rgbToLabKernel(const unsigned char* input,
+                               unsigned char* output, int width, int height) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -225,8 +225,8 @@ __global__ void rgbToLabKernel(const unsigned char *input,
 }
 
 // CIE L*a*b* to RGB Kernel
-__global__ void labToRgbKernel(const unsigned char *input,
-                               unsigned char *output, int width, int height) {
+__global__ void labToRgbKernel(const unsigned char* input,
+                               unsigned char* output, int width, int height) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -274,9 +274,9 @@ __global__ void labToRgbKernel(const unsigned char *input,
 }
 
 // 通道分离 Kernel
-__global__ void splitChannelsKernel(const unsigned char *input,
-                                    unsigned char *ch0, unsigned char *ch1,
-                                    unsigned char *ch2, int width, int height,
+__global__ void splitChannelsKernel(const unsigned char* input,
+                                    unsigned char* ch0, unsigned char* ch1,
+                                    unsigned char* ch2, int width, int height,
                                     int channels) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -296,10 +296,10 @@ __global__ void splitChannelsKernel(const unsigned char *input,
 }
 
 // 通道合并 Kernel
-__global__ void mergeChannelsKernel(const unsigned char *ch0,
-                                    const unsigned char *ch1,
-                                    const unsigned char *ch2,
-                                    unsigned char *output, int width,
+__global__ void mergeChannelsKernel(const unsigned char* ch0,
+                                    const unsigned char* ch1,
+                                    const unsigned char* ch2,
+                                    unsigned char* output, int width,
                                     int height) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -317,7 +317,7 @@ __global__ void mergeChannelsKernel(const unsigned char *ch0,
 }
 
 // ColorSpace 实现
-void ColorSpace::rgbToHsv(const GpuImage &input, GpuImage &output,
+void ColorSpace::rgbToHsv(const GpuImage& input, GpuImage& output,
                           cudaStream_t stream) {
   if (!input.isValid() || input.channels != 3) {
     throw std::invalid_argument("Input must be a valid 3-channel image");
@@ -339,7 +339,7 @@ void ColorSpace::rgbToHsv(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ColorSpace::hsvToRgb(const GpuImage &input, GpuImage &output,
+void ColorSpace::hsvToRgb(const GpuImage& input, GpuImage& output,
                           cudaStream_t stream) {
   if (!input.isValid() || input.channels != 3) {
     throw std::invalid_argument("Input must be a valid 3-channel image");
@@ -361,7 +361,7 @@ void ColorSpace::hsvToRgb(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ColorSpace::rgbToYuv(const GpuImage &input, GpuImage &output,
+void ColorSpace::rgbToYuv(const GpuImage& input, GpuImage& output,
                           cudaStream_t stream) {
   if (!input.isValid() || input.channels != 3) {
     throw std::invalid_argument("Input must be a valid 3-channel image");
@@ -383,7 +383,7 @@ void ColorSpace::rgbToYuv(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ColorSpace::yuvToRgb(const GpuImage &input, GpuImage &output,
+void ColorSpace::yuvToRgb(const GpuImage& input, GpuImage& output,
                           cudaStream_t stream) {
   if (!input.isValid() || input.channels != 3) {
     throw std::invalid_argument("Input must be a valid 3-channel image");
@@ -405,7 +405,7 @@ void ColorSpace::yuvToRgb(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ColorSpace::rgbToLab(const GpuImage &input, GpuImage &output,
+void ColorSpace::rgbToLab(const GpuImage& input, GpuImage& output,
                           cudaStream_t stream) {
   if (!input.isValid() || input.channels != 3) {
     throw std::invalid_argument("Input must be a valid 3-channel image");
@@ -427,7 +427,7 @@ void ColorSpace::rgbToLab(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ColorSpace::labToRgb(const GpuImage &input, GpuImage &output,
+void ColorSpace::labToRgb(const GpuImage& input, GpuImage& output,
                           cudaStream_t stream) {
   if (!input.isValid() || input.channels != 3) {
     throw std::invalid_argument("Input must be a valid 3-channel image");
@@ -449,8 +449,8 @@ void ColorSpace::labToRgb(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ColorSpace::splitChannels(const GpuImage &input, GpuImage &channel0,
-                               GpuImage &channel1, GpuImage &channel2,
+void ColorSpace::splitChannels(const GpuImage& input, GpuImage& channel0,
+                               GpuImage& channel1, GpuImage& channel2,
                                cudaStream_t stream) {
   if (!input.isValid() || input.channels < 3) {
     throw std::invalid_argument(
@@ -485,9 +485,9 @@ void ColorSpace::splitChannels(const GpuImage &input, GpuImage &channel0,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ColorSpace::mergeChannels(const GpuImage &channel0,
-                               const GpuImage &channel1,
-                               const GpuImage &channel2, GpuImage &output,
+void ColorSpace::mergeChannels(const GpuImage& channel0,
+                               const GpuImage& channel1,
+                               const GpuImage& channel2, GpuImage& output,
                                cudaStream_t stream) {
   if (!channel0.isValid() || !channel1.isValid() || !channel2.isValid()) {
     throw std::invalid_argument("All channels must be valid");

@@ -13,8 +13,8 @@ struct KernelData {
 
 // 使用 Shared Memory 的卷积 Kernel
 template <int BLOCK_SIZE, int MAX_KERNEL_SIZE>
-__global__ void convolveKernelShared(const unsigned char *input,
-                                     unsigned char *output, int width,
+__global__ void convolveKernelShared(const unsigned char* input,
+                                     unsigned char* output, int width,
                                      int height, int channels, int kernelSize,
                                      int borderMode, KernelData kernelData) {
 
@@ -88,8 +88,8 @@ __global__ void convolveKernelShared(const unsigned char *input,
 }
 
 // 简单卷积 Kernel（不使用 shared memory，用于小图像或调试）
-__global__ void convolveKernelSimple(const unsigned char *input,
-                                     unsigned char *output, int width,
+__global__ void convolveKernelSimple(const unsigned char* input,
+                                     unsigned char* output, int width,
                                      int height, int channels, int kernelSize,
                                      KernelData kernelData) {
 
@@ -125,8 +125,8 @@ __global__ void convolveKernelSimple(const unsigned char *input,
 }
 
 // 可分离卷积 - 水平方向 Kernel
-__global__ void separableRowKernel(const unsigned char *input,
-                                   unsigned char *output, int width, int height,
+__global__ void separableRowKernel(const unsigned char* input,
+                                   unsigned char* output, int width, int height,
                                    int channels, int kernelSize,
                                    KernelData kernelData) {
 
@@ -157,8 +157,8 @@ __global__ void separableRowKernel(const unsigned char *input,
 }
 
 // 可分离卷积 - 垂直方向 Kernel
-__global__ void separableColKernel(const unsigned char *input,
-                                   unsigned char *output, int width, int height,
+__global__ void separableColKernel(const unsigned char* input,
+                                   unsigned char* output, int width, int height,
                                    int channels, int kernelSize,
                                    KernelData kernelData) {
 
@@ -189,7 +189,7 @@ __global__ void separableColKernel(const unsigned char *input,
 }
 
 // Sobel 边缘检测 Kernel
-__global__ void sobelKernel(const unsigned char *input, unsigned char *output,
+__global__ void sobelKernel(const unsigned char* input, unsigned char* output,
                             int width, int height, int channels) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -240,8 +240,8 @@ __global__ void sobelKernel(const unsigned char *input, unsigned char *output,
 }
 
 // ConvolutionEngine 实现
-void ConvolutionEngine::convolve(const GpuImage &input, GpuImage &output,
-                                 const float *kernel, int kernelSize,
+void ConvolutionEngine::convolve(const GpuImage& input, GpuImage& output,
+                                 const float* kernel, int kernelSize,
                                  BorderMode borderMode, cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -285,7 +285,7 @@ void ConvolutionEngine::convolve(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ConvolutionEngine::gaussianBlur(const GpuImage &input, GpuImage &output,
+void ConvolutionEngine::gaussianBlur(const GpuImage& input, GpuImage& output,
                                      int kernelSize, float sigma,
                                      cudaStream_t stream) {
   if (kernelSize < 1 || kernelSize > 7 || kernelSize % 2 == 0) {
@@ -299,8 +299,8 @@ void ConvolutionEngine::gaussianBlur(const GpuImage &input, GpuImage &output,
   convolve(input, output, kernel.data(), kernelSize, BorderMode::Zero, stream);
 }
 
-void ConvolutionEngine::sobelEdgeDetection(const GpuImage &input,
-                                           GpuImage &output,
+void ConvolutionEngine::sobelEdgeDetection(const GpuImage& input,
+                                           GpuImage& output,
                                            cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -346,7 +346,7 @@ std::vector<float> ConvolutionEngine::generateGaussianKernel(int size,
   }
 
   // 归一化
-  for (float &v : kernel) {
+  for (float& v : kernel) {
     v /= sum;
   }
 
@@ -373,17 +373,17 @@ std::vector<float> ConvolutionEngine::generateGaussianKernel1D(int size,
   }
 
   // 归一化
-  for (float &v : kernel) {
+  for (float& v : kernel) {
     v /= sum;
   }
 
   return kernel;
 }
 
-void ConvolutionEngine::separableConvolve(const GpuImage &input,
-                                          GpuImage &output,
-                                          const float *rowKernel,
-                                          const float *colKernel,
+void ConvolutionEngine::separableConvolve(const GpuImage& input,
+                                          GpuImage& output,
+                                          const float* rowKernel,
+                                          const float* colKernel,
                                           int kernelSize, cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");

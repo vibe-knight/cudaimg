@@ -15,9 +15,9 @@
 
 namespace gpu_image {
 
-HostImage ImageIO::loadFromFile(const std::string &filepath) {
+HostImage ImageIO::loadFromFile(const std::string& filepath) {
   int width, height, channels;
-  unsigned char *data =
+  unsigned char* data =
       stbi_load(filepath.c_str(), &width, &height, &channels, 0);
 
   if (data == nullptr) {
@@ -36,7 +36,7 @@ HostImage ImageIO::loadFromFile(const std::string &filepath) {
   return image;
 }
 
-bool ImageIO::saveToFile(const HostImage &image, const std::string &filepath) {
+bool ImageIO::saveToFile(const HostImage& image, const std::string& filepath) {
   if (!image.isValid()) {
     return false;
   }
@@ -67,13 +67,13 @@ bool ImageIO::saveToFile(const HostImage &image, const std::string &filepath) {
   return result != 0;
 }
 
-HostImage ImageIO::loadFromMemory(const unsigned char *data, size_t size) {
+HostImage ImageIO::loadFromMemory(const unsigned char* data, size_t size) {
   if (data == nullptr || size == 0) {
     throw std::invalid_argument("Invalid memory buffer");
   }
 
   int width, height, channels;
-  unsigned char *pixels = stbi_load_from_memory(data, static_cast<int>(size),
+  unsigned char* pixels = stbi_load_from_memory(data, static_cast<int>(size),
                                                 &width, &height, &channels, 0);
 
   if (pixels == nullptr) {
@@ -94,14 +94,14 @@ HostImage ImageIO::loadFromMemory(const unsigned char *data, size_t size) {
 }
 
 // stb_image_write 回调，用于写入 std::vector
-static void stbiWriteCallback(void *context, void *data, int size) {
-  auto *vec = static_cast<std::vector<unsigned char> *>(context);
-  auto *bytes = static_cast<unsigned char *>(data);
+static void stbiWriteCallback(void* context, void* data, int size) {
+  auto* vec = static_cast<std::vector<unsigned char>*>(context);
+  auto* bytes = static_cast<unsigned char*>(data);
   vec->insert(vec->end(), bytes, bytes + size);
 }
 
-std::vector<unsigned char> ImageIO::encodeToMemory(const HostImage &image,
-                                                   const std::string &format) {
+std::vector<unsigned char> ImageIO::encodeToMemory(const HostImage& image,
+                                                   const std::string& format) {
   if (!image.isValid()) {
     throw std::invalid_argument("Invalid image");
   }
@@ -143,7 +143,7 @@ std::vector<std::string> ImageIO::getSupportedFormats() {
   return {"png", "jpg", "jpeg", "bmp", "tga", "psd", "gif", "hdr", "pnm"};
 }
 
-bool ImageIO::isFormatSupported(const std::string &filepath) {
+bool ImageIO::isFormatSupported(const std::string& filepath) {
   if (filepath.empty())
     return false;
 
@@ -166,29 +166,29 @@ bool ImageIO::isFormatSupported(const std::string &filepath) {
 // 无 stb 时的空实现，所有函数抛出异常
 namespace gpu_image {
 
-HostImage ImageIO::loadFromFile(const std::string &) {
+HostImage ImageIO::loadFromFile(const std::string&) {
   throw std::runtime_error(
       "ImageIO requires stb_image. Build with -DGPU_IMAGE_ENABLE_IO=ON");
 }
 
-bool ImageIO::saveToFile(const HostImage &, const std::string &) {
+bool ImageIO::saveToFile(const HostImage&, const std::string&) {
   throw std::runtime_error(
       "ImageIO requires stb_image_write. Build with -DGPU_IMAGE_ENABLE_IO=ON");
 }
 
-HostImage ImageIO::loadFromMemory(const unsigned char *, size_t) {
+HostImage ImageIO::loadFromMemory(const unsigned char*, size_t) {
   throw std::runtime_error(
       "ImageIO requires stb_image. Build with -DGPU_IMAGE_ENABLE_IO=ON");
 }
 
-std::vector<unsigned char> ImageIO::encodeToMemory(const HostImage &,
-                                                   const std::string &) {
+std::vector<unsigned char> ImageIO::encodeToMemory(const HostImage&,
+                                                   const std::string&) {
   throw std::runtime_error(
       "ImageIO requires stb_image_write. Build with -DGPU_IMAGE_ENABLE_IO=ON");
 }
 
 std::vector<std::string> ImageIO::getSupportedFormats() { return {}; }
-bool ImageIO::isFormatSupported(const std::string &) { return false; }
+bool ImageIO::isFormatSupported(const std::string&) { return false; }
 
 } // namespace gpu_image
 

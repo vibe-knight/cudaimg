@@ -40,7 +40,7 @@ HostImage createTestImage(int width, int height, int channels) {
 
 // 运行基准测试
 template <typename Func>
-double runBenchmark(const std::string &name, Func func, int iterations = 100) {
+double runBenchmark(const std::string& name, Func func, int iterations = 100) {
   // 预热
   for (int i = 0; i < 10; ++i) {
     func();
@@ -80,7 +80,7 @@ int main() {
   std::vector<std::pair<int, int>> sizes = {
       {256, 256}, {512, 512}, {1024, 1024}, {2048, 2048}, {4096, 4096}};
 
-  for (const auto &size : sizes) {
+  for (const auto& size : sizes) {
     int width = size.first;
     int height = size.second;
 
@@ -180,7 +180,7 @@ int main() {
   Benchmark timer;
 
   timer.start();
-  for (const auto &img : batchImages) {
+  for (const auto& img : batchImages) {
     GpuImage gpu = processor.loadFromHost(img);
     GpuImage step1 = processor.adjustBrightness(gpu, 20);
     GpuImage step2 = processor.gaussianBlur(step1, 3, 1.0f);
@@ -196,19 +196,19 @@ int main() {
   for (int numStreams : {1, 2, 4, 8}) {
     PipelineProcessor pipeline(numStreams);
 
-    pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+    pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
       GpuImage temp;
       PixelOperator::adjustBrightness(img, temp, 20, stream);
       img = std::move(temp);
     });
 
-    pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+    pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
       GpuImage temp;
       ConvolutionEngine::gaussianBlur(img, temp, 3, 1.0f, stream);
       img = std::move(temp);
     });
 
-    pipeline.addStep([](GpuImage &img, cudaStream_t stream) {
+    pipeline.addStep([](GpuImage& img, cudaStream_t stream) {
       PixelOperator::invertInPlace(img, stream);
     });
 

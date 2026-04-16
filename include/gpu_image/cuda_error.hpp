@@ -10,7 +10,7 @@ namespace gpu_image {
 // CUDA 错误异常类
 class CudaException : public std::runtime_error {
 public:
-  CudaException(cudaError_t error, const char *file, int line);
+  CudaException(cudaError_t error, const char* file, int line);
   cudaError_t errorCode() const { return error_; }
 
 private:
@@ -64,10 +64,10 @@ public:
   bool isOk() const { return success_; }
   bool isError() const { return !success_; }
 
-  T &value() { return value_; }
-  const T &value() const { return value_; }
+  T& value() { return value_; }
+  const T& value() const { return value_; }
 
-  const std::string &errorMessage() const { return errorMsg_; }
+  const std::string& errorMessage() const { return errorMsg_; }
 
 private:
   bool success_ = false;
@@ -93,7 +93,7 @@ public:
 
   bool isOk() const { return success_; }
   bool isError() const { return !success_; }
-  const std::string &errorMessage() const { return errorMsg_; }
+  const std::string& errorMessage() const { return errorMsg_; }
 
 private:
   bool success_ = false;

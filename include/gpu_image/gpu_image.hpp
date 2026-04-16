@@ -40,11 +40,11 @@ struct HostImage {
   int channels = 0;
 
   // 访问像素
-  unsigned char &at(int x, int y, int c) {
+  unsigned char& at(int x, int y, int c) {
     return data[(static_cast<size_t>(y) * width + x) * channels + c];
   }
 
-  const unsigned char &at(int x, int y, int c) const {
+  const unsigned char& at(int x, int y, int c) const {
     return data[(static_cast<size_t>(y) * width + x) * channels + c];
   }
 
@@ -67,15 +67,15 @@ namespace ImageUtils {
 GpuImage createGpuImage(int width, int height, int channels);
 
 // 从 HostImage 创建 GpuImage
-GpuImage uploadToGpu(const HostImage &hostImage);
+GpuImage uploadToGpu(const HostImage& hostImage);
 
 // 从 GpuImage 下载到 HostImage
-HostImage downloadFromGpu(const GpuImage &gpuImage);
+HostImage downloadFromGpu(const GpuImage& gpuImage);
 
 // 异步版本
-void uploadToGpuAsync(const HostImage &hostImage, GpuImage &gpuImage,
+void uploadToGpuAsync(const HostImage& hostImage, GpuImage& gpuImage,
                       cudaStream_t stream);
-void downloadFromGpuAsync(const GpuImage &gpuImage, HostImage &hostImage,
+void downloadFromGpuAsync(const GpuImage& gpuImage, HostImage& hostImage,
                           cudaStream_t stream);
 
 // 创建空的 HostImage

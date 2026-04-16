@@ -6,8 +6,8 @@
 namespace gpu_image {
 
 // 全局阈值 Kernel
-__global__ void thresholdKernel(const unsigned char *input,
-                                unsigned char *output, int width, int height,
+__global__ void thresholdKernel(const unsigned char* input,
+                                unsigned char* output, int width, int height,
                                 int channels, unsigned char thresh,
                                 unsigned char maxVal, int type) {
 
@@ -47,8 +47,8 @@ __global__ void thresholdKernel(const unsigned char *input,
 }
 
 // 自适应阈值 Kernel (均值)
-__global__ void adaptiveThresholdMeanKernel(const unsigned char *input,
-                                            unsigned char *output, int width,
+__global__ void adaptiveThresholdMeanKernel(const unsigned char* input,
+                                            unsigned char* output, int width,
                                             int height, int channels,
                                             unsigned char maxVal, int type,
                                             int blockSize, int C) {
@@ -96,8 +96,8 @@ __global__ void adaptiveThresholdMeanKernel(const unsigned char *input,
 
 // 自适应阈值 Kernel (高斯)
 __global__ void
-adaptiveThresholdGaussianKernel(const unsigned char *input,
-                                unsigned char *output, int width, int height,
+adaptiveThresholdGaussianKernel(const unsigned char* input,
+                                unsigned char* output, int width, int height,
                                 int channels, unsigned char maxVal, int type,
                                 int blockSize, int C, float sigma) {
 
@@ -144,7 +144,7 @@ adaptiveThresholdGaussianKernel(const unsigned char *input,
 }
 
 // Threshold 实现
-void Threshold::threshold(const GpuImage &input, GpuImage &output,
+void Threshold::threshold(const GpuImage& input, GpuImage& output,
                           unsigned char thresh, unsigned char maxVal,
                           ThresholdType type, cudaStream_t stream) {
   if (!input.isValid()) {
@@ -169,7 +169,7 @@ void Threshold::threshold(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Threshold::adaptiveThreshold(const GpuImage &input, GpuImage &output,
+void Threshold::adaptiveThreshold(const GpuImage& input, GpuImage& output,
                                   unsigned char maxVal, AdaptiveMethod method,
                                   ThresholdType type, int blockSize, int C,
                                   cudaStream_t stream) {
@@ -212,7 +212,7 @@ void Threshold::adaptiveThreshold(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-unsigned char Threshold::otsuThreshold(const GpuImage &input,
+unsigned char Threshold::otsuThreshold(const GpuImage& input,
                                        cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
@@ -261,7 +261,7 @@ unsigned char Threshold::otsuThreshold(const GpuImage &input,
   return threshold;
 }
 
-void Threshold::otsuBinarize(const GpuImage &input, GpuImage &output,
+void Threshold::otsuBinarize(const GpuImage& input, GpuImage& output,
                              unsigned char maxVal, cudaStream_t stream) {
   unsigned char thresh = otsuThreshold(input, stream);
   threshold(input, output, thresh, maxVal, ThresholdType::Binary, stream);

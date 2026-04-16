@@ -6,7 +6,7 @@
 namespace gpu_image {
 
 // 双线性插值 device 函数
-__device__ float bilinearInterpolate(const unsigned char *src, int srcWidth,
+__device__ float bilinearInterpolate(const unsigned char* src, int srcWidth,
                                      int srcHeight, int channels, float srcX,
                                      float srcY, int channel) {
 
@@ -40,7 +40,7 @@ __device__ float bilinearInterpolate(const unsigned char *src, int srcWidth,
 }
 
 // 最近邻插值 device 函数
-__device__ unsigned char nearestNeighborInterpolate(const unsigned char *src,
+__device__ unsigned char nearestNeighborInterpolate(const unsigned char* src,
                                                     int srcWidth, int srcHeight,
                                                     int channels, float srcX,
                                                     float srcY, int channel) {
@@ -55,8 +55,8 @@ __device__ unsigned char nearestNeighborInterpolate(const unsigned char *src,
 }
 
 // 双线性插值缩放 Kernel
-__global__ void resizeBilinearKernel(const unsigned char *input,
-                                     unsigned char *output, int srcWidth,
+__global__ void resizeBilinearKernel(const unsigned char* input,
+                                     unsigned char* output, int srcWidth,
                                      int srcHeight, int dstWidth, int dstHeight,
                                      int channels) {
 
@@ -84,8 +84,8 @@ __global__ void resizeBilinearKernel(const unsigned char *input,
 }
 
 // 最近邻插值缩放 Kernel
-__global__ void resizeNearestKernel(const unsigned char *input,
-                                    unsigned char *output, int srcWidth,
+__global__ void resizeNearestKernel(const unsigned char* input,
+                                    unsigned char* output, int srcWidth,
                                     int srcHeight, int dstWidth, int dstHeight,
                                     int channels) {
 
@@ -117,8 +117,8 @@ __device__ float bicubicWeight(float x) {
 }
 
 // 双三次插值缩放 Kernel
-__global__ void resizeBicubicKernel(const unsigned char *input,
-                                    unsigned char *output, int srcWidth,
+__global__ void resizeBicubicKernel(const unsigned char* input,
+                                    unsigned char* output, int srcWidth,
                                     int srcHeight, int dstWidth, int dstHeight,
                                     int channels) {
 
@@ -157,7 +157,7 @@ __global__ void resizeBicubicKernel(const unsigned char *input,
 }
 
 // ImageResizer 实现
-void ImageResizer::resize(const GpuImage &input, GpuImage &output, int newWidth,
+void ImageResizer::resize(const GpuImage& input, GpuImage& output, int newWidth,
                           int newHeight, InterpolationMode mode,
                           cudaStream_t stream) {
   if (!input.isValid()) {
@@ -204,7 +204,7 @@ void ImageResizer::resize(const GpuImage &input, GpuImage &output, int newWidth,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void ImageResizer::resizeByScale(const GpuImage &input, GpuImage &output,
+void ImageResizer::resizeByScale(const GpuImage& input, GpuImage& output,
                                  float scaleX, float scaleY,
                                  InterpolationMode mode, cudaStream_t stream) {
   if (scaleX <= 0 || scaleY <= 0) {
@@ -220,7 +220,7 @@ void ImageResizer::resizeByScale(const GpuImage &input, GpuImage &output,
   resize(input, output, newWidth, newHeight, mode, stream);
 }
 
-void ImageResizer::resizeFit(const GpuImage &input, GpuImage &output,
+void ImageResizer::resizeFit(const GpuImage& input, GpuImage& output,
                              int maxWidth, int maxHeight,
                              InterpolationMode mode, cudaStream_t stream) {
   if (maxWidth <= 0 || maxHeight <= 0) {

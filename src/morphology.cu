@@ -25,7 +25,7 @@ __device__ bool isInStructuringElement(int dx, int dy, int halfSize,
 }
 
 // 腐蚀 Kernel
-__global__ void erodeKernel(const unsigned char *input, unsigned char *output,
+__global__ void erodeKernel(const unsigned char* input, unsigned char* output,
                             int width, int height, int channels, int kernelSize,
                             int elementType) {
 
@@ -60,7 +60,7 @@ __global__ void erodeKernel(const unsigned char *input, unsigned char *output,
 }
 
 // 膨胀 Kernel
-__global__ void dilateKernel(const unsigned char *input, unsigned char *output,
+__global__ void dilateKernel(const unsigned char* input, unsigned char* output,
                              int width, int height, int channels,
                              int kernelSize, int elementType) {
 
@@ -95,8 +95,8 @@ __global__ void dilateKernel(const unsigned char *input, unsigned char *output,
 }
 
 // 图像相减 Kernel
-__global__ void subtractKernel(const unsigned char *a, const unsigned char *b,
-                               unsigned char *output, int width, int height,
+__global__ void subtractKernel(const unsigned char* a, const unsigned char* b,
+                               unsigned char* output, int width, int height,
                                int channels) {
 
   int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -114,9 +114,9 @@ __global__ void subtractKernel(const unsigned char *a, const unsigned char *b,
 
 // 辅助函数
 static void
-launchMorphKernel(void (*kernel)(const unsigned char *, unsigned char *, int,
-                                 int, int, int, int),
-                  const GpuImage &input, GpuImage &output, int kernelSize,
+launchMorphKernel(void (*kernel)(const unsigned char*, unsigned char*, int, int,
+                                 int, int, int),
+                  const GpuImage& input, GpuImage& output, int kernelSize,
                   StructuringElement element, cudaStream_t stream) {
 
   if (!input.isValid()) {
@@ -147,31 +147,31 @@ launchMorphKernel(void (*kernel)(const unsigned char *, unsigned char *, int,
 }
 
 // Morphology 实现
-void Morphology::erode(const GpuImage &input, GpuImage &output, int kernelSize,
+void Morphology::erode(const GpuImage& input, GpuImage& output, int kernelSize,
                        StructuringElement element, cudaStream_t stream) {
   launchMorphKernel(erodeKernel, input, output, kernelSize, element, stream);
 }
 
-void Morphology::dilate(const GpuImage &input, GpuImage &output, int kernelSize,
+void Morphology::dilate(const GpuImage& input, GpuImage& output, int kernelSize,
                         StructuringElement element, cudaStream_t stream) {
   launchMorphKernel(dilateKernel, input, output, kernelSize, element, stream);
 }
 
-void Morphology::open(const GpuImage &input, GpuImage &output, int kernelSize,
+void Morphology::open(const GpuImage& input, GpuImage& output, int kernelSize,
                       StructuringElement element, cudaStream_t stream) {
   GpuImage temp;
   erode(input, temp, kernelSize, element, stream);
   dilate(temp, output, kernelSize, element, stream);
 }
 
-void Morphology::close(const GpuImage &input, GpuImage &output, int kernelSize,
+void Morphology::close(const GpuImage& input, GpuImage& output, int kernelSize,
                        StructuringElement element, cudaStream_t stream) {
   GpuImage temp;
   dilate(input, temp, kernelSize, element, stream);
   erode(temp, output, kernelSize, element, stream);
 }
 
-void Morphology::gradient(const GpuImage &input, GpuImage &output,
+void Morphology::gradient(const GpuImage& input, GpuImage& output,
                           int kernelSize, StructuringElement element,
                           cudaStream_t stream) {
   GpuImage dilated, eroded;
@@ -197,7 +197,7 @@ void Morphology::gradient(const GpuImage &input, GpuImage &output,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Morphology::topHat(const GpuImage &input, GpuImage &output, int kernelSize,
+void Morphology::topHat(const GpuImage& input, GpuImage& output, int kernelSize,
                         StructuringElement element, cudaStream_t stream) {
   GpuImage opened;
   open(input, opened, kernelSize, element, stream);
@@ -221,7 +221,7 @@ void Morphology::topHat(const GpuImage &input, GpuImage &output, int kernelSize,
   CUDA_CHECK(cudaGetLastError());
 }
 
-void Morphology::blackHat(const GpuImage &input, GpuImage &output,
+void Morphology::blackHat(const GpuImage& input, GpuImage& output,
                           int kernelSize, StructuringElement element,
                           cudaStream_t stream) {
   GpuImage closed;
