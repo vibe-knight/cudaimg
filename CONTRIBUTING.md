@@ -325,9 +325,9 @@ Use the [documentation template](https://github.com/LessUp/mini-opencv/blob/main
 ## Additional Resources
 
 - [Project README](README.md)
-- [AGENTS.md](AGENTS.md) - Guide for coding agents
-- [Design Document](.kiro/specs/gpu-image-processing/design.md)
-- [Requirements Document](.kiro/specs/gpu-image-processing/requirements.md)
+- [AGENTS.md](AGENTS.md) - Guide for coding agents (includes Spec-Driven Development workflow)
+- [Specifications](specs/README.md) - Product requirements, RFCs, and technical designs
+- [Documentation](docs/README.md) - User guides, tutorials, and API reference
 - [ChangeLog](CHANGELOG.md)
 
 ---

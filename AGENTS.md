@@ -3,6 +3,45 @@
 This guide is for coding agents working in `mini-opencv`.
 It captures the repository's actual build, test, formatting, and code-style conventions.
 
+## Project Philosophy: Spec-Driven Development (SDD)
+
+This project strictly follows the **Spec-Driven Development (SDD)** paradigm. All code implementations must use the specification documents in the `/specs` directory as the Single Source of Truth.
+
+### Directory Context
+
+| Directory | Purpose |
+|-----------|---------|
+| `/specs/product/` | Product feature definitions and acceptance criteria (PRD) |
+| `/specs/rfc/` | Technical design documents and architecture proposals |
+| `/specs/api/` | API interface definitions (function signatures, OpenAPI) |
+| `/specs/db/` | Data model and schema definitions |
+| `/specs/testing/` | Test specifications and BDD feature files |
+| `/docs/` | User documentation, tutorials, and setup guides |
+
+### AI Agent Workflow Instructions
+
+When you (the AI) are asked to develop a new feature, modify existing functionality, or fix a bug, **you must strictly follow this workflow without skipping any steps**:
+
+#### Step 1: Review Specs
+- Before writing any code, first read the relevant product docs, RFCs, and API definitions in the `/specs` directory.
+- If the user's request conflicts with existing specs, **stop coding immediately** and point out the conflict. Ask the user whether to update the specs first.
+
+#### Step 2: Spec-First Update
+- If this is a new feature, or if existing interfaces/database structures need to change, **you must first propose updating or creating the corresponding spec documents** (e.g., RFCs, API definitions).
+- Wait for user confirmation of spec changes before entering the code implementation phase.
+
+#### Step 3: Implementation
+- When writing code, **100% comply with spec definitions** (including variable names, API paths, data types, status codes, etc.).
+- Do not add features not defined in specs (No Gold-Plating).
+
+#### Step 4: Test against Specs
+- Write unit tests and integration tests based on the acceptance criteria in `/specs`.
+- Ensure test cases cover all boundary conditions described in the specs.
+
+### Code Generation Rules
+- Any externally exposed API changes must synchronously update `/specs/api/` definitions.
+- If uncertain about technical details, consult `/specs/rfc/` for architecture conventions. Do not invent design patterns.
+
 ## Scope
 `mini-opencv` is a CUDA-backed C++ image processing library built with CMake.
 Public headers live in `include/gpu_image/`, implementations in `src/`, tests in `tests/`, examples in `examples/`, and optional benchmarks in `benchmarks/`.
