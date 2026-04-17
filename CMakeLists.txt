@@ -39,22 +39,28 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # ── 主库 ─────────────────────────────────────────────────────────
 add_library(gpu_image_processing STATIC
-    src/cuda_error.cpp
-    src/device_buffer.cu
-    src/memory_manager.cpp
-    src/stream_manager.cu
-    src/pixel_operator.cu
-    src/convolution_engine.cu
-    src/histogram_calculator.cu
-    src/image_resizer.cu
-    src/image_processor.cpp
-    src/pipeline_processor.cu
-    src/morphology.cu
-    src/threshold.cu
-    src/color_space.cu
-    src/geometric.cu
-    src/filters.cu
-    src/image_io.cpp
+    # Core infrastructure
+    src/core/cuda_error.cpp
+    src/core/device_buffer.cu
+    src/core/memory_manager.cpp
+    # Utils
+    src/utils/stream_manager.cu
+    # Operators
+    src/operators/pixel_operator.cu
+    src/operators/convolution_engine.cu
+    src/operators/histogram_calculator.cu
+    src/operators/image_resizer.cu
+    # Processing
+    src/processing/image_processor.cpp
+    src/processing/pipeline_processor.cu
+    # More Operators
+    src/operators/morphology.cu
+    src/operators/threshold.cu
+    src/operators/color_space.cu
+    src/operators/geometric.cu
+    src/operators/filters.cu
+    # I/O
+    src/io/image_io.cpp
 )
 
 add_library(gpu_image::gpu_image_processing ALIAS gpu_image_processing)
@@ -112,18 +118,18 @@ if(BUILD_TESTS)
     FetchContent_MakeAvailable(googletest)
     
     add_executable(gpu_image_tests
-        tests/test_main.cpp
-        tests/test_device_buffer.cpp
-        tests/test_pixel_operator.cpp
-        tests/test_convolution.cpp
-        tests/test_histogram.cpp
-        tests/test_resizer.cpp
-        tests/test_pipeline.cpp
-        tests/test_morphology.cpp
-        tests/test_threshold.cpp
-        tests/test_color_space.cpp
-        tests/test_geometric.cpp
-        tests/test_filters.cpp
+        tests/core/test_main.cpp
+        tests/core/test_device_buffer.cpp
+        tests/operators/test_pixel_operator.cpp
+        tests/operators/test_convolution.cpp
+        tests/operators/test_histogram.cpp
+        tests/operators/test_resizer.cpp
+        tests/processing/test_pipeline.cpp
+        tests/operators/test_morphology.cpp
+        tests/operators/test_threshold.cpp
+        tests/operators/test_color_space.cpp
+        tests/operators/test_geometric.cpp
+        tests/operators/test_filters.cpp
     )
     
     target_link_libraries(gpu_image_tests

@@ -3,24 +3,33 @@
 // GPU Image Processing Library
 // 基于 CUDA 的高性能图像处理库
 
-#include "gpu_image/color_space.hpp"
-#include "gpu_image/convolution_engine.hpp"
-#include "gpu_image/cuda_error.hpp"
-#include "gpu_image/device_buffer.hpp"
-#include "gpu_image/filters.hpp"
-#include "gpu_image/geometric.hpp"
-#include "gpu_image/gpu_image.hpp"
-#include "gpu_image/histogram_calculator.hpp"
-#include "gpu_image/image_io.hpp"
-#include "gpu_image/image_processor.hpp"
-#include "gpu_image/image_resizer.hpp"
-#include "gpu_image/kernel_helpers.hpp"
-#include "gpu_image/memory_manager.hpp"
-#include "gpu_image/morphology.hpp"
-#include "gpu_image/pipeline_processor.hpp"
-#include "gpu_image/pixel_operator.hpp"
-#include "gpu_image/stream_manager.hpp"
-#include "gpu_image/threshold.hpp"
+// Core components
+#include "gpu_image/core/cuda_error.hpp"
+#include "gpu_image/core/device_buffer.hpp"
+#include "gpu_image/core/gpu_image.hpp"
+#include "gpu_image/core/kernel_helpers.hpp"
+#include "gpu_image/core/memory_manager.hpp"
+
+// Operators
+#include "gpu_image/operators/color_space.hpp"
+#include "gpu_image/operators/convolution_engine.hpp"
+#include "gpu_image/operators/filters.hpp"
+#include "gpu_image/operators/geometric.hpp"
+#include "gpu_image/operators/histogram_calculator.hpp"
+#include "gpu_image/operators/image_resizer.hpp"
+#include "gpu_image/operators/morphology.hpp"
+#include "gpu_image/operators/pixel_operator.hpp"
+#include "gpu_image/operators/threshold.hpp"
+
+// Processing
+#include "gpu_image/processing/image_processor.hpp"
+#include "gpu_image/processing/pipeline_processor.hpp"
+
+// I/O
+#include "gpu_image/io/image_io.hpp"
+
+// Utils
+#include "gpu_image/utils/stream_manager.hpp"
 
 namespace gpu_image {
 

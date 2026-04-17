@@ -10,11 +10,11 @@ on:
     branches: [master, main]
     paths:
       # Configuration
-      - '_config.yml'
+      - 'docs/_config.yml'
       - 'Gemfile'
       - 'Gemfile.lock'
       # Main content
-      - 'index.md'
+      - 'docs/index.md'
       - 'README.md'
       - 'README.zh-CN.md'
       - 'CONTRIBUTING.md'
@@ -22,11 +22,6 @@ on:
       - 'LICENSE'
       # Documentation
       - 'docs/**'
-      # Assets
-      - 'assets/**'
-      - '_sass/**'
-      - '_layouts/**'
-      - '_includes/**'
       # Changelog
       - 'changelog/*.md'
       # Workflow
@@ -63,7 +58,7 @@ jobs:
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
-          source: ./
+          source: ./docs
           destination: ./_site
           verbose: ${{ inputs.debug == 'true' }}
           future: true

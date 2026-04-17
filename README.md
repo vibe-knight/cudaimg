@@ -19,11 +19,11 @@ A high-performance CUDA-based image processing library providing GPU-accelerated
 
 | Resource | Description |
 |----------|-------------|
-| [Installation](docs/installation.md) | Complete setup guide |
-| [Quick Start](docs/quickstart.md) | Get started in 5 minutes |
+| [Installation](docs/setup/installation.md) | Complete setup guide |
+| [Quick Start](docs/setup/quickstart.md) | Get started in 5 minutes |
 | [API Reference](docs/api/) | Complete API documentation |
-| [Examples](docs/examples/) | Code examples and tutorials |
-| [FAQ](docs/faq.md) | Frequently asked questions |
+| [Examples](docs/tutorials/examples/) | Code examples and tutorials |
+| [Specifications](specs/README.md) | Requirements, RFCs, and technical designs |
 
 **Full Documentation:** https://lessup.github.io/mini-opencv/
 
@@ -113,12 +113,20 @@ HostImage result = processor.downloadImage(edges);
 
 Complete documentation available at [GitHub Pages](https://lessup.github.io/mini-opencv/):
 
-- [Installation Guide](docs/installation.md)
-- [Quick Start](docs/quickstart.md)
-- [Architecture Overview](docs/architecture.md)
-- [Performance Optimization](docs/performance.md)
+- [Installation Guide](docs/setup/installation.md)
+- [Quick Start](docs/setup/quickstart.md)
+- [Architecture Overview](docs/architecture/architecture.md)
+- [Performance Optimization](docs/tutorials/performance.md)
 - [API Reference](docs/api/)
-- [FAQ](docs/faq.md)
+- [FAQ](docs/tutorials/faq.md)
+
+### Specifications
+
+Technical requirements and design documents:
+
+- [Product Requirements](specs/product/gpu-image-processing-requirements.md)
+- [Architecture Design](specs/rfc/0001-gpu-image-processing-design.md)
+- [Implementation Tasks](specs/rfc/0001-gpu-image-processing-tasks.md)
 
 ---
 

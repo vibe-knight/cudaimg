@@ -19,11 +19,11 @@
 
 | 资源 | 描述 |
 |------|------|
-| [安装指南](docs/installation.zh-CN.md) | 完整的安装配置指南 |
-| [快速入门](docs/quickstart.zh-CN.md) | 5 分钟快速上手 |
+| [安装指南](docs/setup/installation.zh-CN.md) | 完整的安装配置指南 |
+| [快速入门](docs/setup/quickstart.zh-CN.md) | 5 分钟快速上手 |
 | [API 参考](docs/api.zh-CN/) | 完整 API 文档 |
-| [示例代码](docs/examples.zh-CN/) | 代码示例和教程 |
-| [常见问题](docs/faq.zh-CN.md) | 常见问题解答 |
+| [示例代码](docs/tutorials/examples/) | 代码示例和教程 |
+| [规范文档](specs/README.md) | 需求、RFC 和技术设计 |
 
 **完整文档：** https://lessup.github.io/mini-opencv/
 
@@ -113,12 +113,20 @@ HostImage result = processor.downloadImage(edges);
 
 完整文档请访问 [GitHub Pages](https://lessup.github.io/mini-opencv/)：
 
-- [安装指南](docs/installation.zh-CN.md)
-- [快速入门](docs/quickstart.zh-CN.md)
-- [架构概览](docs/architecture.zh-CN.md)
-- [性能优化](docs/performance.zh-CN.md)
+- [安装指南](docs/setup/installation.zh-CN.md)
+- [快速入门](docs/setup/quickstart.zh-CN.md)
+- [架构概览](docs/architecture/architecture.zh-CN.md)
+- [性能优化](docs/tutorials/performance.zh-CN.md)
 - [API 参考](docs/api.zh-CN/)
-- [常见问题](docs/faq.zh-CN.md)
+- [常见问题](docs/tutorials/faq.zh-CN.md)
+
+### 规范文档
+
+技术需求和设计文档：
+
+- [产品需求](specs/product/gpu-image-processing-requirements.md)
+- [架构设计](specs/rfc/0001-gpu-image-processing-design.md)
+- [实现任务](specs/rfc/0001-gpu-image-processing-tasks.md)
 
 ---
 

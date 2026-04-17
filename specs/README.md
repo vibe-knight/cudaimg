@@ -1,17 +1,27 @@
 # Specifications
 
 This directory contains all specification documents for the mini-opencv project.
-Specs are the **Single Source of Truth** for development.
+
+**Specs are the Single Source of Truth for development.**
 
 ## Directory Structure
 
+```
+specs/
+├── product/     # Product requirements and feature definitions (PRD)
+├── rfc/         # Technical design documents and architecture proposals
+├── api/         # API interface definitions (function signatures, contracts)
+├── db/          # Data model and schema definitions
+└── testing/     # Test specifications and BDD feature files
+```
+
 | Directory | Purpose |
 |-----------|---------|
-| `product/` | Product requirements and feature definitions (PRD) |
-| `rfc/` | Technical design documents and architecture proposals |
-| `api/` | API interface definitions (OpenAPI, function signatures) |
-| `db/` | Data model and schema definitions |
-| `testing/` | Test specifications and BDD feature files |
+| `product/` | Product requirements documents (PRD), feature definitions, acceptance criteria |
+| `rfc/` | Request for Comments - technical designs, architecture proposals, task breakdowns |
+| `api/` | API contracts - function signatures, parameter types, return specifications |
+| `db/` | Data models - image structures, memory layouts, configuration types |
+| `testing/` | Test specs - correctness properties, coverage matrix, BDD feature files |
 
 ## Active Specifications
 
