@@ -51,7 +51,7 @@ private:
   std::vector<ProcessingStep> steps_;
 
   void createStreams();
-  void destroyStreams();
+  void destroyStreams() noexcept;
 };
 
 } // namespace gpu_image

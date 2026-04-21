@@ -80,9 +80,12 @@ void DeviceBuffer::copyToHostAsync(void* hostPtr, size_t copySize,
                              cudaMemcpyDeviceToHost, stream));
 }
 
-void DeviceBuffer::release() {
+void DeviceBuffer::release() noexcept {
   if (devicePtr_ != nullptr) {
-    cudaFree(devicePtr_);
+    cudaError_t err = cudaFree(devicePtr_);
+    if (err != cudaSuccess) {
+      // Don't throw in destructor/release - just silently handle
+    }
     devicePtr_ = nullptr;
     size_ = 0;
   }

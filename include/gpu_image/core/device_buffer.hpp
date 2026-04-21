@@ -60,8 +60,8 @@ public:
     return devicePtr_ != nullptr && size_ > 0;
   }
 
-  // 释放内存（cudaFree）
-  void release();
+  // 释放内存（cudaFree）- noexcept for safe destructor use
+  void release() noexcept;
 
   // 放弃所有权，返回原始指针和大小（不释放内存）
   // 调用者负责后续释放

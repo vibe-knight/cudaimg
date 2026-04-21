@@ -20,9 +20,12 @@ void PipelineProcessor::createStreams() {
   }
 }
 
-void PipelineProcessor::destroyStreams() {
+void PipelineProcessor::destroyStreams() noexcept {
   for (cudaStream_t stream : streams_) {
-    cudaStreamDestroy(stream);
+    cudaError_t err = cudaStreamDestroy(stream);
+    if (err != cudaSuccess) {
+      // Don't throw in destructor - silently handle
+    }
   }
   streams_.clear();
 }

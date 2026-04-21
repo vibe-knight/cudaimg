@@ -8,7 +8,8 @@
 title: Mini-OpenCV
 description: >-
   High-performance CUDA-based image processing library. 
-  GPU-accelerated operators for computer vision.
+  GPU-accelerated operators for computer vision. 30-50x faster than CPU OpenCV.
+tagline: GPU-Accelerated Image Processing
 
 # ═════════════════════════════════════════════════════════════════════════════
 # THEME CONFIGURATION
@@ -45,10 +46,12 @@ logo: "/assets/images/logo.svg"
 
 # Aux links (top right navigation)
 aux_links:
-  "View on GitHub":
+  "GitHub":
     - "https://github.com/LessUp/mini-opencv"
   "Releases":
     - "https://github.com/LessUp/mini-opencv/releases"
+  "Discussions":
+    - "https://github.com/LessUp/mini-opencv/discussions"
 
 # Aux link new tab
 aux_links_new_tab: true

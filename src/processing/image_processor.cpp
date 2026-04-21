@@ -16,8 +16,11 @@ ImageProcessor::ImageProcessor() {
 }
 
 ImageProcessor::~ImageProcessor() {
-  // 清理资源
-  cudaDeviceSynchronize();
+  // Clean up resources - ignore errors in destructor
+  cudaError_t err = cudaDeviceSynchronize();
+  if (err != cudaSuccess) {
+    // Silently handle - don't throw in destructor
+  }
 }
 
 GpuImage ImageProcessor::loadFromMemory(const unsigned char* data, int width,
