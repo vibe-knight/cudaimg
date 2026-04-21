@@ -27,7 +27,10 @@ void StreamManager::destroyStreams() {
   std::lock_guard<std::mutex> lock(mutex_);
 
   for (cudaStream_t stream : streams_) {
-    cudaStreamDestroy(stream);
+    cudaError_t err = cudaStreamDestroy(stream);
+    if (err != cudaSuccess) {
+      // Log but don't throw in destructor
+    }
   }
   streams_.clear();
   while (!availableStreams_.empty()) {

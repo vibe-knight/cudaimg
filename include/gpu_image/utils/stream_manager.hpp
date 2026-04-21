@@ -17,7 +17,8 @@ public:
   StreamManager& operator=(const StreamManager&) = delete;
 
   // 获取一个可用的 stream
-  cudaStream_t acquireStream();
+  // Thread-safe: acquires mutex internally
+  [[nodiscard]] cudaStream_t acquireStream();
 
   // 释放 stream 回池
   void releaseStream(cudaStream_t stream);

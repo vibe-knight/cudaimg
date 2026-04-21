@@ -322,8 +322,8 @@ void Filters::bilateralFilter(const GpuImage& input, GpuImage& output,
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
   }
-  if (kernelSize < 1 || kernelSize % 2 == 0) {
-    throw std::invalid_argument("Kernel size must be odd and positive");
+  if (kernelSize < 1 || kernelSize > 31 || kernelSize % 2 == 0) {
+    throw std::invalid_argument("Kernel size must be odd and between 1-31");
   }
   if (sigmaSpace <= 0.0f) {
     throw std::invalid_argument("sigmaSpace must be positive");
@@ -514,6 +514,9 @@ void ImageArithmetic::blend(const GpuImage& src1, const GpuImage& src2,
   if (src1.width != src2.width || src1.height != src2.height ||
       src1.channels != src2.channels) {
     throw std::invalid_argument("Image dimensions must match");
+  }
+  if (alpha < 0.0f || alpha > 1.0f) {
+    throw std::invalid_argument("Alpha must be in range [0, 1]");
   }
 
   if (output.width != src1.width || output.height != src1.height ||
