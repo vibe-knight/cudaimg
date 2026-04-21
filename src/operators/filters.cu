@@ -355,8 +355,8 @@ void Filters::boxFilter(const GpuImage& input, GpuImage& output, int kernelSize,
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
   }
-  if (kernelSize < 1 || kernelSize % 2 == 0) {
-    throw std::invalid_argument("Kernel size must be odd and positive");
+  if (kernelSize < 1 || kernelSize > 31 || kernelSize % 2 == 0) {
+    throw std::invalid_argument("Kernel size must be odd and between 1-31");
   }
 
   if (output.width != input.width || output.height != input.height ||
@@ -381,6 +381,9 @@ void Filters::sharpen(const GpuImage& input, GpuImage& output, float strength,
                       cudaStream_t stream) {
   if (!input.isValid()) {
     throw std::invalid_argument("Invalid input image");
+  }
+  if (strength <= 0.0f) {
+    throw std::invalid_argument("Strength must be positive");
   }
 
   if (output.width != input.width || output.height != input.height ||
@@ -441,7 +444,11 @@ void ImageArithmetic::add(const GpuImage& src1, const GpuImage& src2,
     output = ImageUtils::createGpuImage(src1.width, src1.height, src1.channels);
   }
 
-  int size = src1.width * src1.height * src1.channels;
+  size_t totalSize = static_cast<size_t>(src1.width) * src1.height * src1.channels;
+  if (totalSize > static_cast<size_t>(INT_MAX)) {
+    throw std::invalid_argument("Image size too large for processing");
+  }
+  int size = static_cast<int>(totalSize);
   int blockSize = 256;
   int gridSize = (size + blockSize - 1) / blockSize;
 
@@ -467,7 +474,11 @@ void ImageArithmetic::subtract(const GpuImage& src1, const GpuImage& src2,
     output = ImageUtils::createGpuImage(src1.width, src1.height, src1.channels);
   }
 
-  int size = src1.width * src1.height * src1.channels;
+  size_t totalSize = static_cast<size_t>(src1.width) * src1.height * src1.channels;
+  if (totalSize > static_cast<size_t>(INT_MAX)) {
+    throw std::invalid_argument("Image size too large for processing");
+  }
+  int size = static_cast<int>(totalSize);
   int blockSize = 256;
   int gridSize = (size + blockSize - 1) / blockSize;
 
@@ -494,7 +505,11 @@ void ImageArithmetic::multiply(const GpuImage& src1, const GpuImage& src2,
     output = ImageUtils::createGpuImage(src1.width, src1.height, src1.channels);
   }
 
-  int size = src1.width * src1.height * src1.channels;
+  size_t totalSize = static_cast<size_t>(src1.width) * src1.height * src1.channels;
+  if (totalSize > static_cast<size_t>(INT_MAX)) {
+    throw std::invalid_argument("Image size too large for processing");
+  }
+  int size = static_cast<int>(totalSize);
   int blockSize = 256;
   int gridSize = (size + blockSize - 1) / blockSize;
 
@@ -524,7 +539,11 @@ void ImageArithmetic::blend(const GpuImage& src1, const GpuImage& src2,
     output = ImageUtils::createGpuImage(src1.width, src1.height, src1.channels);
   }
 
-  int size = src1.width * src1.height * src1.channels;
+  size_t totalSize = static_cast<size_t>(src1.width) * src1.height * src1.channels;
+  if (totalSize > static_cast<size_t>(INT_MAX)) {
+    throw std::invalid_argument("Image size too large for processing");
+  }
+  int size = static_cast<int>(totalSize);
   int blockSize = 256;
   int gridSize = (size + blockSize - 1) / blockSize;
 
@@ -552,7 +571,11 @@ void ImageArithmetic::addWeighted(const GpuImage& src1, float alpha,
     output = ImageUtils::createGpuImage(src1.width, src1.height, src1.channels);
   }
 
-  int size = src1.width * src1.height * src1.channels;
+  size_t totalSize = static_cast<size_t>(src1.width) * src1.height * src1.channels;
+  if (totalSize > static_cast<size_t>(INT_MAX)) {
+    throw std::invalid_argument("Image size too large for processing");
+  }
+  int size = static_cast<int>(totalSize);
   int blockSize = 256;
   int gridSize = (size + blockSize - 1) / blockSize;
 
@@ -578,7 +601,11 @@ void ImageArithmetic::absDiff(const GpuImage& src1, const GpuImage& src2,
     output = ImageUtils::createGpuImage(src1.width, src1.height, src1.channels);
   }
 
-  int size = src1.width * src1.height * src1.channels;
+  size_t totalSize = static_cast<size_t>(src1.width) * src1.height * src1.channels;
+  if (totalSize > static_cast<size_t>(INT_MAX)) {
+    throw std::invalid_argument("Image size too large for processing");
+  }
+  int size = static_cast<int>(totalSize);
   int blockSize = 256;
   int gridSize = (size + blockSize - 1) / blockSize;
 
@@ -601,7 +628,11 @@ void ImageArithmetic::addScalar(const GpuImage& input, GpuImage& output,
         ImageUtils::createGpuImage(input.width, input.height, input.channels);
   }
 
-  int size = input.width * input.height * input.channels;
+  size_t totalSize = static_cast<size_t>(input.width) * input.height * input.channels;
+  if (totalSize > static_cast<size_t>(INT_MAX)) {
+    throw std::invalid_argument("Image size too large for processing");
+  }
+  int size = static_cast<int>(totalSize);
   int blockSize = 256;
   int gridSize = (size + blockSize - 1) / blockSize;
 
@@ -624,7 +655,11 @@ void ImageArithmetic::multiplyScalar(const GpuImage& input, GpuImage& output,
         ImageUtils::createGpuImage(input.width, input.height, input.channels);
   }
 
-  int size = input.width * input.height * input.channels;
+  size_t totalSize = static_cast<size_t>(input.width) * input.height * input.channels;
+  if (totalSize > static_cast<size_t>(INT_MAX)) {
+    throw std::invalid_argument("Image size too large for processing");
+  }
+  int size = static_cast<int>(totalSize);
   int blockSize = 256;
   int gridSize = (size + blockSize - 1) / blockSize;
 

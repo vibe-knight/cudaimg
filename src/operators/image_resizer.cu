@@ -207,6 +207,9 @@ void ImageResizer::resize(const GpuImage& input, GpuImage& output, int newWidth,
 void ImageResizer::resizeByScale(const GpuImage& input, GpuImage& output,
                                  float scaleX, float scaleY,
                                  InterpolationMode mode, cudaStream_t stream) {
+  if (!input.isValid()) {
+    throw std::invalid_argument("Invalid input image");
+  }
   if (scaleX <= 0 || scaleY <= 0) {
     throw std::invalid_argument("Scale factors must be positive");
   }
@@ -223,6 +226,9 @@ void ImageResizer::resizeByScale(const GpuImage& input, GpuImage& output,
 void ImageResizer::resizeFit(const GpuImage& input, GpuImage& output,
                              int maxWidth, int maxHeight,
                              InterpolationMode mode, cudaStream_t stream) {
+  if (!input.isValid()) {
+    throw std::invalid_argument("Invalid input image");
+  }
   if (maxWidth <= 0 || maxHeight <= 0) {
     throw std::invalid_argument("Max dimensions must be positive");
   }
