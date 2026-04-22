@@ -1,5 +1,5 @@
-#include "gpu_image/operators/color_space.hpp"
 #include "gpu_image/core/cuda_error.hpp"
+#include "gpu_image/operators/color_space.hpp"
 #include <cmath>
 #include <stdexcept>
 

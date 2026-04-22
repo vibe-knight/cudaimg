@@ -444,7 +444,8 @@ void ImageArithmetic::add(const GpuImage& src1, const GpuImage& src2,
     output = ImageUtils::createGpuImage(src1.width, src1.height, src1.channels);
   }
 
-  size_t totalSize = static_cast<size_t>(src1.width) * src1.height * src1.channels;
+  size_t totalSize =
+      static_cast<size_t>(src1.width) * src1.height * src1.channels;
   if (totalSize > static_cast<size_t>(INT_MAX)) {
     throw std::invalid_argument("Image size too large for processing");
   }
@@ -474,7 +475,8 @@ void ImageArithmetic::subtract(const GpuImage& src1, const GpuImage& src2,
     output = ImageUtils::createGpuImage(src1.width, src1.height, src1.channels);
   }
 
-  size_t totalSize = static_cast<size_t>(src1.width) * src1.height * src1.channels;
+  size_t totalSize =
+      static_cast<size_t>(src1.width) * src1.height * src1.channels;
   if (totalSize > static_cast<size_t>(INT_MAX)) {
     throw std::invalid_argument("Image size too large for processing");
   }
@@ -505,7 +507,8 @@ void ImageArithmetic::multiply(const GpuImage& src1, const GpuImage& src2,
     output = ImageUtils::createGpuImage(src1.width, src1.height, src1.channels);
   }
 
-  size_t totalSize = static_cast<size_t>(src1.width) * src1.height * src1.channels;
+  size_t totalSize =
+      static_cast<size_t>(src1.width) * src1.height * src1.channels;
   if (totalSize > static_cast<size_t>(INT_MAX)) {
     throw std::invalid_argument("Image size too large for processing");
   }
@@ -539,7 +542,8 @@ void ImageArithmetic::blend(const GpuImage& src1, const GpuImage& src2,
     output = ImageUtils::createGpuImage(src1.width, src1.height, src1.channels);
   }
 
-  size_t totalSize = static_cast<size_t>(src1.width) * src1.height * src1.channels;
+  size_t totalSize =
+      static_cast<size_t>(src1.width) * src1.height * src1.channels;
   if (totalSize > static_cast<size_t>(INT_MAX)) {
     throw std::invalid_argument("Image size too large for processing");
   }
@@ -571,7 +575,8 @@ void ImageArithmetic::addWeighted(const GpuImage& src1, float alpha,
     output = ImageUtils::createGpuImage(src1.width, src1.height, src1.channels);
   }
 
-  size_t totalSize = static_cast<size_t>(src1.width) * src1.height * src1.channels;
+  size_t totalSize =
+      static_cast<size_t>(src1.width) * src1.height * src1.channels;
   if (totalSize > static_cast<size_t>(INT_MAX)) {
     throw std::invalid_argument("Image size too large for processing");
   }
@@ -601,7 +606,8 @@ void ImageArithmetic::absDiff(const GpuImage& src1, const GpuImage& src2,
     output = ImageUtils::createGpuImage(src1.width, src1.height, src1.channels);
   }
 
-  size_t totalSize = static_cast<size_t>(src1.width) * src1.height * src1.channels;
+  size_t totalSize =
+      static_cast<size_t>(src1.width) * src1.height * src1.channels;
   if (totalSize > static_cast<size_t>(INT_MAX)) {
     throw std::invalid_argument("Image size too large for processing");
   }
@@ -628,7 +634,8 @@ void ImageArithmetic::addScalar(const GpuImage& input, GpuImage& output,
         ImageUtils::createGpuImage(input.width, input.height, input.channels);
   }
 
-  size_t totalSize = static_cast<size_t>(input.width) * input.height * input.channels;
+  size_t totalSize =
+      static_cast<size_t>(input.width) * input.height * input.channels;
   if (totalSize > static_cast<size_t>(INT_MAX)) {
     throw std::invalid_argument("Image size too large for processing");
   }
@@ -655,7 +662,8 @@ void ImageArithmetic::multiplyScalar(const GpuImage& input, GpuImage& output,
         ImageUtils::createGpuImage(input.width, input.height, input.channels);
   }
 
-  size_t totalSize = static_cast<size_t>(input.width) * input.height * input.channels;
+  size_t totalSize =
+      static_cast<size_t>(input.width) * input.height * input.channels;
   if (totalSize > static_cast<size_t>(INT_MAX)) {
     throw std::invalid_argument("Image size too large for processing");
   }

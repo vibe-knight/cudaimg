@@ -1,5 +1,5 @@
-#include "gpu_image/operators/convolution_engine.hpp"
 #include "gpu_image/core/cuda_error.hpp"
+#include "gpu_image/operators/convolution_engine.hpp"
 #include <cmath>
 #include <stdexcept>
 

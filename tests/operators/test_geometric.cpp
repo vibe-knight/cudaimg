@@ -1,5 +1,5 @@
-#include "gpu_image/operators/geometric.hpp"
 #include "gpu_image/core/gpu_image.hpp"
+#include "gpu_image/operators/geometric.hpp"
 #include <gtest/gtest.h>
 #include <vector>
 
