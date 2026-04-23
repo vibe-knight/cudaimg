@@ -1,15 +1,11 @@
-# ═════════════════════════════════════════════════════════════════════════════
-# Mini-OpenCV GitHub Pages Configuration
-# ═════════════════════════════════════════════════════════════════════════════
-# Theme: Just the Docs - Modern documentation theme with search
-# https://github.com/just-the-docs/just-the-docs
-# ═════════════════════════════════════════════════════════════════════════════
+# GPU Image Processing - Jekyll/GitHub Pages Configuration
+# Theme: Just the Docs v0.9.0
 
-title: Mini-OpenCV
+title: GPU Image Processing
 description: >-
-  High-performance CUDA-based image processing library. 
-  GPU-accelerated operators for computer vision. 30-50x faster than CPU OpenCV.
-tagline: GPU-Accelerated Image Processing
+  High-performance CUDA-based GPU image processing library.
+  30-50x faster than CPU OpenCV for comparable operations.
+tagline: CUDA-Accelerated Computer Vision
 
 # ═════════════════════════════════════════════════════════════════════════════
 # THEME CONFIGURATION
@@ -38,8 +34,8 @@ repository: LessUp/mini-opencv
 # JUST THE DOCS THEME SETTINGS
 # ═════════════════════════════════════════════════════════════════════════════
 
-# Color scheme (light/dark/auto)
-color_scheme: dark
+# Color scheme: auto respects system preference (light/dark)
+color_scheme: auto
 
 # Logo
 logo: "/assets/images/logo.svg"
@@ -50,17 +46,27 @@ aux_links:
     - "https://github.com/LessUp/mini-opencv"
   "Releases":
     - "https://github.com/LessUp/mini-opencv/releases"
-  "Discussions":
-    - "https://github.com/LessUp/mini-opencv/discussions"
 
 # Aux link new tab
 aux_links_new_tab: true
+
+# Main navigation structure
+nav_external_links:
+  - title: GitHub
+    url: https://github.com/LessUp/mini-opencv
+    hide_icon: false
+
+# Back to top link
+back_to_top: true
+back_to_top_text: "Back to top"
+
+# Breadcrumbs
+breadcrumbs: true
 
 # ═════════════════════════════════════════════════════════════════════════════
 # SEARCH CONFIGURATION
 # ═════════════════════════════════════════════════════════════════════════════
 
-# Enable search
 search_enabled: true
 search:
   heading_level: 3
@@ -72,31 +78,11 @@ search:
   button: true
 
 # ═════════════════════════════════════════════════════════════════════════════
-# NAVIGATION CONFIGURATION
-# ═════════════════════════════════════════════════════════════════════════════
-
-# Main navigation structure
-nav_external_links:
-  - title: GitHub
-    url: https://github.com/LessUp/mini-opencv
-    hide_icon: false
-  - title: Releases
-    url: https://github.com/LessUp/mini-opencv/releases
-    hide_icon: false
-
-# Back to top link
-back_to_top: true
-back_to_top_text: "Back to top"
-
-# Breadcrumbs
-breadcrumbs: true
-
-# ═════════════════════════════════════════════════════════════════════════════
 # FOOTER CONFIGURATION
 # ═════════════════════════════════════════════════════════════════════════════
 
 footer_content: >
-  Copyright &copy; 2025-2026 LessUp. 
+  Copyright &copy; 2025-2026 LessUp.
   Distributed under the <a href="https://github.com/LessUp/mini-opencv/blob/main/LICENSE">MIT License</a>.
 
 last_edit_timestamp: true
@@ -106,10 +92,7 @@ last_edit_time_format: "%b %e %Y at %I:%M %p"
 # CODE HIGHLIGHTING
 # ═════════════════════════════════════════════════════════════════════════════
 
-# Enable copy code button
 copy_code_button: true
-
-# Syntax highlighting
 syntax_highlighter: rouge
 markdown: kramdown
 kramdown:
@@ -158,46 +141,7 @@ exclude:
   - cmake-build-*/
   - compile_commands.json
   
-  # Source code
-  - src/
-  - include/
-  - tests/
-  - examples/
-  - benchmarks/
-  
-  # CMake
-  - CMakeLists.txt
-  - CMakePresets.json
-  - CMakeUserPresets.json
-  
-  # Config files
-  - .editorconfig
-  - .clang-format
-  - .clang-tidy
-  - .gitignore
-  - .git
-  - .github
-  - .kiro
-  
-  # Source files (not needed for docs site)
-  - "*.cu"
-  - "*.cuh"
-  - "*.cpp"
-  - "*.hpp"
-  - "*.h"
-  
-  # Compiled files
-  - "*.o"
-  - "*.a"
-  - "*.so"
-  - "*.exe"
-  - "*.dll"
-  
-  # Scripts
-  - "*.sh"
-  - scripts/
-  
-  # Dependencies
+  # Source code (already in root)
   - vendor/
   - node_modules/
   - Gemfile
@@ -208,15 +152,9 @@ exclude:
   - .sass-cache/
   - .jekyll-cache/
   - .jekyll-metadata
-  
-  # Release notes
-  - RELEASE_NOTES.md
-  - RELEASE_v2.1.0.md
-  - DOCUMENTATION_OVERHAUL_SUMMARY.md
-  - create_release.sh
 
 # ═════════════════════════════════════════════════════════════════════════════
-# INCLUDE SPECIFIC FILES
+# INCLUDE SPECIFIC FILES (from repo root)
 # ═════════════════════════════════════════════════════════════════════════════
 
 include:
@@ -237,11 +175,6 @@ defaults:
     values:
       layout: "default"
       nav_exclude: false
-  
-  - scope:
-      path: "changelog"
-    values:
-      nav_exclude: true
 
 # ═════════════════════════════════════════════════════════════════════════════
 # COMPRESSION (PERFORMANCE)

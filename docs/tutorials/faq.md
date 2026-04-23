@@ -269,7 +269,7 @@ Check: `nvidia-smi` should show GPU information.
 
 ### How can I contribute?
 
-See [ContributING.md](../CONTRIBUTING.md) for:
+See [Contributing Guide](https://github.com/LessUp/mini-opencv/blob/main/CONTRIBUTING.md) for:
 - Reporting bugs
 - Requesting features
 - Submitting pull requests
@@ -283,8 +283,8 @@ Check [GitHub Issues](https://github.com/LessUp/mini-opencv/issues) for planned 
 If your question isn't answered here:
 
 1. Search [GitHub Issues](https://github.com/LessUp/mini-opencv/issues)
-2. Check [API Reference](api/)
-3. Read [Performance Guide](performance)
+2. Check [API Reference]({{ site.baseurl }}/api/)
+3. Read [Performance Guide]({{ site.baseurl }}/tutorials/performance)
 4. Ask in [GitHub Discussions](https://github.com/LessUp/mini-opencv/discussions)
 
 ---

@@ -1,4 +1,34 @@
-# Specifications
+# Specifications (Legacy)
+
+> ⚠️ **注意：此目录已迁移至 OpenSpec 框架。**
+
+此目录保留为历史参考。新的规范文档位于 [`openspec/specs/`](../openspec/specs/) 目录。
+
+## 迁移说明
+
+| 原位置 | 新位置 |
+|--------|--------|
+| `specs/product/gpu-image-processing-requirements.md` | `openspec/specs/gpu-image-processing/requirements.md` |
+| `specs/rfc/0001-gpu-image-processing-design.md` | `openspec/specs/gpu-image-processing/design.md` |
+| `specs/rfc/0001-gpu-image-processing-tasks.md` | `openspec/changes/archive/2026-04-23-gpu-image-processing-init/tasks.md` |
+
+## 当前规范结构
+
+```
+openspec/
+├── specs/                    # 主规范（单一真实来源）
+│   ├── architecture.md       # 架构概览
+│   └── gpu-image-processing/ # GPU 图像处理规范
+│       ├── requirements.md   # 产品需求
+│       ├── design.md         # 技术设计
+│       └── api.md            # API 定义
+├── changes/                  # 活跃的变更提案
+└── changes/archive/          # 已完成的变更归档
+```
+
+---
+
+# 历史内容（保留参考）
 
 This directory contains all specification documents for the mini-opencv project.
 

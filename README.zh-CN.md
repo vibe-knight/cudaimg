@@ -6,12 +6,16 @@
 ![CUDA](https://img.shields.io/badge/CUDA-11.0+-76B900?logo=nvidia&logoColor=white)
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=c%2B%2B&logoColor=white)
 ![CMake](https://img.shields.io/badge/CMake-3.18+-064F8C?logo=cmake&logoColor=white)
+![Version](https://img.shields.io/badge/Version-2.0.0-blue.svg)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-success.svg)
 
 [English](README.md) | 简体中文
 
 基于 CUDA 的高性能图像处理库，为计算机视觉应用提供 GPU 加速算子。
 
 > **⚡ 性能**：相比 CPU OpenCV 同等操作快 30-50 倍
+>
+> *在 RTX 4090 上测试 4K 图像，对比 OpenCV 4.8 CPU 实现。详见 [benchmarks/](benchmarks/)*
 
 ---
 
@@ -21,7 +25,7 @@
 |------|------|
 | [安装指南](docs/setup/installation.zh-CN.md) | 完整的安装配置指南 |
 | [快速入门](docs/setup/quickstart.zh-CN.md) | 5 分钟快速上手 |
-| [API 参考](docs/api.zh-CN/) | 完整 API 文档 |
+| [API 参考](docs/api.zh-CN/README.md) | 完整 API 文档 |
 | [示例代码](docs/tutorials/examples/) | 代码示例和教程 |
 | [规范文档](specs/README.md) | 需求、RFC 和技术设计 |
 
@@ -50,10 +54,10 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                      应用层                                   │
-│         ImageProcessor  ·  PipelineProcessor                 │
+│         图像处理器  ·  流水线处理器                            │
 ├─────────────────────────────────────────────────────────────┤
 │                   算子层 (CUDA Kernels)                       │
-│  像素操作      │  卷积引擎        │  几何变换                  │
+│  Pixel算子    │  卷积引擎        │  几何变换                  │
 │  形态学        │  色彩空间        │  滤波器                    │
 │  阈值处理      │  直方图计算      │  图像缩放                  │
 ├─────────────────────────────────────────────────────────────┤
@@ -87,12 +91,19 @@ ctest --test-dir build --output-on-failure
 #include "gpu_image/gpu_image_processing.hpp"
 using namespace gpu_image;
 
+// 第1步：创建图像处理器
 ImageProcessor processor;
 
-// 加载并处理
+// 第2步：创建/加载主机端图像
+HostImage hostImage = ImageUtils::createHostImage(1920, 1080, 3);
+// 填充 hostImage.data 数据（RGB，8位每通道）
+
+// 第3步：上传到GPU并处理
 GpuImage gpu = processor.loadFromHost(hostImage);
 GpuImage blurred = processor.gaussianBlur(gpu, 5, 1.5f);
 GpuImage edges = processor.sobelEdgeDetection(gpu);
+
+// 第4步：下载结果回主机
 HostImage result = processor.downloadImage(edges);
 ```
 
@@ -100,12 +111,25 @@ HostImage result = processor.downloadImage(edges);
 
 ## 📋 系统要求
 
+### 硬件/软件要求
+
 | 组件 | 最低要求 | 推荐配置 |
 |------|----------|----------|
 | CUDA | 11.0 | 12.x |
 | CMake | 3.18 | 3.24+ |
 | C++ | C++17 | C++17 |
 | GPU | CC 7.5+ (Turing) | RTX 30/40 系列 |
+
+### 支持的图像格式
+
+| 格式 | 读取 | 写入 |
+|------|------|------|
+| JPEG/JPG | ✓ | ✓ |
+| PNG | ✓ | ✓ |
+| BMP | ✓ | ✓ |
+| TGA | ✓ | ✗ |
+
+**注意：** 所有格式均支持 8 位每通道（灰度、RGB、RGBA）
 
 ---
 
@@ -117,7 +141,7 @@ HostImage result = processor.downloadImage(edges);
 - [快速入门](docs/setup/quickstart.zh-CN.md)
 - [架构概览](docs/architecture/architecture.zh-CN.md)
 - [性能优化](docs/tutorials/performance.zh-CN.md)
-- [API 参考](docs/api.zh-CN/)
+- [API 参考](docs/api.zh-CN/README.md)
 - [常见问题](docs/tutorials/faq.zh-CN.md)
 
 ### 规范文档
@@ -139,6 +163,36 @@ HostImage result = processor.downloadImage(edges);
 ## 📝 更新日志
 
 请参阅 [CHANGELOG.md](CHANGELOG.md) 了解版本历史。
+
+---
+
+## 🛠️ 常见问题
+
+**Q: CMake 找不到 CUDA / `nvcc` 未找到**
+```bash
+# 显式设置 CUDA 路径
+export CUDAToolkit_ROOT=/usr/local/cuda
+# 或在配置时指定：
+cmake -S . -B build -DCUDAToolkit_ROOT=/usr/local/cuda
+```
+
+**Q: 运行示例显示 "CUDA is not available"**
+- 确保你有计算能力 7.5+ 的 NVIDIA GPU
+- 从 [NVIDIA](https://developer.nvidia.com/cuda-downloads) 安装 CUDA Toolkit 11.0+
+- 验证：`nvidia-smi` 应显示你的 GPU
+
+**Q: 测试执行时失败或崩溃**
+- 检查 GPU 显存：大图像可能需要更多显存
+- 尝试较小的测试图像或减少 batch size
+- 使用详细输出运行：`ctest --test-dir build --output-on-failure -V`
+
+**Q: 如何验证安装成功？**
+```bash
+cd build && ctest --output-on-failure
+# 所有测试应该通过
+```
+
+更多问题请查看 [GitHub Discussions](https://github.com/LessUp/mini-opencv/discussions)。
 
 ---
 

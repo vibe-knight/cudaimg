@@ -1,15 +1,32 @@
-<!-- From: /home/shane/dev/mini-opencv/AGENTS.md -->
 # AGENTS Guide
 
 > This guide is for coding agents (AI assistants) working in `mini-opencv`.
 > It captures the repository's build, test, formatting, and code-style conventions.
-> Language: The project's source code comments and some documentation are in Chinese and English (bilingual).
+> Language: The project's source code comments and documentation are bilingual (Chinese and English).
 
 ---
 
 ## Project Overview
 
 **Mini-OpenCV** is a CUDA-based high-performance image processing library providing GPU-accelerated operators for computer vision applications. It delivers 30-50x faster performance than CPU OpenCV for comparable operations.
+
+**Key Information:**
+- **Version:** 2.0.0
+- **License:** MIT
+- **Repository:** https://github.com/LessUp/mini-opencv
+- **Documentation:** https://lessup.github.io/mini-opencv/
+
+### Technology Stack
+
+| Component | Technology |
+|-----------|------------|
+| **Language** | C++17, CUDA 14 |
+| **Build System** | CMake 3.18+ |
+| **CUDA** | 11.0+ (Recommended: 12.x) |
+| **Testing** | Google Test v1.14.0 |
+| **Benchmarking** | Google Benchmark v1.8.3 |
+| **Image I/O** | stb (fetched via CMake FetchContent) |
+| **Documentation** | Jekyll + Just the Docs theme |
 
 ### Architecture (分层架构)
 
@@ -29,64 +46,107 @@
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Technology Stack
+---
 
-| Component | Technology |
-|-----------|------------|
-| **Language** | C++17, CUDA 14 |
-| **Build System** | CMake 3.18+ |
-| **CUDA** | 11.0+ (Recommended: 12.x) |
-| **Testing** | Google Test v1.14.0 |
-| **Benchmarking** | Google Benchmark |
-| **Image I/O** | stb (fetched via CMake) |
+## Key Configuration Files
+
+| File | Purpose |
+|------|---------|
+| `CMakeLists.txt` | Main build configuration (library targets, dependencies, CUDA settings) |
+| `.clang-format` | LLVM-style formatting (2-space indent, 80-column limit) |
+| `.editorconfig` | UTF-8, LF endings, final newline, trim trailing whitespace |
+| `docs/_config.yml` | Jekyll/GitHub Pages config (Just the Docs theme v0.9.0) |
+| `.github/workflows/ci.yml` | CI build and test pipeline |
+| `.github/workflows/pages.yml` | Documentation deployment to GitHub Pages |
+
+### CMakeLists.txt Key Details
+
+**Library Target:** `gpu_image_processing` (alias: `gpu_image::gpu_image_processing`)
+
+**Build Options:**
+| Option | Default | Description |
+|--------|---------|-------------|
+| `BUILD_TESTS` | ON | Build test suite with Google Test |
+| `BUILD_EXAMPLES` | ON | Build example programs |
+| `BUILD_BENCHMARKS` | OFF | Build benchmark executable |
+| `GPU_IMAGE_ENABLE_IO` | ON | Enable image file I/O via stb |
+
+**CUDA Configuration:**
+- Auto-detects GPU architecture (native on CMake 3.24+)
+- Fallback architectures: 75, 80, 86, 89 (Turing+)
+- Compiles with `--expt-relaxed-constexpr`
+
+**Dependencies (via FetchContent):**
+- Google Test v1.14.0 (required for tests)
+- Google Benchmark v1.8.3 (optional)
+- stb (master branch, for image I/O)
 
 ---
 
 ## Project Philosophy: Spec-Driven Development (SDD)
 
-This project strictly follows **Spec-Driven Development (SDD)** paradigm. All code implementations must use the specification documents in the `/specs` directory as the Single Source of Truth.
+This project uses **OpenSpec** framework for spec-driven development. All code implementations must use the specification documents in the `/openspec/specs` directory as the Single Source of Truth.
 
 ### Directory Context
 
 | Directory | Purpose |
 |-----------|---------|
-| `/specs/product/` | Product feature definitions and acceptance criteria (PRD) |
-| `/specs/rfc/` | Technical design documents and architecture proposals |
-| `/specs/api/` | API interface definitions (function signatures, contracts) |
-| `/specs/db/` | Data model and schema definitions |
-| `/specs/testing/` | Test specifications and BDD feature files |
+| `/openspec/specs/` | Main specifications (Single Source of Truth) |
+| `/openspec/changes/` | Active change proposals |
+| `/openspec/changes/archive/` | Completed changes archive |
 | `/docs/` | User documentation, tutorials, and setup guides (bilingual) |
+
+### OpenSpec Workflow
+
+| Command | Purpose |
+|---------|---------|
+| `/opsx:propose <feature>` | Create a new change proposal |
+| `/opsx:explore <idea>` | Think through ideas before committing |
+| `/opsx:apply` | Implement tasks from the change |
+| `/opsx:archive` | Archive completed change |
+
+### Active Specifications
+
+| Spec | Type | Status |
+|------|------|--------|
+| [GPU Image Processing Requirements](openspec/specs/gpu-image-processing/requirements.md) | Product | ✅ Implemented |
+| [GPU Image Processing Design](openspec/specs/gpu-image-processing/design.md) | RFC | ✅ Implemented |
+| [GPU Image Processing API](openspec/specs/gpu-image-processing/api.md) | API | ✅ Implemented |
+| [Architecture Overview](openspec/specs/architecture.md) | Architecture | ✅ Implemented |
 
 ### AI Agent Workflow Instructions
 
 When developing a new feature, modifying existing functionality, or fixing a bug, **you must strictly follow this workflow without skipping any steps**:
 
-#### Step 1: Review Specs
+#### Step 1: Propose Change
 
-- Before writing any code, first read the relevant product docs, RFCs, and API definitions in the `/specs` directory.
-- If the user's request conflicts with existing specs, **stop coding immediately** and point out the conflict. Ask the user whether to update the specs first.
+- Use `/opsx:propose <feature-description>` to create a change proposal
+- This generates: `proposal.md`, `specs/`, `design.md`, `tasks.md`
+- If unsure about the approach, use `/opsx:explore <idea>` first to investigate
 
-#### Step 2: Spec-First Update
+#### Step 2: Review & Design
 
-- If this is a new feature, or if existing interfaces/database structures need to change, **you must first propose updating or creating the corresponding spec documents** (e.g., RFCs, API definitions).
-- Wait for user confirmation of spec changes before entering the code implementation phase.
+- Review the generated artifacts in `/openspec/changes/<change-name>/`
+- Refine the design if needed
+- If the change conflicts with existing specs, **stop and ask the user** whether to update specs first
 
-#### Step 3: Implementation
+#### Step 3: Apply & Implement
 
-- When writing code, **100% comply with spec definitions** (including variable names, API paths, data types, status codes, etc.).
-- Do not add features not defined in specs (No Gold-Plating).
+- Use `/opsx:apply` to implement tasks from the change
+- Tasks are marked complete with `[x]` checkboxes
+- **100% comply with spec definitions** (including variable names, API paths, data types, etc.)
+- Do not add features not defined in specs (No Gold-Plating)
 
 #### Step 4: Test against Specs
 
-- Write unit tests and integration tests based on the acceptance criteria in `/specs`.
-- Ensure test cases cover all boundary conditions described in the specs.
+- Write unit tests and integration tests based on the acceptance criteria
+- Ensure test cases cover all boundary conditions described in the specs
 
----
+#### Step 5: Archive
 
-## Code Generation Rules
-
-- Any externally exposed API changes must synchronously update `/specs/api/` definitions.
-- If uncertain about technical details, consult `/specs/rfc/` for architecture conventions. Do not invent design patterns.
+- Use `/opsx:archive` when complete
+- Delta specs are merged into main specs
+- Change is moved to archive folder for audit trail
 
 ---
 
@@ -94,30 +154,42 @@ When developing a new feature, modifying existing functionality, or fixing a bug
 
 ```
 mini-opencv/
-├── include/gpu_image/        # Public headers
-│   ├── core/                 # Core infrastructure (DeviceBuffer, GpuImage, CudaError)
-│   ├── operators/            # CUDA operator kernels (PixelOperator, etc.)
-│   ├── processing/           # High-level APIs (ImageProcessor, PipelineProcessor)
-│   ├── io/                   # Image I/O (ImageIO)
-│   └── utils/                # Utilities (StreamManager)
-├── src/                      # Implementations
-│   ├── core/                 # Core implementation
-│   ├── operators/            # Operator kernels (.cu files)
-│   ├── processing/           # High-level API implementation
-│   ├── io/                   # Image I/O implementation
-│   └── utils/                # Utility implementations
-├── tests/                    # Test files
-│   ├── core/                 # Core tests
-│   ├── operators/            # Operator tests
-│   └── processing/           # Processing tests
-├── examples/                 # Example programs
-├── benchmarks/               # Benchmark programs
-├── specs/                    # Specifications (SDD)
-├── docs/                     # Documentation (bilingual)
-└── .github/workflows/        # CI/CD configuration
+├── include/gpu_image/          # 19 public header files
+│   ├── core/                   # 5 files: DeviceBuffer, GpuImage, CudaError, kernel_helpers, memory_manager
+│   ├── operators/              # 9 files: CUDA operator interfaces
+│   ├── processing/             # 2 files: ImageProcessor, PipelineProcessor
+│   ├── io/                     # 1 file: ImageIO
+│   ├── utils/                  # 1 file: StreamManager
+│   └── gpu_image_processing.hpp # Master header file
+├── src/                        # Implementations (.cpp and .cu files)
+│   ├── core/                   # 3 files: cuda_error.cpp, device_buffer.cu, memory_manager.cpp
+│   ├── operators/              # 9 CUDA files: color_space, convolution, filters, geometric, histogram, resizer, morphology, pixel, threshold
+│   ├── processing/             # 2 files: image_processor.cpp, pipeline_processor.cu
+│   ├── io/                     # 1 file: image_io.cpp
+│   └── utils/                  # 1 file: stream_manager.cu
+├── tests/                      # 12 test files
+│   ├── core/                   # 2 files: test_main.cpp, test_device_buffer.cpp
+│   ├── operators/              # 9 files: color_space, convolution, filters, geometric, histogram, morphology, pixel, resizer, threshold
+│   └── processing/             # 1 file: test_pipeline.cpp
+├── examples/                   # Example programs
+│   ├── basic_example.cpp       # Basic usage demo
+│   └── pipeline_example.cpp    # Batch processing demo
+├── benchmarks/                 # Performance benchmarks
+│   └── benchmark_main.cpp      # Google Benchmark executable
+├── specs/                      # Specifications (SDD)
+├── docs/                       # 56 documentation files (bilingual, Jekyll/GitHub Pages)
+├── cmake/                      # CMake modules
+├── scripts/                    # Utility scripts
+│   └── create_release.sh       # Release creation script
+├── .github/workflows/          # CI/CD configuration
+│   ├── ci.yml                  # Build and test pipeline
+│   └── pages.yml               # Documentation deployment
+├── .clang-format               # Code formatting rules
+├── .editorconfig               # Editor configuration
+└── CHANGELOG.md                # Version history
 ```
 
-**Main library target**: `gpu_image_processing` (alias: `gpu_image::gpu_image_processing`)
+**Main library target:** `gpu_image_processing` (alias: `gpu_image::gpu_image_processing`)
 
 ---
 
@@ -157,6 +229,15 @@ cmake --build build --target gpu_image_benchmark -j$(nproc)
 # Install
 cmake --install build
 ```
+
+### Build Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `BUILD_TESTS` | ON | Build test suite |
+| `BUILD_EXAMPLES` | ON | Build example programs |
+| `BUILD_BENCHMARKS` | OFF | Build benchmark executable |
+| `GPU_IMAGE_ENABLE_IO` | ON | Enable image file I/O via stb |
 
 ---
 
@@ -200,6 +281,82 @@ If you need to target "one test file," use that file's fixture name, e.g., `Filt
 - When validating image operations, assert image validity, dimensions, channels, and representative pixel values
 - Use `EXPECT_THROW` for input validation behavior
 - Add or update regression tests alongside bug fixes
+- Test annotations should include Feature and Property references:
+  ```cpp
+  /**
+   * Feature: gpu-image-processing, Property 1: Data Transfer Round-Trip Consistency
+   * Validates: Requirements 1.1, 1.2
+   */
+  ```
+
+### BDD and Property Testing
+
+The project follows a **dual testing strategy**:
+
+| Type | Framework | Purpose |
+|------|-----------|---------|
+| **Unit Tests** | Google Test | Specific examples, edge cases, error paths |
+| **Property Tests** | RapidCheck | Universal properties, mathematical invariants |
+| **Benchmarks** | Google Benchmark | Performance measurement |
+
+**9 Core Correctness Properties** (from design spec):
+1. Data Transfer Round-Trip Consistency
+2. Invert Operation Involution
+3. Grayscale Formula Correctness
+4. Brightness Adjustment Range Invariance
+5. Convolution vs Reference Consistency
+6. Boundary Handling Correctness
+7. Histogram Sum Invariance
+8. Scaling Approximate Round-Trip
+9. Pipeline Processing Result Consistency
+
+**BDD Feature Files** use Gherkin format:
+```gherkin
+Feature: Image Invert Operation
+  As a developer
+  I want to invert image colors
+  So that I can create negative images
+
+  Scenario: Double invert returns original
+    Given any valid image
+    When I apply invert operation twice
+    Then the result should equal the original image
+```
+
+---
+
+## CI/CD and Deployment
+
+### CI Configuration
+
+| Property | Value |
+|----------|-------|
+| CI image | `nvidia/cuda:12.4.1-devel-ubuntu22.04` |
+| CI packages | `cmake`, `ninja-build`, `g++`, `git` |
+| CI build | `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release` |
+| CI test | `ctest --test-dir build --output-on-failure` |
+| Format check | `clang-format-14 --dry-run --Werror` |
+
+### GitHub Actions Workflows
+
+**CI Workflow** (`.github/workflows/ci.yml`):
+- **Triggers:** Push/PR to main/master, manual dispatch
+- **Jobs:**
+  - **Build:** Configure with CMake, build with ninja/g++
+  - **Test:** `ctest --test-dir build --output-on-failure`
+  - **Format Check:** `clang-format-14 --dry-run --Werror`
+
+**Pages Workflow** (`.github/workflows/pages.yml`):
+- **Purpose:** Deploy documentation to GitHub Pages
+- **Triggers:** Changes to `docs/**` or workflow file on main
+- **Technology:** Jekyll with `just-the-docs` theme (v0.9.0)
+- **URL:** https://lessup.github.io/mini-opencv
+- **Features:**
+  - Search enabled
+  - Bilingual support (English/Chinese)
+  - Mermaid diagrams
+  - SEO optimization
+  - Responsive design with auto light/dark mode
 
 ---
 
@@ -232,7 +389,7 @@ If only `clang-format` is installed locally, use it, but keep output identical t
 | `.clang-format` | C++ and CUDA layout (LLVM style, 2-space indent, 80-column limit) |
 | `.editorconfig` | UTF-8, LF endings, final newline, trim trailing whitespace |
 
-> **Note**: `.clang-format` uses 2-space indentation, while `.editorconfig` lists 4 spaces for code files. Existing code matches `clang-format`, so do not "fix" files toward 4-space indentation.
+> **Note:** `.clang-format` uses 2-space indentation. Existing code matches `clang-format`, so do not "fix" files toward 4-space indentation.
 
 ---
 
@@ -327,24 +484,23 @@ enum class ErrorCode {
 | Language | Existing comments are often Chinese or bilingual; match surrounding file |
 | README updates | If behavior changes in user-visible way |
 
+### Documentation Standards
+
+The project maintains **bilingual documentation** (English and Chinese):
+- All documentation files have `.zh-CN.md` counterparts
+- Language selector on each page
+- Chinese and English comments in source code
+
+**Jekyll Front Matter for docs:**
+```yaml
 ---
-
-## CI/CD Information
-
-### CI Configuration
-
-| Property | Value |
-|----------|-------|
-| CI image | `nvidia/cuda:12.4.1-devel-ubuntu22.04` |
-| CI packages | `cmake`, `ninja-build`, `g++`, `git` |
-| CI build | `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release` |
-| CI test | `ctest --test-dir build --output-on-failure` |
-| Format check | Separate job using `clang-format-14` |
-
-### GitHub Actions Workflows
-
-- **CI workflow** (`.github/workflows/ci.yml`): Build and test on every push/PR
-- **Pages workflow** (`.github/workflows/pages.yml`): Deploy documentation to GitHub Pages
+layout: default
+title: Page Title
+nav_order: 1          # Navigation order
+parent: Documentation # Parent category
+description: SEO description
+---
+```
 
 ---
 
@@ -421,6 +577,34 @@ public:
 
 ---
 
+## Commit Message Format
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+
+| Type | Description |
+|------|-------------|
+| `feat` | A new feature |
+| `fix` | A bug fix |
+| `docs` | Documentation only changes |
+| `style` | Changes that do not affect the code meaning (formatting, etc.) |
+| `refactor` | A code change that neither fixes a bug nor adds a feature |
+| `perf` | A code change that improves performance |
+| `test` | Adding or updating tests |
+| `chore` | Changes to the build process or auxiliary tools |
+| `ci` | Changes to CI configuration files |
+
+---
+
 ## Practical Agent Guidance
 
 1. **Make the smallest correct change**
@@ -429,12 +613,15 @@ public:
 4. **Do not create new targets** if an existing module or test target is sufficient
 5. **Before finishing, run the most relevant filtered test command** when CUDA is available in the environment
 6. **Follow SDD workflow**: Specs → Implementation → Tests
+7. **Update bilingual documentation** if user-visible behavior changes (both English and Chinese versions in `/docs/`)
+8. **Ensure test coverage** aligns with spec acceptance criteria
+9. **Verify formatting** using clang-format-14 before finalizing changes
 
 ---
 
 ## Related Documents
 
-- [Specifications](specs/README.md) - Product requirements, RFCs, and technical designs
+- [Specifications](openspec/specs/architecture.md) - Product requirements, RFCs, and technical designs
 - [Documentation](docs/README.md) - User guides, tutorials, and API reference (bilingual)
 - [Contributing Guide](CONTRIBUTING.md) - Full contribution guidelines
 - [Changelog](CHANGELOG.md) - Version history

@@ -242,10 +242,10 @@ if (sigma <= 0) {
 
 ## Next Steps
 
-- [Performance Guide](performance) - Practical optimization tips
-- [API Reference](api/) - Detailed module documentation
-- [Examples](../examples/) - Code samples
+- [Performance Guide]({{ site.baseurl }}/tutorials/performance) - Practical optimization tips
+- [API Reference]({{ site.baseurl }}/api/) - Detailed module documentation
+- [Examples]({{ site.baseurl }}/tutorials/examples/) - Code samples
 
 ---
 
-*For architecture questions, see [FAQ](faq.md) or open a discussion*
+*For architecture questions, see [FAQ]({{ site.baseurl }}/tutorials/faq) or open a discussion*

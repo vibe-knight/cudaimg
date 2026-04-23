@@ -295,10 +295,10 @@ nm -C build/lib/libgpu_image_processing.a | grep "T gpu_image::"
 
 ## 下一步
 
-- [快速入门](quickstart.zh-CN.md) - 构建你的第一个程序
-- [架构概览](architecture.zh-CN.md) - 了解设计
-- [性能指南](performance.zh-CN.md) - 针对你的硬件优化
+- [快速入门]({{ site.baseurl }}/setup/quickstart) - 构建你的第一个程序
+- [架构概览]({{ site.baseurl }}/architecture/architecture) - 了解设计
+- [性能指南]({{ site.baseurl }}/tutorials/performance) - 针对你的硬件优化
 
 ---
 
-*如需额外帮助，请参阅 [FAQ](faq.zh-CN.md) 或 [GitHub Issues](https://github.com/LessUp/mini-opencv/issues)*
+*如需额外帮助，请参阅 [FAQ]({{ site.baseurl }}/tutorials/faq) 或 [GitHub Issues](https://github.com/LessUp/mini-opencv/issues)*

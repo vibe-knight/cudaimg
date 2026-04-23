@@ -42,6 +42,9 @@ _site/
 # Cache
 .cache/
 
+# OpenSpec
+openspec/.cache/
+
 # OS
 .DS_Store
 Thumbs.db

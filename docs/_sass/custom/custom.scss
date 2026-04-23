@@ -1,30 +1,48 @@
 // ═════════════════════════════════════════════════════════════════════════════
-// Mini-OpenCV Custom Styles
-// Just the Docs Theme Customizations - CUDA/AI Dark Theme
+// GPU Image Processing - Custom Styles
+// Just the Docs Theme Customizations
 // ═════════════════════════════════════════════════════════════════════════════
 
 // ═════════════════════════════════════════════════════════════════════════════
-// COLOR PALETTE - NVIDIA/CUDA Green Dark Theme
+// COLOR PALETTE
 // ═════════════════════════════════════════════════════════════════════════════
 
 :root {
-  --nvidia-green: #76b900;
-  --nvidia-green-light: #8bc34a;
-  --nvidia-green-dark: #558b00;
+  // Primary accent - NVIDIA green
+  --accent-color: #76b900;
+  --accent-light: #8bc34a;
+  --accent-dark: #558b00;
+  
+  // Light theme (default)
+  --bg-primary: #ffffff;
+  --bg-secondary: #f6f8fa;
+  --bg-tertiary: #eaeef2;
+  --text-primary: #1f2328;
+  --text-secondary: #656d76;
+  --text-link: #0969da;
+  --border-primary: #d0d7de;
+  --border-secondary: #e6e9ef;
+  
+  // Code
+  --code-bg: #f6f8fa;
+  --code-text: #24292f;
+}
+
+[data-theme="dark"] {
   --bg-primary: #0d1117;
   --bg-secondary: #161b22;
   --bg-tertiary: #21262d;
   --text-primary: #e6edf3;
   --text-secondary: #8b949e;
-  --text-accent: #58a6ff;
+  --text-link: #58a6ff;
   --border-primary: #30363d;
   --border-secondary: #21262d;
-  --code-bg: #1c2128;
-  --code-border: #30363d;
+  --code-bg: #161b22;
+  --code-text: #e6edf3;
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// NAVIGATION SIDEBAR STYLING
+// NAVIGATION
 // ═════════════════════════════════════════════════════════════════════════════
 
 .side-bar {
@@ -37,10 +55,7 @@
   letter-spacing: -0.02em;
   
   &:hover {
-    background: linear-gradient(90deg, var(--nvidia-green), var(--nvidia-green-light));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--accent-color);
   }
 }
 
@@ -53,61 +68,50 @@
     
     &:hover {
       background: var(--bg-tertiary);
-      color: var(--nvidia-green);
+      color: var(--accent-color);
     }
     
     &.active {
       background: linear-gradient(90deg, rgba(118, 185, 0, 0.15), transparent);
-      color: var(--nvidia-green);
-      border-left: 3px solid var(--nvidia-green);
+      color: var(--accent-color);
+      border-left: 3px solid var(--accent-color);
       font-weight: 600;
     }
   }
 }
 
-.nav-list-item .nav-list-item .nav-list-link {
-  padding-left: 32px;
-  font-size: 0.9em;
-}
-
 // ═════════════════════════════════════════════════════════════════════════════
-// MAIN CONTENT STYLING
+// MAIN CONTENT
 // ═════════════════════════════════════════════════════════════════════════════
 
 .main-content {
   h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     margin-bottom: 1.5rem;
-    border-bottom: 2px solid var(--border-primary);
     padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-primary);
   }
   
   h2 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-top: 3rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 2.5rem;
     margin-bottom: 1rem;
     color: var(--text-primary);
-    
-    &::before {
-      content: "▸";
-      color: var(--nvidia-green);
-      margin-right: 0.5rem;
-    }
   }
   
   h3 {
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     font-weight: 600;
     margin-top: 2rem;
     color: var(--text-secondary);
   }
   
   p {
-    line-height: 1.8;
-    margin-bottom: 1.2rem;
+    line-height: 1.7;
+    margin-bottom: 1rem;
   }
 }
 
@@ -116,13 +120,11 @@
 // ═════════════════════════════════════════════════════════════════════════════
 
 a {
-  color: var(--text-accent);
-  transition: all 0.2s ease;
+  color: var(--text-link);
+  transition: color 0.2s ease;
   
   &:hover {
-    color: var(--nvidia-green);
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    color: var(--accent-color);
   }
 }
 
@@ -130,16 +132,16 @@ a[href^="http"]:not([href*="lessup.github.io"])::after {
   content: "↗";
   font-size: 0.75em;
   margin-left: 2px;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// CODE BLOCKS - ENHANCED SYNTAX HIGHLIGHTING
+// CODE
 // ═════════════════════════════════════════════════════════════════════════════
 
 div.highlighter-rouge {
   background: var(--code-bg);
-  border: 1px solid var(--code-border);
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   margin: 1.5rem 0;
   overflow: hidden;
@@ -149,49 +151,26 @@ div.highlighter-rouge {
     
     pre {
       background: transparent;
-      padding: 1.25rem;
+      padding: 1rem;
       margin: 0;
       overflow-x: auto;
-      font-size: 0.9em;
+      font-size: 0.875rem;
       line-height: 1.6;
-      
-      &::-webkit-scrollbar {
-        height: 8px;
-      }
-      
-      &::-webkit-scrollbar-track {
-        background: var(--bg-tertiary);
-      }
-      
-      &::-webkit-scrollbar-thumb {
-        background: var(--border-primary);
-        border-radius: 4px;
-      }
     }
   }
 }
 
 code {
   background: var(--code-bg);
-  border: 1px solid var(--code-border);
+  border: 1px solid var(--border-primary);
   border-radius: 4px;
   padding: 2px 6px;
   font-size: 0.85em;
-  color: var(--nvidia-green-light);
-}
-
-// Syntax highlighting
-.highlight {
-  .k, .kd, .kn, .kp, .kr, .kt { color: #ff7b72; }
-  .na, .nc, .nf { color: #d2a8ff; }
-  .s, .sb, .sc, .sd, .s2 { color: #a5d6ff; }
-  .mi, .mf, .mh, .il { color: #79c0ff; }
-  .c, .cm, .c1, .cp { color: #8b949e; }
-  .nv, .vc, .vg, .vi { color: #ffa657; }
+  color: var(--code-text);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// TABLES - MODERN STYLING
+// TABLES
 // ═════════════════════════════════════════════════════════════════════════════
 
 table {
@@ -200,22 +179,21 @@ table {
   border-radius: 8px;
   border: 1px solid var(--border-primary);
   overflow: hidden;
-  margin: 2rem 0;
+  margin: 1.5rem 0;
   width: 100%;
   
   th {
     background: var(--bg-tertiary);
-    color: var(--nvidia-green);
+    color: var(--text-primary);
     font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.85em;
-    letter-spacing: 0.05em;
-    padding: 14px 16px;
-    border-bottom: 2px solid var(--nvidia-green);
+    font-size: 0.875rem;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--accent-color);
+    text-align: left;
   }
   
   td {
-    padding: 12px 16px;
+    padding: 10px 16px;
     border-bottom: 1px solid var(--border-secondary);
   }
   
@@ -228,20 +206,16 @@ table {
   }
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// BLOCKQUOTES
-// ═════════════════════════════════════════════════════════════════════════════
-
-blockquote {
-  border-left: 4px solid var(--nvidia-green);
-  background: linear-gradient(90deg, rgba(118, 185, 0, 0.1), transparent);
-  padding: 1rem 1.5rem;
-  margin: 1.5rem 0;
-  border-radius: 0 8px 8px 0;
-  
-  p {
-    margin: 0;
-    color: var(--text-secondary);
+// Responsive tables
+@media (max-width: 800px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    
+    th, td {
+      padding: 8px 12px;
+    }
   }
 }
 
@@ -252,21 +226,21 @@ blockquote {
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 10px 20px;
   border-radius: 6px;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
   
   &.btn-primary {
-    background: linear-gradient(135deg, var(--nvidia-green), var(--nvidia-green-dark));
+    background: var(--accent-color);
     color: white;
-    box-shadow: 0 4px 14px rgba(118, 185, 0, 0.3);
     
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(118, 185, 0, 0.4);
+      background: var(--accent-dark);
       text-decoration: none;
     }
   }
@@ -277,10 +251,38 @@ blockquote {
     border: 1px solid var(--border-primary);
     
     &:hover {
-      background: var(--border-primary);
-      border-color: var(--nvidia-green);
+      border-color: var(--accent-color);
       text-decoration: none;
     }
+  }
+  
+  &.btn-outline {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+    
+    &:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      text-decoration: none;
+    }
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// BLOCKQUOTES
+// ═════════════════════════════════════════════════════════════════════════════
+
+blockquote {
+  border-left: 4px solid var(--accent-color);
+  background: var(--bg-secondary);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-radius: 0 6px 6px 0;
+  
+  p {
+    margin: 0;
+    color: var(--text-secondary);
   }
 }
 
@@ -291,26 +293,26 @@ blockquote {
 .site-footer {
   border-top: 1px solid var(--border-primary);
   background: var(--bg-secondary);
-  padding: 2rem;
+  padding: 1.5rem;
   text-align: center;
   color: var(--text-secondary);
-  font-size: 0.9em;
+  font-size: 0.875rem;
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// SEARCH STYLING
+// SEARCH
 // ═════════════════════════════════════════════════════════════════════════════
 
 .search .search-input {
   background: var(--bg-tertiary);
   border: 1px solid var(--border-primary);
-  border-radius: 8px;
-  padding: 12px 16px;
+  border-radius: 6px;
+  padding: 10px 14px;
   color: var(--text-primary);
   
   &:focus {
-    border-color: var(--nvidia-green);
-    box-shadow: 0 0 0 3px rgba(118, 185, 0, 0.2);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(118, 185, 0, 0.2);
     outline: none;
   }
   
@@ -324,8 +326,8 @@ blockquote {
 // ═════════════════════════════════════════════════════════════════════════════
 
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -334,10 +336,10 @@ blockquote {
 
 ::-webkit-scrollbar-thumb {
   background: var(--border-primary);
-  border-radius: 5px;
+  border-radius: 4px;
   
   &:hover {
-    background: var(--nvidia-green);
+    background: var(--accent-color);
   }
 }
 
@@ -351,23 +353,21 @@ blockquote {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// RESPONSIVE
+// UTILITY
 // ═════════════════════════════════════════════════════════════════════════════
 
-@media (max-width: 800px) {
-  .main-content h1 {
-    font-size: 2rem;
-  }
-  
-  .main-content h2 {
-    font-size: 1.5rem;
-  }
-  
-  table {
-    font-size: 0.9em;
-    
-    th, td {
-      padding: 10px 12px;
-    }
-  }
+// Better spacing for lists
+ul, ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+li {
+  margin-bottom: 0.25rem;
+}
+
+// Better pre/code scrolling
+pre {
+  max-width: 100%;
+  overflow-x: auto;
 }

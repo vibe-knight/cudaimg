@@ -271,10 +271,10 @@ GpuImage fullSize = processor.resize(processed, width, height);
 
 ## Next Steps
 
-- [API Reference](api/) - Detailed function documentation
-- [Examples](../examples/) - Working code samples
+- [API Reference]({{ site.baseurl }}/api/) - Detailed function documentation
+- [Examples]({{ site.baseurl }}/tutorials/examples/) - Working code samples
 - Run benchmarks: `cmake --build build --target gpu_image_benchmark`
 
 ---
 
-*For performance questions, see [FAQ](faq.md) or open a discussion*
+*For performance questions, see [FAQ]({{ site.baseurl }}/tutorials/faq) or open a discussion*

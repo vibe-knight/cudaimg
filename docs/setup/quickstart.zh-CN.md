@@ -233,14 +233,14 @@ int main() {
 
 ## 下一步
 
-- [安装指南](installation.zh-CN.md) - 详细的安装选项
-- [架构概览](architecture.zh-CN.md) - 了解库的设计
-- [性能指南](performance.zh-CN.md) - 优化技巧
-- [API 参考](api.zh-CN/) - 完整的 API 文档
+- [安装指南]({{ site.baseurl }}/setup/installation) - 详细的安装选项
+- [架构概览]({{ site.baseurl }}/architecture/architecture) - 了解库的设计
+- [性能指南]({{ site.baseurl }}/tutorials/performance) - 优化技巧
+- [API 参考]({{ site.baseurl }}/api.zh-CN/) - 完整的 API 文档
 
 ## 获取帮助
 
-- 查看 [FAQ](faq.zh-CN.md)
+- 查看 [FAQ]({{ site.baseurl }}/tutorials/faq)
 - 搜索 [GitHub Issues](https://github.com/LessUp/mini-opencv/issues)
 - 加入 [GitHub Discussions](https://github.com/LessUp/mini-opencv/discussions)
 
