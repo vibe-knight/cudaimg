@@ -34,8 +34,9 @@ repository: LessUp/mini-opencv
 # JUST THE DOCS THEME SETTINGS
 # ═════════════════════════════════════════════════════════════════════════════
 
-# Color scheme: auto respects system preference (light/dark)
-color_scheme: auto
+# Color scheme: light (default theme for v0.9.0 compatibility)
+# Note: 'auto' color scheme requires Just the Docs v0.10.0+
+color_scheme: light
 
 # Logo
 logo: "/assets/images/logo.svg"
