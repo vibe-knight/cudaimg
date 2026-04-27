@@ -5,6 +5,9 @@ cmake-build-*/
 # IDE
 .idea/
 .vscode/
+!.vscode/mcp.json
+!.vscode/extensions.json
+!.vscode/settings.json
 *.swp
 *.swo
 *~
@@ -52,3 +55,4 @@ Thumbs.db
 # BMad Method V6
 _bmad/
 _bmad-output/
+.omc/

@@ -11,7 +11,7 @@
 **Mini-OpenCV** is a CUDA-based high-performance image processing library providing GPU-accelerated operators for computer vision applications. It delivers 30-50x faster performance than CPU OpenCV for comparable operations.
 
 **Key Information:**
-- **Version:** 2.0.0
+- **Version:** 2.1.0
 - **License:** MIT
 - **Repository:** https://github.com/LessUp/mini-opencv
 - **Documentation:** https://lessup.github.io/mini-opencv/

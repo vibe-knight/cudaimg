@@ -15,6 +15,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.0] - 2026-04-27
+
+### Changed
+
+- Comprehensive project cleanup and standardization
+- Unified version number to 2.1.0 across all files
+- Locked stb dependency to specific commit for reproducibility
+- Fixed .gitignore conflict with .vscode/mcp.json
+
+### Removed
+
+- specs.legacy/ directory (migrated to openspec/)
+- build/ directory (build artifacts)
+- Redundant changelog documentation files
+
+---
+
 ## [2.0.0] - 2026-03-24
 
 ### Fixed
@@ -124,13 +141,15 @@ Focused on deterministic correctness with minimal changes. Enhanced reliability 
 | Version | Date | Highlights |
 |---------|------|------------|
 | [Unreleased] | — | Documentation rewrite, bilingual support |
+| [2.1.0] | 2026-04-27 | Project cleanup, standardization |
 | [2.0.0] | 2026-03-24 | Correctness fixes, CI hardening |
 | [1.3.0] | 2026-03-10 | Pages optimization, professional docs |
 | [1.2.0] | 2026-03-10 | Workflow standardization |
 | [1.1.0] | 2026-03-09 | Initial CI setup |
 | [1.0.0] | 2025-02-13 | Initial release |
 
-[Unreleased]: https://github.com/LessUp/mini-opencv/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/LessUp/mini-opencv/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/LessUp/mini-opencv/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/LessUp/mini-opencv/compare/v1.3.0...v2.0.0
 [1.3.0]: https://github.com/LessUp/mini-opencv/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/LessUp/mini-opencv/compare/v1.1.0...v1.2.0

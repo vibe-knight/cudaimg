@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 project(gpu_image_processing
-    VERSION 2.0.0
+    VERSION 2.1.0
     DESCRIPTION "CUDA-based high-performance image processing library"
     LANGUAGES CXX
 )
@@ -87,7 +87,7 @@ if(GPU_IMAGE_ENABLE_IO)
     FetchContent_Declare(
         stb
         GIT_REPOSITORY https://github.com/nothings/stb.git
-        GIT_TAG master
+        GIT_TAG ae721c548fd61d0af42f99ab55b29c132b7a231a
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
     )

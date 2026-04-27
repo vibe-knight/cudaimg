@@ -6,7 +6,7 @@
 ![CUDA](https://img.shields.io/badge/CUDA-11.0+-76B900?logo=nvidia&logoColor=white)
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=c%2B%2B&logoColor=white)
 ![CMake](https://img.shields.io/badge/CMake-3.18+-064F8C?logo=cmake&logoColor=white)
-![Version](https://img.shields.io/badge/Version-2.0.0-blue.svg)
+![Version](https://img.shields.io/badge/Version-2.1.0-blue.svg)
 ![Status](https://img.shields.io/badge/Status-Production%20Ready-success.svg)
 
 [English](README.md) | [简体中文](README.zh-CN.md)
