@@ -81,7 +81,10 @@ void MemoryManager::clearPool() {
 
   for (auto& [sz, ptrs] : memoryPool_) {
     for (void* ptr : ptrs) {
-      cudaFree(ptr);
+      cudaError_t err = cudaFree(ptr);
+      // 清理时忽略错误但继续执行，避免内存泄漏
+      // 错误可能发生在 CUDA 上下文已销毁的情况
+      (void)err;  // 显式忽略返回值
     }
   }
   memoryPool_.clear();

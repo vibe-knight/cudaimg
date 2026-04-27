@@ -51,20 +51,12 @@ A high-performance CUDA-based image processing library providing GPU-accelerated
 
 ## 🏗️ Architecture
 
+> **See [Architecture Specification](openspec/specs/architecture.md) for complete design details.**
+
+Three-layer design: **High-level APIs** → **CUDA Kernels** → **Infrastructure**
+
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Application Layer                         │
-│         ImageProcessor  ·  PipelineProcessor                 │
-├─────────────────────────────────────────────────────────────┤
-│              Operator Layer (CUDA Kernels)                   │
-│  PixelOperator  │  ConvolutionEngine  │  Geometric          │
-│  Morphology     │  ColorSpace         │  Filters            │
-│  Threshold      │  HistogramCalculator│  ImageResizer       │
-├─────────────────────────────────────────────────────────────┤
-│                  Infrastructure Layer                        │
-│  DeviceBuffer  ·  GpuImage/HostImage  ·  CudaError          │
-│  ImageIO       ·  StreamManager                                │
-└─────────────────────────────────────────────────────────────┘
+Application Layer → Operator Layer → Infrastructure Layer
 ```
 
 ---

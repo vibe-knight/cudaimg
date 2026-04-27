@@ -634,6 +634,6 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/) specificatio
 |------|--------|
 | `.cursor/rules/` | Not present |
 | `.cursorrules` | Not present |
-| `.github/copilot-instructions.md` | Not present |
+| `.github/copilot-instructions.md` | Present - GitHub Copilot guidelines |
 
 If any of these files are added later, treat them as higher-priority instructions and update this file.
