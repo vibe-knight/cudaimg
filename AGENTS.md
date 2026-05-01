@@ -92,18 +92,15 @@ This project uses **OpenSpec** framework for spec-driven development. All code i
 | Directory | Purpose |
 |-----------|---------|
 | `/openspec/specs/` | Main specifications (Single Source of Truth) |
-| `/openspec/changes/` | Active change proposals |
-| `/openspec/changes/archive/` | Completed changes archive |
 | `/docs/` | User documentation, tutorials, and setup guides (bilingual) |
 
 ### OpenSpec Workflow
 
 | Command | Purpose |
 |---------|---------|
-| `/opsx:propose <feature>` | Create a new change proposal |
 | `/opsx:explore <idea>` | Think through ideas before committing |
+| `/opsx:propose <feature>` | Create a new change proposal |
 | `/opsx:apply` | Implement tasks from the change |
-| `/opsx:archive` | Archive completed change |
 
 ### Active Specifications
 
@@ -142,51 +139,27 @@ When developing a new feature, modifying existing functionality, or fixing a bug
 - Write unit tests and integration tests based on the acceptance criteria
 - Ensure test cases cover all boundary conditions described in the specs
 
-#### Step 5: Archive
-
-- Use `/opsx:archive` when complete
-- Delta specs are merged into main specs
-- Change is moved to archive folder for audit trail
-
 ---
 
 ## Project Structure
 
 ```
 mini-opencv/
-├── include/gpu_image/          # 19 public header files
-│   ├── core/                   # 5 files: DeviceBuffer, GpuImage, CudaError, kernel_helpers, memory_manager
-│   ├── operators/              # 9 files: CUDA operator interfaces
-│   ├── processing/             # 2 files: ImageProcessor, PipelineProcessor
-│   ├── io/                     # 1 file: ImageIO
-│   ├── utils/                  # 1 file: StreamManager
+├── include/gpu_image/          # Public header files
+│   ├── core/                   # DeviceBuffer, GpuImage, CudaError, kernel_helpers, memory_manager
+│   ├── operators/              # CUDA operator interfaces
+│   ├── processing/             # ImageProcessor, PipelineProcessor
+│   ├── io/                     # ImageIO
 │   └── gpu_image_processing.hpp # Master header file
 ├── src/                        # Implementations (.cpp and .cu files)
-│   ├── core/                   # 3 files: cuda_error.cpp, device_buffer.cu, memory_manager.cpp
-│   ├── operators/              # 9 CUDA files: color_space, convolution, filters, geometric, histogram, resizer, morphology, pixel, threshold
-│   ├── processing/             # 2 files: image_processor.cpp, pipeline_processor.cu
-│   ├── io/                     # 1 file: image_io.cpp
-│   └── utils/                  # 1 file: stream_manager.cu
-├── tests/                      # 12 test files
-│   ├── core/                   # 2 files: test_main.cpp, test_device_buffer.cpp
-│   ├── operators/              # 9 files: color_space, convolution, filters, geometric, histogram, morphology, pixel, resizer, threshold
-│   └── processing/             # 1 file: test_pipeline.cpp
+├── tests/                      # Test suite (Google Test)
 ├── examples/                   # Example programs
-│   ├── basic_example.cpp       # Basic usage demo
-│   └── pipeline_example.cpp    # Batch processing demo
 ├── benchmarks/                 # Performance benchmarks
-│   └── benchmark_main.cpp      # Google Benchmark executable
-├── specs/                      # Specifications (SDD)
-├── docs/                       # 56 documentation files (bilingual, Jekyll/GitHub Pages)
+├── openspec/specs/             # Specifications (SDD)
+├── docs/                       # Documentation (Jekyll/GitHub Pages)
 ├── cmake/                      # CMake modules
 ├── scripts/                    # Utility scripts
-│   └── create_release.sh       # Release creation script
-├── .github/workflows/          # CI/CD configuration
-│   ├── ci.yml                  # Build and test pipeline
-│   └── pages.yml               # Documentation deployment
-├── .clang-format               # Code formatting rules
-├── .editorconfig               # Editor configuration
-└── CHANGELOG.md                # Version history
+└── .github/workflows/          # CI/CD (ci.yml, pages.yml)
 ```
 
 **Main library target:** `gpu_image_processing` (alias: `gpu_image::gpu_image_processing`)
@@ -621,8 +594,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/) specificatio
 
 ## Related Documents
 
-- [Specifications](openspec/specs/architecture.md) - Product requirements, RFCs, and technical designs
-- [Documentation](docs/README.md) - User guides, tutorials, and API reference (bilingual)
+- [Specifications](openspec/specs/architecture.md) - Product requirements and technical designs
 - [Contributing Guide](CONTRIBUTING.md) - Full contribution guidelines
 - [Changelog](CHANGELOG.md) - Version history
 
@@ -632,8 +604,4 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/) specificatio
 
 | File | Status |
 |------|--------|
-| `.cursor/rules/` | Not present |
-| `.cursorrules` | Not present |
 | `.github/copilot-instructions.md` | Present - GitHub Copilot guidelines |
-
-If any of these files are added later, treat them as higher-priority instructions and update this file.
