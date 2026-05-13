@@ -1,4 +1,6 @@
 #include "gpu_image/core/cuda_error.hpp"
+#include "gpu_image/core/image_utils.hpp"
+#include "gpu_image/core/kernel_helpers.hpp"
 #include "gpu_image/operators/pixel_operator.hpp"
 #include <stdexcept>
 
@@ -80,29 +82,14 @@ __global__ void adjustBrightnessInPlaceKernel(unsigned char* data, int width,
   }
 }
 
-// 辅助函数：计算 grid 和 block 大小
-static void calculateGridBlock(int width, int height, dim3& grid, dim3& block) {
-  block = dim3(16, 16);
-  grid =
-      dim3((width + block.x - 1) / block.x, (height + block.y - 1) / block.y);
-}
-
-// PixelOperator 实现
+// PixelOperator implementation
 void PixelOperator::invert(const GpuImage& input, GpuImage& output,
                            cudaStream_t stream) {
-  if (!input.isValid()) {
-    throw std::invalid_argument("Invalid input image");
-  }
-
-  // 确保输出图像大小正确
-  if (output.width != input.width || output.height != input.height ||
-      output.channels != input.channels) {
-    output =
-        ImageUtils::createGpuImage(input.width, input.height, input.channels);
-  }
+  validateInput(input);
+  ImageUtils::ensureOutputSize(input, output);
 
   dim3 grid, block;
-  calculateGridBlock(input.width, input.height, grid, block);
+  calcGridBlock2D(input.width, input.height, grid, block);
 
   invertKernel<<<grid, block, 0, stream>>>(
       input.buffer.dataAs<unsigned char>(),
@@ -113,12 +100,10 @@ void PixelOperator::invert(const GpuImage& input, GpuImage& output,
 }
 
 void PixelOperator::invertInPlace(GpuImage& image, cudaStream_t stream) {
-  if (!image.isValid()) {
-    throw std::invalid_argument("Invalid image");
-  }
+  validateInput(image);
 
   dim3 grid, block;
-  calculateGridBlock(image.width, image.height, grid, block);
+  calcGridBlock2D(image.width, image.height, grid, block);
 
   invertInPlaceKernel<<<grid, block, 0, stream>>>(
       image.buffer.dataAs<unsigned char>(), image.width, image.height,
@@ -129,22 +114,17 @@ void PixelOperator::invertInPlace(GpuImage& image, cudaStream_t stream) {
 
 void PixelOperator::toGrayscale(const GpuImage& input, GpuImage& output,
                                 cudaStream_t stream) {
-  if (!input.isValid()) {
-    throw std::invalid_argument("Invalid input image");
-  }
+  validateInput(input);
   if (input.channels < 3) {
     throw std::invalid_argument(
         "Input must have at least 3 channels for grayscale conversion");
   }
 
   // 输出是单通道
-  if (output.width != input.width || output.height != input.height ||
-      output.channels != 1) {
-    output = ImageUtils::createGpuImage(input.width, input.height, 1);
-  }
+  ImageUtils::ensureOutputSize(output, input.width, input.height, 1);
 
   dim3 grid, block;
-  calculateGridBlock(input.width, input.height, grid, block);
+  calcGridBlock2D(input.width, input.height, grid, block);
 
   toGrayscaleKernel<<<grid, block, 0, stream>>>(
       input.buffer.dataAs<unsigned char>(),
@@ -156,18 +136,11 @@ void PixelOperator::toGrayscale(const GpuImage& input, GpuImage& output,
 
 void PixelOperator::adjustBrightness(const GpuImage& input, GpuImage& output,
                                      int offset, cudaStream_t stream) {
-  if (!input.isValid()) {
-    throw std::invalid_argument("Invalid input image");
-  }
-
-  if (output.width != input.width || output.height != input.height ||
-      output.channels != input.channels) {
-    output =
-        ImageUtils::createGpuImage(input.width, input.height, input.channels);
-  }
+  validateInput(input);
+  ImageUtils::ensureOutputSize(input, output);
 
   dim3 grid, block;
-  calculateGridBlock(input.width, input.height, grid, block);
+  calcGridBlock2D(input.width, input.height, grid, block);
 
   adjustBrightnessKernel<<<grid, block, 0, stream>>>(
       input.buffer.dataAs<unsigned char>(),
@@ -179,12 +152,10 @@ void PixelOperator::adjustBrightness(const GpuImage& input, GpuImage& output,
 
 void PixelOperator::adjustBrightnessInPlace(GpuImage& image, int offset,
                                             cudaStream_t stream) {
-  if (!image.isValid()) {
-    throw std::invalid_argument("Invalid image");
-  }
+  validateInput(image);
 
   dim3 grid, block;
-  calculateGridBlock(image.width, image.height, grid, block);
+  calcGridBlock2D(image.width, image.height, grid, block);
 
   adjustBrightnessInPlaceKernel<<<grid, block, 0, stream>>>(
       image.buffer.dataAs<unsigned char>(), image.width, image.height,
@@ -192,101 +163,5 @@ void PixelOperator::adjustBrightnessInPlace(GpuImage& image, int offset,
 
   CUDA_CHECK(cudaGetLastError());
 }
-
-// ImageUtils 实现
-namespace ImageUtils {
-
-GpuImage createGpuImage(int width, int height, int channels) {
-  if (!validateImageParams(width, height, channels)) {
-    throw std::invalid_argument("Invalid image parameters");
-  }
-
-  GpuImage image;
-  image.width = width;
-  image.height = height;
-  image.channels = channels;
-  image.buffer = DeviceBuffer(image.totalBytes());
-
-  return image;
-}
-
-GpuImage uploadToGpu(const HostImage& hostImage) {
-  if (!hostImage.isValid()) {
-    throw std::invalid_argument("Invalid host image");
-  }
-
-  GpuImage gpuImage =
-      createGpuImage(hostImage.width, hostImage.height, hostImage.channels);
-  gpuImage.buffer.copyFromHost(hostImage.data.data(), hostImage.totalBytes());
-
-  return gpuImage;
-}
-
-HostImage downloadFromGpu(const GpuImage& gpuImage) {
-  if (!gpuImage.isValid()) {
-    throw std::invalid_argument("Invalid GPU image");
-  }
-
-  HostImage hostImage =
-      createHostImage(gpuImage.width, gpuImage.height, gpuImage.channels);
-  gpuImage.buffer.copyToHost(hostImage.data.data(), hostImage.totalBytes());
-
-  return hostImage;
-}
-
-void uploadToGpuAsync(const HostImage& hostImage, GpuImage& gpuImage,
-                      cudaStream_t stream) {
-  if (!hostImage.isValid()) {
-    throw std::invalid_argument("Invalid host image");
-  }
-
-  if (gpuImage.width != hostImage.width ||
-      gpuImage.height != hostImage.height ||
-      gpuImage.channels != hostImage.channels) {
-    gpuImage =
-        createGpuImage(hostImage.width, hostImage.height, hostImage.channels);
-  }
-
-  gpuImage.buffer.copyFromHostAsync(hostImage.data.data(),
-                                    hostImage.totalBytes(), stream);
-}
-
-void downloadFromGpuAsync(const GpuImage& gpuImage, HostImage& hostImage,
-                          cudaStream_t stream) {
-  if (!gpuImage.isValid()) {
-    throw std::invalid_argument("Invalid GPU image");
-  }
-
-  if (hostImage.width != gpuImage.width ||
-      hostImage.height != gpuImage.height ||
-      hostImage.channels != gpuImage.channels) {
-    hostImage =
-        createHostImage(gpuImage.width, gpuImage.height, gpuImage.channels);
-  }
-
-  gpuImage.buffer.copyToHostAsync(hostImage.data.data(), hostImage.totalBytes(),
-                                  stream);
-}
-
-HostImage createHostImage(int width, int height, int channels) {
-  if (!validateImageParams(width, height, channels)) {
-    throw std::invalid_argument("Invalid image parameters");
-  }
-
-  HostImage image;
-  image.width = width;
-  image.height = height;
-  image.channels = channels;
-  image.data.resize(image.totalBytes());
-
-  return image;
-}
-
-bool validateImageParams(int width, int height, int channels) {
-  return width > 0 && height > 0 &&
-         (channels == 1 || channels == 3 || channels == 4);
-}
-
-} // namespace ImageUtils
 
 } // namespace gpu_image

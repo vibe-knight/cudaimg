@@ -1,4 +1,5 @@
 #include "gpu_image/core/cuda_error.hpp"
+#include "gpu_image/core/image_utils.hpp"
 #include "gpu_image/operators/image_resizer.hpp"
 #include <algorithm>
 #include <stdexcept>

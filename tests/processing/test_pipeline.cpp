@@ -66,7 +66,7 @@ TEST_F(PipelineTest, PipelineConsistency) {
   GpuImage gpuInput = processor.loadFromHost(input);
   GpuImage step1 = processor.adjustBrightness(gpuInput, 30);
   GpuImage step2 = processor.invert(step1);
-  HostImage sequentialResult = processor.downloadImage(step2);
+  HostImage sequentialResult = processor.download(step2);
 
   // 流水线处理
   PipelineProcessor pipeline(2);

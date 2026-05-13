@@ -1,4 +1,5 @@
 #include "gpu_image/core/cuda_error.hpp"
+#include "gpu_image/core/image_utils.hpp"
 #include "gpu_image/operators/filters.hpp"
 #include <cmath>
 #include <stdexcept>

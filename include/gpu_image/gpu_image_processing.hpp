@@ -6,7 +6,9 @@
 // Core components
 #include "gpu_image/core/cuda_error.hpp"
 #include "gpu_image/core/device_buffer.hpp"
+#include "gpu_image/core/execution_context.hpp"
 #include "gpu_image/core/gpu_image.hpp"
+#include "gpu_image/core/image_utils.hpp"
 #include "gpu_image/core/kernel_helpers.hpp"
 #include "gpu_image/core/memory_manager.hpp"
 
@@ -16,6 +18,7 @@
 #include "gpu_image/operators/filters.hpp"
 #include "gpu_image/operators/geometric.hpp"
 #include "gpu_image/operators/histogram_calculator.hpp"
+#include "gpu_image/operators/image_operator.hpp"
 #include "gpu_image/operators/image_resizer.hpp"
 #include "gpu_image/operators/morphology.hpp"
 #include "gpu_image/operators/pixel_operator.hpp"

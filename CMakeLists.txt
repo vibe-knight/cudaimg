@@ -43,6 +43,8 @@ add_library(gpu_image_processing STATIC
     src/core/cuda_error.cpp
     src/core/device_buffer.cu
     src/core/memory_manager.cpp
+    src/core/image_utils.cpp
+    src/core/execution_context.cpp
     # Utils
     src/utils/stream_manager.cu
     # Operators
@@ -120,6 +122,7 @@ if(BUILD_TESTS)
     add_executable(gpu_image_tests
         tests/core/test_main.cpp
         tests/core/test_device_buffer.cpp
+        tests/core/test_execution_context.cpp
         tests/operators/test_pixel_operator.cpp
         tests/operators/test_convolution.cpp
         tests/operators/test_histogram.cpp
