@@ -42,6 +42,12 @@ _site/
 .jekyll-metadata
 .sass-cache/
 
+# VitePress
+docs/node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+docs/package-lock.json
+
 # Cache
 .cache/
 
