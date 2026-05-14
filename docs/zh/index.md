@@ -2,96 +2,106 @@
 layout: home
 ---
 
-<div class="home-hero">
-  <div class="hero-badge">
-    <span class="badge-dot"></span>
-    生产就绪 · CUDA 12.x · C++17
+<div class="home-header">
+  <div class="home-header-left">
+    <div class="home-logo">MO</div>
+    <div>
+      <div class="home-title">Mini-OpenCV</div>
+      <div class="home-subtitle">v2.1.0 · CUDA 14 · C++17</div>
+    </div>
   </div>
-  
-  <h1 class="hero-title">
-    <span class="gradient">GPU 加速</span>图像处理库
-  </h1>
-  
-  <p class="hero-subtitle">
-    高性能 CUDA 计算机视觉库。<br/>
-    相比 CPU OpenCV 实现 <strong>30-50 倍加速</strong>。
-  </p>
-  
-  <div class="hero-actions">
-    <a href="./setup/quickstart" class="btn-primary">
-      ⚡ 快速开始
-    </a>
-    <a href="./architecture/overview" class="btn-secondary">
-      📖 架构设计
-    </a>
-    <a href="https://github.com/LessUp/mini-opencv" class="btn-secondary" target="_blank">
-      ⭐ GitHub
-    </a>
-  </div>
-  
-  <div class="hero-stats">
-    <div class="stat">
-      <div class="stat-value">30-50×</div>
-      <div class="stat-label">加速比</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">9+</div>
-      <div class="stat-label">算子</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">CC 7.5+</div>
-      <div class="stat-label">GPU 架构</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">MIT</div>
-      <div class="stat-label">许可证</div>
-    </div>
+  <div class="home-nav">
+    <a href="./setup/quickstart">快速开始</a>
+    <a href="./architecture/overview">架构</a>
+    <a href="./api/">API</a>
+    <a href="https://github.com/LessUp/mini-opencv" target="_blank">GitHub</a>
   </div>
 </div>
 
-## 为什么选择 Mini-OpenCV？
+<div class="home-intro-row">
+  <div class="home-intro">
+    高性能 CUDA 图像处理库，相比 CPU OpenCV 实现 <strong>30-50× 加速</strong>。
+    支持 9+ 类算子，采用三层架构设计，提供简洁的 C++17 API。
+    完整的 GoogleTest 测试套件和 Google Benchmark 性能基准。
+  </div>
+  <div class="home-stats">
+    <span><strong>30-50×</strong> 加速</span>
+    <span><strong>9+</strong> 算子</span>
+    <span><strong>MIT</strong> 许可证</span>
+  </div>
+</div>
 
-<div class="feature-grid">
+## 核心特性
+
+<div class="feature-map">
   <div class="feature-card">
-    <div class="feature-icon">⚡</div>
-    <h3>高性能</h3>
-    <p>CUDA 加速算子通过共享内存分块和多流执行，相比 CPU 实现获得 30-50 倍加速。</p>
-    <a href="./benchmarks/">查看性能数据 →</a>
+    <div class="feature-card-title">⚡ 高性能计算</div>
+    <div class="feature-card-desc">
+      CUDA 内核优化：共享内存分块、原子操作、warp 级原语，实现最大吞吐量
+    </div>
+    <div class="feature-tags">
+      <a href="./architecture/overview#cuda-optimization" class="feature-tag">Shared Memory</a>
+      <a href="./architecture/overview#cuda-optimization" class="feature-tag">Atomic Ops</a>
+      <a href="./architecture/overview#cuda-optimization" class="feature-tag">Warp Primitives</a>
+    </div>
   </div>
-  
+
   <div class="feature-card">
-    <div class="feature-icon">🧠</div>
-    <h3>智能内存</h3>
-    <p>零拷贝优化最小化主机-设备传输。内存池复用减少分配开销。</p>
-    <a href="./architecture/memory-model">了解更多 →</a>
+    <div class="feature-card-title">🧠 智能内存管理</div>
+    <div class="feature-card-desc">
+      零拷贝优化最小化主机-设备传输，内存池复用减少分配开销
+    </div>
+    <div class="feature-tags">
+      <a href="./architecture/memory-model" class="feature-tag">Zero-Copy</a>
+      <a href="./architecture/memory-model" class="feature-tag">Memory Pool</a>
+      <a href="./architecture/cuda-streams" class="feature-tag">Stream Async</a>
+    </div>
   </div>
-  
+
   <div class="feature-card">
-    <div class="feature-icon">🔧</div>
-    <h3>易于集成</h3>
-    <p>简洁的 C++17 API，自动内存管理。可作为性能关键路径的即插即用替代方案。</p>
-    <a href="./setup/quickstart">快速开始 →</a>
+    <div class="feature-card-title">🏗️ 三层架构</div>
+    <div class="feature-card-desc">
+      Application → Operator → Infrastructure，清晰的职责分离
+    </div>
+    <div class="feature-tags">
+      <a href="./api/core/image-processor" class="feature-tag">ImageProcessor</a>
+      <a href="./api/" class="feature-tag">Operators</a>
+      <a href="./api/core/device-buffer" class="feature-tag">DeviceBuffer</a>
+    </div>
   </div>
-  
+
   <div class="feature-card">
-    <div class="feature-icon">📊</div>
-    <h3>优化内核</h3>
-    <p>共享内存分块、原子操作、纹理内存和 warp 级原语实现最大吞吐量。</p>
-    <a href="./architecture/overview">架构详解 →</a>
+    <div class="feature-card-title">📊 9+ 算子支持</div>
+    <div class="feature-card-desc">
+      卷积、形态学、几何变换、直方图、阈值、色彩空间、滤波器等
+    </div>
+    <div class="feature-tags">
+      <a href="./api/operators/convolution" class="feature-tag">Convolution</a>
+      <a href="./api/operators/morphology" class="feature-tag">Morphology</a>
+      <a href="./api/operators/geometric" class="feature-tag">Geometric</a>
+    </div>
   </div>
-  
+
   <div class="feature-card">
-    <div class="feature-icon">🧪</div>
-    <h3>充分测试</h3>
-    <p>完整的 GoogleTest 测试套件，包含正确性属性验证和性能基准测试。</p>
-    <a href="./tutorials/examples">示例代码 →</a>
+    <div class="feature-card-title">🧪 完整测试</div>
+    <div class="feature-card-desc">
+      GoogleTest 单元测试 + Google Benchmark 性能基准，确保正确性和性能
+    </div>
+    <div class="feature-tags">
+      <a href="./benchmarks/" class="feature-tag">Benchmarks</a>
+      <a href="./tutorials/examples" class="feature-tag">Examples</a>
+    </div>
   </div>
-  
+
   <div class="feature-card">
-    <div class="feature-icon">📖</div>
-    <h3>完整文档</h3>
-    <p>中英双语的完整 API 参考、架构指南和教程。</p>
-    <a href="./api/">API 文档 →</a>
+    <div class="feature-card-title">📖 双语文档</div>
+    <div class="feature-card-desc">
+      中英文完整的 API 参考、架构指南和教程
+    </div>
+    <div class="feature-tags">
+      <a href="./api/" class="feature-tag">API Docs</a>
+      <a href="./tutorials/examples" class="feature-tag">Tutorials</a>
+    </div>
   </div>
 </div>
 
@@ -127,29 +137,36 @@ HostImage result = processor.downloadImage(edges);
 ## 了解更多
 
 <div class="docs-grid">
+  <a href="./whitepaper/overview" class="doc-card">
+    <div class="doc-icon">📄</div>
+    <h3>技术白皮书</h3>
+    <p>项目背景、技术选型、性能优化策略详解。</p>
+    <span class="doc-arrow">→</span>
+  </a>
+
   <a href="./architecture/overview" class="doc-card">
     <div class="doc-icon">🏗️</div>
     <h3>架构设计</h3>
     <p>三层架构设计，CUDA 内核优化详解。</p>
     <span class="doc-arrow">→</span>
   </a>
-  
+
   <a href="./api/" class="doc-card">
     <div class="doc-icon">📚</div>
     <h3>API 参考</h3>
     <p>完整的 API 文档和示例代码。</p>
     <span class="doc-arrow">→</span>
   </a>
-  
+
   <a href="./benchmarks/" class="doc-card">
     <div class="doc-icon">📊</div>
     <h3>性能基准</h3>
     <p>性能数据和优化技术详解。</p>
     <span class="doc-arrow">→</span>
   </a>
-  
+
   <a href="./references/" class="doc-card">
-    <div class="doc-icon">📄</div>
+    <div class="doc-icon">📖</div>
     <h3>学术引用</h3>
     <p>相关论文和开源项目。</p>
     <span class="doc-arrow">→</span>

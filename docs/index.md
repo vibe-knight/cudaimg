@@ -1,19 +1,28 @@
 ---
 layout: home
+hero:
+  name: Mini-OpenCV
+  text: ' '
+  actions:
+    - theme: brand
+      text: English
+      link: /en/
+    - theme: alt
+      text: 简体中文
+      link: /zh/
 ---
 
-<div class="landing-container">
-  <img src="/images/logo.svg" alt="Mini-OpenCV Logo" class="landing-logo" />
-  
-  <h1 class="landing-title">Mini-OpenCV</h1>
-  <p class="landing-subtitle">High-Performance CUDA Image Processing Library</p>
-  
-  <div class="landing-buttons">
-    <a href="/en/" class="landing-btn landing-btn-primary">
-      English
-    </a>
-    <a href="/zh/" class="landing-btn landing-btn-secondary">
-      简体中文
-    </a>
-  </div>
-</div>
+<script setup>
+import { onMounted } from 'vue'
+import { useRouter } from 'vitepress'
+
+onMounted(() => {
+  const router = useRouter()
+  const lang = navigator.language || navigator.userLanguage
+  if (lang.startsWith('zh')) {
+    router.go('/zh/')
+  } else {
+    router.go('/en/')
+  }
+})
+</script>

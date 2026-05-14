@@ -1,8 +1,6 @@
----
-title: Changelog
----
-
 # Changelog
+
+This page documents the changes in each Mini-OpenCV release.
 
 All notable changes to this project are documented in this file.
 
@@ -45,6 +43,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CUDA language standard: C++14 compatible
 - Removed C++17 features blocking older NVCC versions
 - Updated documentation test coverage descriptions
+
+### Technical Notes
 
 Focused on deterministic correctness with minimal changes. Enhanced reliability for geometric transforms, concurrent convolution, and parameter validation.
 
@@ -90,6 +90,8 @@ Focused on deterministic correctness with minimal changes. Enhanced reliability 
 - Memory management: `DeviceBuffer`, `MemoryManager`, `StreamManager`
 - Processing API: `ImageProcessor`, `PipelineProcessor`
 
+### Operators
+
 - **Pixel**: invert, grayscale, brightness adjustment
 - **Convolution**: Gaussian blur, Sobel edge, custom kernels
 - **Histogram**: calculation, equalization
@@ -101,6 +103,8 @@ Focused on deterministic correctness with minimal changes. Enhanced reliability 
 - **Filters**: median, bilateral, box, sharpen, Laplacian
 - **Arithmetic**: add, subtract, multiply, blend, weighted sum, abs diff
 - **Pipeline**: multi-step chaining, batch async processing
+
+### Infrastructure
 
 - CMake build system with CUDA support
 - Unit test suite (Google Test v1.14.0)

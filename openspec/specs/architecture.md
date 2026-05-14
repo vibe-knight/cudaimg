@@ -79,7 +79,7 @@ Core utilities for GPU memory management and error handling.
 | **Testing** | Google Test v1.14.0 |
 | **Benchmarking** | Google Benchmark v1.8.3 |
 | **Image I/O** | stb (fetched via CMake) |
-| **Documentation** | Jekyll + Just the Docs theme |
+| **Documentation** | VitePress 1.5.0 + Mermaid |
 
 ---
 

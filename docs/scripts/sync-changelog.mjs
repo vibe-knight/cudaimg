@@ -1,77 +1,64 @@
 #!/usr/bin/env node
-
 /**
- * Sync CHANGELOG.md from root to docs
+ * Sync CHANGELOG.md to docs/{zh,en}/changelog.md
  *
- * This script:
- * 1. Reads the root CHANGELOG.md
- * 2. Removes HTML comments
- * 3. Converts heading format: ## [0.1.0] - 2024-01-01 → ## 0.1.0 (2024-01-01)
- * 4. Removes sub-headings (### Added, ### Changed, etc.)
- * 5. Outputs to docs/en/changelog.md and docs/zh/changelog.md
+ * This script copies the content from the root CHANGELOG.md to the docs site,
+ * with formatting changes for both Chinese and English versions.
+ *
+ * Run from the docs directory: node scripts/sync-changelog.mjs
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { resolve, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { readFileSync, writeFileSync, existsSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const rootDir = resolve(__dirname, '..', '..')
-const changelogPath = resolve(rootDir, 'CHANGELOG.md')
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const docsDir = join(__dirname, "..");
+const rootDir = join(docsDir, "..");
 
-function processChangelog(content) {
-  // Remove HTML comments
-  let processed = content.replace(/<!--[\s\S]*?-->/g, '')
+const sourcePath = join(rootDir, "CHANGELOG.md");
 
-  // Convert heading format: ## [0.1.0] - 2024-01-01 → ## 0.1.0 (2024-01-01)
-  processed = processed.replace(
-    /^## \[([^\]]+)\] - (\d{4}-\d{2}-\d{2})$/gm,
-    '## $1 ($2)'
-  )
-
-  // Remove sub-headings (### Added, ### Changed, etc.)
-  processed = processed.replace(/^###\s+.*$/gm, '')
-
-  // Remove multiple blank lines
-  processed = processed.replace(/\n{3,}/g, '\n\n')
-
-  return processed.trim()
+if (!existsSync(sourcePath)) {
+  console.log("No CHANGELOG.md found, skipping sync");
+  process.exit(0);
 }
 
-function addFrontmatter(content, lang = 'en') {
-  const titles = {
-    en: 'Changelog',
-    zh: '更新日志'
-  }
+const ZH_HEADER = `# 更新日志
 
-  return `---
-title: ${titles[lang]}
----
+本页记录 Mini-OpenCV 每个版本的变更内容。
 
-${content}
-`
-}
+`;
 
-function main() {
-  if (!existsSync(changelogPath)) {
-    console.error('CHANGELOG.md not found at:', changelogPath)
-    process.exit(1)
-  }
+const EN_HEADER = `# Changelog
 
-  const content = readFileSync(changelogPath, 'utf-8')
-  const processed = processChangelog(content)
+This page documents the changes in each Mini-OpenCV release.
 
-  // Write English version
-  const enPath = resolve(rootDir, 'docs', 'en', 'changelog.md')
-  writeFileSync(enPath, addFrontmatter(processed, 'en'))
-  console.log('Written:', enPath)
+`;
 
-  // Write Chinese version (same content, different frontmatter)
-  const zhPath = resolve(rootDir, 'docs', 'zh', 'changelog.md')
-  writeFileSync(zhPath, addFrontmatter(processed, 'zh'))
-  console.log('Written:', zhPath)
+// Read the source file
+let content = readFileSync(sourcePath, "utf-8");
 
-  console.log('Changelog sync complete!')
-}
+// Remove the HTML comment block at the top
+content = content.replace(/<!--[\s\S]*?-->\n*/g, "");
 
-main()
+// Remove the "# Changelog" title (we'll add our own header)
+content = content.replace(/^#.*Changelog.*\n+/i, "");
+
+// Convert title format: ## [2.1.0] - 2024-01-15 -> ## 2.1.0 (2024-01-15)
+content = content.replace(
+  /^## \[([^\]]+)\] - (\d{4}-\d{1,2}-\d{1,2})/gm,
+  "## $1 ($2)"
+);
+
+// Remove subsection headers like ### Added, ### Changed, ### Fixed
+content = content.replace(/^### (Added|Changed|Fixed|Improved|Breaking|Removed|Deprecated)\n+/gm, "");
+
+// Write the Chinese version
+const zhTargetPath = join(docsDir, "zh/changelog.md");
+writeFileSync(zhTargetPath, ZH_HEADER + content.trim() + "\n");
+console.log(`Synced changelog to ${zhTargetPath}`);
+
+// Write the English version
+const enTargetPath = join(docsDir, "en/changelog.md");
+writeFileSync(enTargetPath, EN_HEADER + content.trim() + "\n");
+console.log(`Synced changelog to ${enTargetPath}`);

@@ -47,6 +47,13 @@ export default withMermaid(defineConfig({
         sidebar: {
           '/en/': [
             {
+              text: 'Technical Whitepaper',
+              collapsed: false,
+              items: [
+                { text: 'Overview', link: '/en/whitepaper/overview' },
+              ],
+            },
+            {
               text: 'Getting Started',
               collapsed: false,
               items: [
@@ -131,6 +138,13 @@ export default withMermaid(defineConfig({
         ],
         sidebar: {
           '/zh/': [
+            {
+              text: '技术白皮书',
+              collapsed: false,
+              items: [
+                { text: '技术概述', link: '/zh/whitepaper/overview' },
+              ],
+            },
             {
               text: '快速开始',
               collapsed: false,
@@ -239,6 +253,14 @@ export default withMermaid(defineConfig({
       secondaryColor: '#f6f8fa',
       tertiaryColor: '#d0d7de',
       fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+    },
+    flowchart: {
+      curve: 'basis',
+      padding: 15,
+    },
+    sequence: {
+      actorMargin: 50,
+      boxMargin: 10,
     },
   },
 }))

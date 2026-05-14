@@ -2,96 +2,106 @@
 layout: home
 ---
 
-<div class="home-hero">
-  <div class="hero-badge">
-    <span class="badge-dot"></span>
-    Production Ready · CUDA 12.x · C++17
+<div class="home-header">
+  <div class="home-header-left">
+    <div class="home-logo">MO</div>
+    <div>
+      <div class="home-title">Mini-OpenCV</div>
+      <div class="home-subtitle">v2.1.0 · CUDA 14 · C++17</div>
+    </div>
   </div>
-  
-  <h1 class="hero-title">
-    <span class="gradient">GPU-Accelerated</span> Image Processing
-  </h1>
-  
-  <p class="hero-subtitle">
-    High-performance CUDA library for computer vision.<br/>
-    Achieve <strong>30-50× speedup</strong> over CPU OpenCV.
-  </p>
-  
-  <div class="hero-actions">
-    <a href="./setup/quickstart" class="btn-primary">
-      ⚡ Quick Start
-    </a>
-    <a href="./architecture/overview" class="btn-secondary">
-      📖 Architecture
-    </a>
-    <a href="https://github.com/LessUp/mini-opencv" class="btn-secondary" target="_blank">
-      ⭐ GitHub
-    </a>
-  </div>
-  
-  <div class="hero-stats">
-    <div class="stat">
-      <div class="stat-value">30-50×</div>
-      <div class="stat-label">Speedup</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">9+</div>
-      <div class="stat-label">Operators</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">CC 7.5+</div>
-      <div class="stat-label">GPU Arch</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">MIT</div>
-      <div class="stat-label">License</div>
-    </div>
+  <div class="home-nav">
+    <a href="./setup/quickstart">Quick Start</a>
+    <a href="./architecture/overview">Architecture</a>
+    <a href="./api/">API</a>
+    <a href="https://github.com/LessUp/mini-opencv" target="_blank">GitHub</a>
   </div>
 </div>
 
-## Why Mini-OpenCV?
+<div class="home-intro-row">
+  <div class="home-intro">
+    High-performance CUDA image processing library achieving <strong>30-50× speedup</strong> over CPU OpenCV.
+    Supports 9+ operator categories with a three-layer architecture and clean C++17 API.
+    Comprehensive GoogleTest suite and Google Benchmark included.
+  </div>
+  <div class="home-stats">
+    <span><strong>30-50×</strong> Speedup</span>
+    <span><strong>9+</strong> Operators</span>
+    <span><strong>MIT</strong> License</span>
+  </div>
+</div>
 
-<div class="feature-grid">
+## Core Features
+
+<div class="feature-map">
   <div class="feature-card">
-    <div class="feature-icon">⚡</div>
-    <h3>High Performance</h3>
-    <p>CUDA-accelerated operators achieve 30-50× speedup over CPU implementations using shared memory tiling and multi-stream execution.</p>
-    <a href="./benchmarks/">View Benchmarks →</a>
+    <div class="feature-card-title">⚡ High Performance</div>
+    <div class="feature-card-desc">
+      CUDA kernel optimizations: shared memory tiling, atomic operations, warp-level primitives
+    </div>
+    <div class="feature-tags">
+      <a href="./architecture/overview#cuda-optimization" class="feature-tag">Shared Memory</a>
+      <a href="./architecture/overview#cuda-optimization" class="feature-tag">Atomic Ops</a>
+      <a href="./architecture/overview#cuda-optimization" class="feature-tag">Warp Primitives</a>
+    </div>
   </div>
-  
+
   <div class="feature-card">
-    <div class="feature-icon">🧠</div>
-    <h3>Smart Memory</h3>
-    <p>Zero-copy optimization minimizes host-device transfers. Memory pool reuse reduces allocation overhead.</p>
-    <a href="./architecture/memory-model">Learn More →</a>
+    <div class="feature-card-title">🧠 Smart Memory</div>
+    <div class="feature-card-desc">
+      Zero-copy optimization minimizes host-device transfers, memory pool reuse reduces allocation overhead
+    </div>
+    <div class="feature-tags">
+      <a href="./architecture/memory-model" class="feature-tag">Zero-Copy</a>
+      <a href="./architecture/memory-model" class="feature-tag">Memory Pool</a>
+      <a href="./architecture/cuda-streams" class="feature-tag">Stream Async</a>
+    </div>
   </div>
-  
+
   <div class="feature-card">
-    <div class="feature-icon">🔧</div>
-    <h3>Easy Integration</h3>
-    <p>Simple C++17 API with automatic memory management. Drop-in replacement for performance-critical code paths.</p>
-    <a href="./setup/quickstart">Get Started →</a>
+    <div class="feature-card-title">🏗️ Three-Layer Architecture</div>
+    <div class="feature-card-desc">
+      Application → Operator → Infrastructure, clear separation of concerns
+    </div>
+    <div class="feature-tags">
+      <a href="./api/core/image-processor" class="feature-tag">ImageProcessor</a>
+      <a href="./api/" class="feature-tag">Operators</a>
+      <a href="./api/core/device-buffer" class="feature-tag">DeviceBuffer</a>
+    </div>
   </div>
-  
+
   <div class="feature-card">
-    <div class="feature-icon">📊</div>
-    <h3>Optimized Kernels</h3>
-    <p>Shared memory tiling, atomic operations, texture memory, and warp-level primitives for maximum throughput.</p>
-    <a href="./architecture/overview">Architecture →</a>
+    <div class="feature-card-title">📊 9+ Operators</div>
+    <div class="feature-card-desc">
+      Convolution, morphology, geometric transforms, histogram, threshold, color space, filters, etc.
+    </div>
+    <div class="feature-tags">
+      <a href="./api/operators/convolution" class="feature-tag">Convolution</a>
+      <a href="./api/operators/morphology" class="feature-tag">Morphology</a>
+      <a href="./api/operators/geometric" class="feature-tag">Geometric</a>
+    </div>
   </div>
-  
+
   <div class="feature-card">
-    <div class="feature-icon">🧪</div>
-    <h3>Well Tested</h3>
-    <p>Comprehensive GoogleTest suite with correctness properties and performance benchmarks.</p>
-    <a href="./tutorials/examples">Examples →</a>
+    <div class="feature-card-title">🧪 Well Tested</div>
+    <div class="feature-card-desc">
+      GoogleTest unit tests + Google Benchmark performance baselines ensure correctness and performance
+    </div>
+    <div class="feature-tags">
+      <a href="./benchmarks/" class="feature-tag">Benchmarks</a>
+      <a href="./tutorials/examples" class="feature-tag">Examples</a>
+    </div>
   </div>
-  
+
   <div class="feature-card">
-    <div class="feature-icon">📖</div>
-    <h3>Full Documentation</h3>
-    <p>Complete API reference, architecture guides, and tutorials in English and Chinese.</p>
-    <a href="./api/">API Docs →</a>
+    <div class="feature-card-title">📖 Bilingual Docs</div>
+    <div class="feature-card-desc">
+      Complete API reference, architecture guides, and tutorials in English and Chinese
+    </div>
+    <div class="feature-tags">
+      <a href="./api/" class="feature-tag">API Docs</a>
+      <a href="./tutorials/examples" class="feature-tag">Tutorials</a>
+    </div>
   </div>
 </div>
 
@@ -127,29 +137,36 @@ HostImage result = processor.downloadImage(edges);
 ## Learn More
 
 <div class="docs-grid">
+  <a href="./whitepaper/overview" class="doc-card">
+    <div class="doc-icon">📄</div>
+    <h3>Technical Whitepaper</h3>
+    <p>Project background, tech stack decisions, and optimization strategies.</p>
+    <span class="doc-arrow">→</span>
+  </a>
+
   <a href="./architecture/overview" class="doc-card">
     <div class="doc-icon">🏗️</div>
     <h3>Architecture</h3>
     <p>Three-layer design with CUDA kernel optimizations.</p>
     <span class="doc-arrow">→</span>
   </a>
-  
+
   <a href="./api/" class="doc-card">
     <div class="doc-icon">📚</div>
     <h3>API Reference</h3>
     <p>Complete API documentation with examples.</p>
     <span class="doc-arrow">→</span>
   </a>
-  
+
   <a href="./benchmarks/" class="doc-card">
     <div class="doc-icon">📊</div>
     <h3>Benchmarks</h3>
     <p>Performance data and optimization techniques.</p>
     <span class="doc-arrow">→</span>
   </a>
-  
+
   <a href="./references/" class="doc-card">
-    <div class="doc-icon">📄</div>
+    <div class="doc-icon">📖</div>
     <h3>References</h3>
     <p>Academic papers and related projects.</p>
     <span class="doc-arrow">→</span>
